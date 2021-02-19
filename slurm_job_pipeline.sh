@@ -5,13 +5,13 @@
 #SBATCH --job-name=pipeline
 #SBATCH --partition=compute
 #SBATCH --nodes=1
-#SBATCH --threads-per-core=2
+##SBATCH --threads-per-core=2
 #SBATCH --mem=0
 #SBATCH --output=LOG.pipeline-%j.o
 #SBATCH --error=LOG.pipeline-%j.o
 ##SBATCH --exclusive
 #SBATCH --mail-type=FAIL
-#SBATCH --time=00:30:00
+#SBATCH --time=01:00:00
 
 
 # Paths

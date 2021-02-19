@@ -27,10 +27,11 @@ def run_pc_stable(pcmci, selected_links, list_pc_alpha):
         )['link_matrix']
         
         results = {
-            "links" : links,
-            "p_matrix" : pcmci.p_matrix,
-            "val_matrix" : pcmci.val_matrix,
-            "link_matrix" : link_matrix
+            "links"       : links,
+            "p_matrix"    : pcmci.p_matrix,
+            "val_matrix"  : pcmci.val_matrix,
+            "link_matrix" : link_matrix,
+            "var_names"   : pcmci.var_names
         }
         pc_alpha_results[str(pc_alpha)] = results
         
