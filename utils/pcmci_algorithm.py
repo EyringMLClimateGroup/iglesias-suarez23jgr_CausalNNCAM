@@ -10,36 +10,34 @@ from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb
 def run_pc_stable(pcmci, selected_links, list_pc_alpha):
     pc_alpha_results = dict()
     for pc_alpha in list_pc_alpha:
-        links = pcmci.run_pc_stable(
-                tau_min = tau_min,
-                tau_max = tau_max,
-                selected_links = selected_links,
-                pc_alpha = pc_alpha
-        )
-        # "result_parents" will now be a dictionary with only the causal
-        # parents for each variable like selected_links, but only with the
-        # actual links
-        
-        link_matrix = pcmci.return_significant_links(
-                pq_matrix=pcmci.p_matrix,
-                val_matrix=pcmci.val_matrix,
-                alpha_level=pc_alpha
-        )['link_matrix']
-        
-        results = {
-            "links"       : links,
-            "p_matrix"    : pcmci.p_matrix,
-            "val_matrix"  : pcmci.val_matrix,
-            "link_matrix" : link_matrix,
-            "var_names"   : pcmci.var_names
-        }
+        try:
+            links = pcmci.run_pc_stable(
+                    tau_min = tau_min,
+                    tau_max = tau_max,
+                    selected_links = selected_links,
+                    pc_alpha = pc_alpha
+            )
+            # "result_parents" will now be a dictionary with only the causal
+            # parents for each variable like selected_links, but only with the
+            # actual links
+
+            link_matrix = pcmci.return_significant_links(
+                    pq_matrix=pcmci.p_matrix,
+                    val_matrix=pcmci.val_matrix,
+                    alpha_level=pc_alpha
+            )['link_matrix']
+
+            results = {
+                "links"       : links,
+                "p_matrix"    : pcmci.p_matrix,
+                "val_matrix"  : pcmci.val_matrix,
+                "link_matrix" : link_matrix,
+                "var_names"   : pcmci.var_names
+            }
+        except ValueError as e:
+            print(e)
+            results = {}
         pc_alpha_results[str(pc_alpha)] = results
-        
-        if pcmci.verbosity:
-            print("p-values")
-            print (results['p_matrix'].round(3))
-            print("MCI partial correlations")
-            print (results['val_matrix'].round(2))
         
     return pc_alpha_results
 
