@@ -1,0 +1,30 @@
+# pipeline
+# cfg_pipeline.yml
+---
+documentation:
+  description: Options (specifications) for the "pipeline" script.
+
+  authors:
+    - iglesias-suarez_fernando
+
+  maintainer:
+    - iglesias-suarez_fernando
+
+  references:
+    - acknow_project
+
+  projects:
+    - usmile
+
+
+# Specifications
+spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
+#spcam_parents  : ['tbp','ps']
+#spcam_children : ['tphystnd','prect', 'fsns', 'flns']
+spcam_children : ['flns']
+pc_alphas      : [0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2]
+region         : [ [4,4] , [120,120] ]
+lim_levels     : [850, 700]
+target_levels  : False
+verbosity      : 2
+output_folder  : "./test_outputs"
