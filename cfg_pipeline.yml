@@ -28,3 +28,4 @@ lim_levels     : [850, 700]
 target_levels  : False
 verbosity      : 2
 output_folder  : "./causal_links"
+plots_folder : "./causal_links/plots"

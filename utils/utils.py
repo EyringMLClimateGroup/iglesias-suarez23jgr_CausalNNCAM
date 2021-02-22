@@ -161,7 +161,7 @@ def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
 #    Save data utils
 #########################
 def generate_results_filename(
-        var, level, lat, lon, experiment, output_folder):
+        var, level, lat, lon, experiment, folder):
     results_filename = OUTPUT_FILE_PATTERN.format(
             var_name = var.name,
             level = level+1,
@@ -169,7 +169,7 @@ def generate_results_filename(
             lon = int(lon),
             experiment = experiment
     )
-    return Path(output_folder, results_filename)
+    return Path(folder, results_filename)
 
 
 def save_results(results, file):
@@ -178,3 +178,18 @@ def save_results(results, file):
         pickle.dump(results, f)
     print(f"Saved results into \"{file}\"")
 
+
+def load_results(var, level, lat, lon, experiment, folder):
+#     filename = OUTPUT_FILE_PATTERN.format(
+#             var_name = var.name,
+#             level = level+1,
+#             lat = lat,
+#             lon = lon,
+#             experiment = experiment
+#     )
+#     file = Path(folder, filename)
+    file = generate_results_filename(
+            var, level, lat, lon, experiment, folder)
+    print(f"Loading results from \"{file}\"")
+    with open(file, "rb") as f:
+        return pickle.load(f)
