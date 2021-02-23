@@ -1,6 +1,6 @@
 import numpy    as np
 from pathlib    import Path
-from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, OUTPUT_FILE_PATTERN
+from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN #, OUTPUT_FILE_PATTERN
 from netCDF4    import Dataset
 import pickle
 
@@ -154,6 +154,39 @@ def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
             
             if var.dimensions == 2:     
                 break # Stop loading data after the first level
+    return data
+
+def load_data_concat(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
+    data = list()
+    for var in var_list:
+        for target_lvl, idx_lvl in idx_lvls:
+            norm_data = get_normalized_data(
+                var, 
+                experiment, 
+                folder, 
+                idx_lats, 
+                idx_lons, 
+                idx_lvl)
+            data.append(norm_data)
+            if var.dimensions == 2:     
+                break # Stop loading data after the first level
+    return np.array(data)
+
+
+def format_data(norm_data, var_list, idx_lvls):
+    data  = list()
+    count = 0
+    for var in var_list:
+        for target_lvl, idx_lvl in idx_lvls:
+            if var.dimensions == 3:
+                var_data = VarData(var, norm_data[count], target_lvl)
+            elif var.dimensions == 2:
+                var_data = VarData(var, norm_data[count])
+            data.append(var_data)
+            
+            if var.dimensions == 2:     
+                break # Stop loading data after the first level
+            count+=1
     return data
 
 
