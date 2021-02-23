@@ -212,9 +212,7 @@ def save_results(results, file):
     print(f"Saved results into \"{file}\"")
 
 
-def load_results(var, level, lat, lon, experiment, pattern, folder):
-    file = generate_results_filename(
-            var, level, lat, lon, experiment, pattern, folder)
+def load_results(file):
     print(f"Loading results from \"{file}\"")
     with open(file, "rb") as f:
         return pickle.load(f)
