@@ -40,6 +40,8 @@ ANCIL_FILE          = "ancil_spcam.nc"
 #FILENAME_PATTERN    = "{}_{}.nc" # variable, experiment
 FILENAME_PATTERN    = "{var_name}_{level}_{experiment}.nc"
 #OUTPUT_FILE_PATTERN = "{var_name}_{level}_lat-{lat}_lon-{lon}_{experiment}.obj"
+#PLOT_FILE_PATTERN = "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{experiment}.png"
+
 tau_min             = 1
 tau_max             = 1
 significance        = 'analytic'

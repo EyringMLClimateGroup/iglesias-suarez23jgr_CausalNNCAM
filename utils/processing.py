@@ -43,7 +43,8 @@ def single(
             
             for level in child_levels:
                 results_file = utils.generate_results_filename(
-                        child, level[-1], lat, lon, experiment, output_folder)
+                    child, level[-1], lat, lon, experiment,
+                    output_file_pattern, output_folder)
 
                 if not overwrite and results_file.is_file():
                     print(f"{dt.now()} Found file {results_file}, skipping.")
