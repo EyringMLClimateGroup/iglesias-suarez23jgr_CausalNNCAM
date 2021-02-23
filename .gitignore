@@ -1,4 +1,4 @@
 .ipynb_checkpoints/
 causal_links
-utils/__pycache__/
+__pycache__/
 test_causal_links/

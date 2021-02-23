@@ -193,9 +193,20 @@ def format_data(norm_data, var_list, idx_lvls):
 #########################
 #    Save data utils
 #########################
-def save_results(results, output_file, folder):
-    Path(folder).mkdir(parents=True, exist_ok=True)
-    file = Path(folder, output_file)
+def generate_results_filename(
+        var, level, lat, lon, experiment, output_folder):
+    results_filename = OUTPUT_FILE_PATTERN.format(
+            var_name = var.name,
+            level = level+1,
+            lat = int(lat),
+            lon = int(lon),
+            experiment = experiment
+    )
+    return Path(output_folder, results_filename)
+
+
+def save_results(results, file):
+    Path(file).parents[0].mkdir(parents=True, exist_ok=True)
     with open(file, "wb") as f:
         pickle.dump(results, f)
     print(f"Saved results into \"{file}\"")
