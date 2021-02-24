@@ -2,12 +2,12 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=cct-120
+#SBATCH --job-name=con_flnt_lats_lon-120
 #SBATCH --partition=compute
 #SBATCH --nodes=1
 #SBATCH --mem=0
-#SBATCH --output=LOG.cct-120-%j.o
-#SBATCH --error=LOG.cct-120-%j.o
+#SBATCH --output=LOG.con_flnt_lats_lon-120-%j.o
+#SBATCH --error=LOG.con_flnt_lats_lon-120-%j.o
 ##SBATCH --exclusive
 #SBATCH --mail-type=FAIL
 #SBATCH --time=08:00:00
@@ -28,7 +28,8 @@ echo ""
 
 cd $scriptPath
 
-logFile=`ls LOG.cct-120-*`
+logFile=`ls LOG.con_flnt_lats_lon-120-*`
+echo $scriptPath/$logFile $logPath/$logFile
 cat $scriptPath/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then
