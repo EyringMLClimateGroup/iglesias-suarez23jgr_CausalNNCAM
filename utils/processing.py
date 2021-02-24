@@ -217,7 +217,7 @@ def concat(
             print()
             
             # Store causal links
-            utils.save_results(results, results_filename, output_folder)
+            utils.save_results(results, results_file)
 
 
     total_time = datetime.timedelta(seconds = time.time() - t_start)
