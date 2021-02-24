@@ -74,7 +74,7 @@ class VarData:
         if level is None:
             self.name = variable.name
         else:
-            self.name = f"{variable.name}-{level}"
+            self.name = f"{variable.name}-{round(level, 2)}"
 
 # def read_spcam(var_name, experiment, path):
 #     filename = Path(path, FILENAME_PATTERN.format(var_name, experiment))
