@@ -4,7 +4,6 @@ import numpy                          as np
 from pathlib                      import Path
 import utils.utils                    as utils
 from   utils.constants            import DATA_FOLDER, ANCIL_FILE, experiment
-#import utils.links                    as links
 import utils.pcmci_algorithm          as algorithm
 
 
@@ -91,7 +90,7 @@ def single(
                       + f" Total time so far: {total_time}")
 
                 # Store causal links
-                utils.save_results(results, results_filename, output_folder)
+                utils.save_results(results, results_file)
 
         time_point = datetime.timedelta(seconds = time.time() - t_start_gridpoint)
         total_time = datetime.timedelta(seconds = time.time() - t_start)
@@ -107,7 +106,7 @@ def concat(
     var_parents,
     var_children,
     pc_alphas,
-    levels
+    levels,
     parents_idx_levs,
     children_idx_levs,
     idx_lats,
