@@ -133,7 +133,7 @@ def concat(
             results_filename = utils.generate_results_filename_concat(
                     child, level[-1], gridpoints, experiment,
                     output_file_pattern, output_folder)
-    
+            results_file = Path(output_folder, results_filename)
     
             if not overwrite and results_file.is_file():
                 print(f"{dt.now()} Found file {results_file}, skipping.")
