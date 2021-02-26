@@ -1,0 +1,43 @@
+# pipeline
+# cfg_pipeline.yml
+---
+documentation:
+  description: Options (specifications) for the "pipeline" script.
+
+  authors:
+    - iglesias-suarez_fernando
+    - solino-fernandez_breixo
+
+  maintainer:
+    - iglesias-suarez_fernando
+    - solino-fernandez_breixo
+
+  references:
+    - acknow_project
+
+  projects:
+    - usmile
+
+
+# Specifications
+analysis       : 'single' # 'single': gridpoints individually; 
+                          # 'concat': gridpoints contatenated into a 
+                          #           single time-series; 
+spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
+#spcam_children : ['tphystnd','phq','prect','fsns','flns','fsnt','flnt']
+spcam_children : ['tphystnd','phq','fsns','flns','fsnt','flnt']
+pc_alphas      : [0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2]
+#pc_alphas      : [0.01]
+region         : [ [-90,90] , [118,120] ] # Lons: 120, 118
+lim_levels     : False # [950, 750] # False
+target_levels  : [3.643, 54.595, 103.317, 197.908, 379.100, 524.687, 763.404, 859.534, 912.644, 957.485] # False
+output_folder  : "/work/bd1179/b309172/analysis/usmile/causality_convection/python/causalnncam/causal_links"
+plots_folder : "./test_causal_links/plots"
+#output_folder  : "./test_causal_links"
+verbosity      : 2
+output_file_pattern :
+  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{experiment}.obj"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{experiment}.obj"
+plot_file_pattern : 
+  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{experiment}.png"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{experiment}.obj"

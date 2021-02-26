@@ -74,7 +74,7 @@ class VarData:
         if level is None:
             self.name = variable.name
         else:
-            self.name = f"{variable.name}-{level}"
+            self.name = f"{variable.name}-{round(level, 2)}"
 
 # def read_spcam(var_name, experiment, path):
 #     filename = Path(path, FILENAME_PATTERN.format(var_name, experiment))
@@ -193,13 +193,27 @@ def format_data(norm_data, var_list, idx_lvls):
 #########################
 #    Save data utils
 #########################
-def generate_results_filename(
+def generate_results_filename_single(
         var, level, lat, lon, experiment, pattern, folder):
     results_filename = pattern.format(
             var_name = var.name,
             level = level+1,
             lat = int(lat),
             lon = int(lon),
+            experiment = experiment
+    )
+    return Path(folder, results_filename)
+
+
+def generate_results_filename_concat(
+        var, level, gridpoints, experiment, pattern, folder):
+    results_filename = pattern.format(
+            var_name   = var.name,
+            level      = level+1,
+            lat1       = int(gridpoints[0][0]),
+            lat2       = int(gridpoints[-1][0]),
+            lon1       = int(gridpoints[0][-1]),
+            lon2       = int(gridpoints[-1][-1]),
             experiment = experiment
     )
     return Path(folder, results_filename)
@@ -212,9 +226,7 @@ def save_results(results, file):
     print(f"Saved results into \"{file}\"")
 
 
-def load_results(var, level, lat, lon, experiment, pattern, folder):
-    file = generate_results_filename(
-            var, level, lat, lon, experiment, pattern, folder)
+def load_results(file):
     print(f"Loading results from \"{file}\"")
     with open(file, "rb") as f:
         return pickle.load(f)
