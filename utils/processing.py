@@ -41,7 +41,7 @@ def single(
                 child_levels = children_idx_levs
             
             for level in child_levels:
-                results_file = utils.generate_results_filename(
+                results_file = utils.generate_results_filename_single(
                     child, level[-1], lat, lon, experiment,
                     output_file_pattern, output_folder)
 
@@ -130,17 +130,9 @@ def concat(
             child_levels = children_idx_levs
         for level in child_levels:
             
-            results_filename = output_file_pattern.format(
-                        var_name   = child.name,
-                        level      = level[-1]+1,
-                        lat1       = int(gridpoints[0][0]),
-                        lat2       = int(gridpoints[-1][0]),
-                        lon1       = int(gridpoints[0][-1]),
-                        lon2       = int(gridpoints[-1][-1]),
-                        experiment = experiment
-                )
-            results_file = Path(output_folder, results_filename)
-    
+            results_file = utils.generate_results_filename_concat(
+                    child, level[-1], gridpoints, experiment,
+                    output_file_pattern, output_folder)
     
             if not overwrite and results_file.is_file():
                 print(f"{dt.now()} Found file {results_file}, skipping.")
@@ -223,7 +215,7 @@ def concat(
             print()
             
             # Store causal links
-            utils.save_results(results, output_folder+'/'+results_filename)
+            utils.save_results(results, results_file)
 
 
     total_time = datetime.timedelta(seconds = time.time() - t_start)

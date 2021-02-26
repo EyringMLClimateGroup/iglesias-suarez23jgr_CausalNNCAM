@@ -193,13 +193,27 @@ def format_data(norm_data, var_list, idx_lvls):
 #########################
 #    Save data utils
 #########################
-def generate_results_filename(
+def generate_results_filename_single(
         var, level, lat, lon, experiment, pattern, folder):
     results_filename = pattern.format(
             var_name = var.name,
             level = level+1,
             lat = int(lat),
             lon = int(lon),
+            experiment = experiment
+    )
+    return Path(folder, results_filename)
+
+
+def generate_results_filename_concat(
+        var, level, gridpoints, experiment, pattern, folder):
+    results_filename = pattern.format(
+            var_name   = var.name,
+            level      = level+1,
+            lat1       = int(gridpoints[0][0]),
+            lat2       = int(gridpoints[-1][0]),
+            lon1       = int(gridpoints[0][-1]),
+            lon2       = int(gridpoints[-1][-1]),
             experiment = experiment
     )
     return Path(folder, results_filename)
