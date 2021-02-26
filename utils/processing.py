@@ -130,10 +130,9 @@ def concat(
             child_levels = children_idx_levs
         for level in child_levels:
             
-            results_filename = utils.generate_results_filename_concat(
+            results_file = utils.generate_results_filename_concat(
                     child, level[-1], gridpoints, experiment,
                     output_file_pattern, output_folder)
-    
     
             if not overwrite and results_file.is_file():
                 print(f"{dt.now()} Found file {results_file}, skipping.")
