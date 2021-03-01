@@ -42,17 +42,17 @@ class Setup():
         self.gridpoints = _calculate_gridpoints(region)
         
         ## Model's grid
-        self.levels, self.latitudes, self.longitudes = utils.read_ancilaries(
+        self.levels, latitudes, longitudes = utils.read_ancilaries(
                 Path(DATA_FOLDER, ANCIL_FILE))
 
         
         ## Latitude / Longitude indexes
         self.idx_lats = [
-                utils.find_closest_value(self.latitudes, gridpoint[0])
+                utils.find_closest_value(latitudes, gridpoint[0])
                 for gridpoint in self.gridpoints
         ]
         self.idx_lons = [
-                utils.find_closest_longitude(self.longitudes, gridpoint[1])
+                utils.find_closest_longitude(longitudes, gridpoint[1])
                 for gridpoint in self.gridpoints
         ]
         
