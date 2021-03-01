@@ -29,22 +29,17 @@ class Setup():
 
         # Load specifications
         self.analysis = yml_cfg['analysis']
-        spcam_parents     = yml_cfg['spcam_parents']
-        spcam_children    = yml_cfg['spcam_children']
-        self.pc_alphas         = yml_cfg['pc_alphas']
-        self.region            = yml_cfg['region']
-        lim_levels        = yml_cfg['lim_levels']
-        target_levels     = yml_cfg['target_levels']
-        self.verbosity         = yml_cfg['verbosity']
-        self.output_folder     = yml_cfg['output_folder']
+        self.pc_alphas = yml_cfg['pc_alphas']
+        self.verbosity = yml_cfg['verbosity']
+        self.output_folder = yml_cfg['output_folder']
         self.plots_folder = yml_cfg['plots_folder']
         self.output_file_pattern = yml_cfg['output_file_pattern'][self.analysis]
         self.plot_file_pattern = yml_cfg['plot_file_pattern'][self.analysis]
-        self.overwrite         = False
+        self.overwrite = False
         self.experiment = EXPERIMENT
         
-        self.gridpoints = _calculate_gridpoints(self.region)
-        target_levels = _calculate_target_levels(lim_levels, target_levels)
+        region = yml_cfg['region']
+        self.gridpoints = _calculate_gridpoints(region)
         
         ## Model's grid
         self.levels, self.latitudes, self.longitudes = utils.read_ancilaries(
@@ -64,10 +59,16 @@ class Setup():
         ## Level indexes (children & parents)
         self.parents_idx_levs = [[lev, i]
                                  for i, lev in enumerate(self.levels)] # All
+        
+        lim_levels = yml_cfg['lim_levels']
+        target_levels = yml_cfg['target_levels']
+        target_levels = _calculate_target_levels(lim_levels, target_levels)
         self.children_idx_levs = _calculate_children_level_indices(
                 self.levels, target_levels, self.parents_idx_levs)
         
         ## Variables
+        spcam_parents     = yml_cfg['spcam_parents']
+        spcam_children    = yml_cfg['spcam_children']
         self.var_list = [var for var in SPCAM_Vars
                          if var.name in spcam_parents + spcam_children]
         self.var_parents = [
