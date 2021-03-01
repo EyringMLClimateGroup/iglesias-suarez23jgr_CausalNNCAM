@@ -1,6 +1,7 @@
 import numpy    as np
+import numpy.ma as ma
 from pathlib    import Path
-from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN #, OUTPUT_FILE_PATTERN
+from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars #, OUTPUT_FILE_PATTERN
 from netCDF4    import Dataset
 import pickle
 
@@ -96,6 +97,18 @@ def normalize(values):
     else:
         return values
 
+def log_normalize(values):
+    values = ma.log(values)
+    values[values.mask] = ma.mean(values)
+    anom = values - np.mean(values)
+    std = np.std(anom, ddof=1)
+    if std != 0:
+        return anom/std
+    else:
+        print(f"Values for prect are zero; check data. Stop processing!")
+        exit()
+
+    
 # This code has sometimes peaks that exceeded the maximum memory of 2.5 GB.
 # However, it's only temporarily, as after normalization the space occupied for
 # a single cell is small.
@@ -133,7 +146,12 @@ def get_normalized_data(
         level_data = data[:,0,idx_lats,idx_lons]
     elif variable.dimensions == 2:
         level_data = data[:,idx_lats,idx_lons]
-    return normalize(level_data)
+
+    if variable == SPCAM_Vars.prect:
+        print(f"Log normalization...")
+        return log_normalize(level_data)
+    else:
+        return normalize(level_data)
 
 def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
     data = list()
