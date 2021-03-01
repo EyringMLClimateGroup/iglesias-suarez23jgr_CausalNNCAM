@@ -54,8 +54,6 @@ def select_links(
     parents = set(parents)
     children = set(children)
         
-    _lags = list(range(-(tau_max), -tau_min + 1, 1))
-
     selected_links = dict()
     # Set the default as all combinations of the selected variables
     for var in [*children, *parents]:
