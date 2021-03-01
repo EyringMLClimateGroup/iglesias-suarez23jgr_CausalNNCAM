@@ -227,6 +227,6 @@ def save_results(results, file):
 
 
 def load_results(file):
-    print(f"Loading results from \"{file}\"")
+#     print(f"Loading results from \"{file}\"")
     with open(file, "rb") as f:
         return pickle.load(f)
