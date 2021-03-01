@@ -17,9 +17,9 @@ def run_pc_stable(pcmci, selected_links, list_pc_alpha):
                     selected_links = selected_links,
                     pc_alpha = pc_alpha
             )
-            # "result_parents" will now be a dictionary with only the causal
-            # parents for each variable like selected_links, but only with the
-            # actual links
+            # "result_parents" will now be a dictionary with only the
+            # causal parents for each variable like selected_links, but
+            # only with the actual links
 
             link_matrix = pcmci.return_significant_links(
                     pq_matrix=pcmci.p_matrix,
@@ -43,6 +43,9 @@ def run_pc_stable(pcmci, selected_links, list_pc_alpha):
 
 
 def run_pc_stable_2(pcmci, list_pc_alpha):
+    """
+    NOTE: Undeveloped code
+    """
     pc_alpha_results = dict()
     for pc_alpha in list_pc_alpha:
         # A way to run this in parallel
@@ -59,6 +62,9 @@ def run_pc_stable_2(pcmci, list_pc_alpha):
 
 
 def run_pc_stable_3(pcmci, list_pc_alpha):
+    """
+    NOTE: Undeveloped code
+    """
     # A way to run this in parallel
     results_parents = dict()
     for j in children:
