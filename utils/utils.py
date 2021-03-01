@@ -1,7 +1,7 @@
 import numpy    as np
 import numpy.ma as ma
 from pathlib    import Path
-from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN #, OUTPUT_FILE_PATTERN
+from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars #, OUTPUT_FILE_PATTERN
 from netCDF4    import Dataset
 import pickle
 
@@ -147,7 +147,7 @@ def get_normalized_data(
     elif variable.dimensions == 2:
         level_data = data[:,idx_lats,idx_lons]
 
-    if variable.name == 'prect':
+    if variable == SPCAM_Vars.prect:
         print(f"Log normalization...")
         return log_normalize(level_data)
     else:
