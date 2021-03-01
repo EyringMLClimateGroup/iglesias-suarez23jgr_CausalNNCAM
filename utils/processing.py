@@ -3,7 +3,7 @@ from datetime                     import datetime as dt
 import numpy                          as np
 from pathlib                      import Path
 import utils.utils                    as utils
-from   utils.constants            import DATA_FOLDER, ANCIL_FILE, experiment
+from   utils.constants            import DATA_FOLDER, ANCIL_FILE, EXPERIMENT
 import utils.pcmci_algorithm          as algorithm
 
 
@@ -42,13 +42,12 @@ def single(
             
             for level in child_levels:
                 results_file = utils.generate_results_filename_single(
-                    child, level[-1], lat, lon, experiment,
+                    child, level[-1], lat, lon, EXPERIMENT,
                     output_file_pattern, output_folder)
 
                 if not overwrite and results_file.is_file():
                     print(f"{dt.now()} Found file {results_file}, skipping.")
                     continue # Ignore this level
-
 
                 # Only load parents if necessary to analyze a child
                 # they stay loaded until the next gridpoint
@@ -61,7 +60,7 @@ def single(
                     t_before_load_parents = time.time()
                     data_parents = utils.load_data(
                         var_parents,
-                        experiment,
+                        EXPERIMENT,
                         DATA_FOLDER,
                         parents_idx_levs,
                         idx_lat,
@@ -72,7 +71,7 @@ def single(
 
                 # Process child
                 data_child = utils.load_data([child],
-                                             experiment,
+                                             EXPERIMENT,
                                              DATA_FOLDER,
                                              [level],
                                              idx_lat,
@@ -131,14 +130,13 @@ def concat(
         for level in child_levels:
             
             results_file = utils.generate_results_filename_concat(
-                    child, level[-1], gridpoints, experiment,
+                    child, level[-1], gridpoints, EXPERIMENT,
                     output_file_pattern, output_folder)
     
             if not overwrite and results_file.is_file():
                 print(f"{dt.now()} Found file {results_file}, skipping.")
                 continue # Ignore this level
     
-
             # Only load parents if necessary to analyze a child
             # they stay loaded until the next gridpoint
             if data_parents is None:
@@ -156,7 +154,7 @@ def concat(
 
                     normalized_parents = utils.load_data_concat(
                             var_parents,
-                            experiment,
+                            EXPERIMENT,
                             DATA_FOLDER,
                             parents_idx_levs,
                             idx_lat,
@@ -173,7 +171,6 @@ def concat(
                         seconds = time.time() - t_before_load_parents)
                 print(f"{dt.now()} All parents loaded. Time: {time_load_parents}"); print("")
             
-            
             # Process data child
             print(f"Load {child.name}...")
             t_before_load_child = time.time()
@@ -188,7 +185,7 @@ def concat(
                 
                 normalized_child = utils.load_data_concat(
                         [child],
-                        experiment,
+                        EXPERIMENT,
                         DATA_FOLDER,
                         [level],
                         idx_lat,
