@@ -33,11 +33,10 @@ class SPCAM_Vars(Enum):
     prect = (2, 'out', "Precipitation")       # "Precipitation"
 
 
-# TODO Move this to a config file?
 EXPERIMENT          = '002_train_1_year'
 DATA_FOLDER         = "/work/bd0854/b309172/data/SPCAM_recons"
 ANCIL_FILE          = "ancil_spcam.nc"
 FILENAME_PATTERN    = "{var_name}_{level}_{experiment}.nc"
-tau_min             = 1
-tau_max             = 1
-significance        = 'analytic'
+TAU_MIN             = 1
+TAU_MAX             = 1
+SIGNIFICANCE        = 'analytic'
