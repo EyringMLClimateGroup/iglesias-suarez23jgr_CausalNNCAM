@@ -98,8 +98,9 @@ def log_normalize(values):
     if std != 0:
         return anom/std
     else:
-        print(f"Values for prect are zero; check data. Stop processing!")
-        exit()
+#         print(f"Values for prect are zero; check data. Stop processing!")
+#         exit()
+        raise ValueError("Values for prect are zero; check data.")
 
 
 def get_normalized_data(
