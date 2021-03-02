@@ -1,7 +1,7 @@
 import numpy    as np
 import numpy.ma as ma
 from pathlib    import Path
-from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars #, OUTPUT_FILE_PATTERN
+from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars
 from netCDF4    import Dataset
 import pickle
 
@@ -61,11 +61,9 @@ def read_ancilaries(path):
 #########################
 #    Load data utils
 #########################
-# TODO? Use a dataset instead of this class
 class VarData:
     """
     Helper class to store the variable data and metadata
-    If variab
     """
     
     def __init__(self, variable, data, level = None):
@@ -77,18 +75,13 @@ class VarData:
         else:
             self.name = f"{variable.name}-{round(level, 2)}"
 
-# def read_spcam(var_name, experiment, path):
-#     filename = Path(path, FILENAME_PATTERN.format(var_name, experiment))
-#     with Dataset(filename, 'r') as file:
-#         data = file.variables[var_name][:]
-#     return data
+
 def read_spcam_file(path, var_name):
     with Dataset(path, 'r') as file:
         data = file.variables[var_name][:]
     return data
 
-# def normalize(values):
-#     return (values - np.mean(values))/ np.std(values, ddof=1)
+
 def normalize(values):
     anom = values - np.mean(values)
     std = np.std(anom, ddof=1)
@@ -105,33 +98,13 @@ def log_normalize(values):
     if std != 0:
         return anom/std
     else:
-        print(f"Values for prect are zero; check data. Stop processing!")
-        exit()
+#         print(f"Values for prect are zero; check data. Stop processing!")
+#         exit()
+        raise ValueError("Values for prect are zero; check data.")
 
-    
-# This code has sometimes peaks that exceeded the maximum memory of 2.5 GB.
-# However, it's only temporarily, as after normalization the space occupied for
-# a single cell is small.
-# May it be possible to improve the retrieval so it doesn't load the full file?
-# def get_normalized_data(
-#     variable, experiment, path, idx_levs, idx_lats, idx_lons):
-#     """
-#     Returns a list of VarData, so both 2d and 3d can be treated the same
-#     """
-#     data = read_spcam(variable.name, experiment, path)
-#     norm_data = list()
-#     if variable.dimensions == 3:
-#         for target_lvl, idx_lvl in idx_levs:
-#             level_data = data[:,idx_lvl,idx_lats,idx_lons]
-#             norm_lvl_data = normalize(level_data)
-#             norm_data.append(VarData(variable, norm_lvl_data, target_lvl))
-#     elif variable.dimensions == 2:
-#         level_data = data[:,idx_lats,idx_lons]
-#         norm_lvl_data = normalize(level_data)
-#         norm_data.append(VarData(variable, norm_lvl_data))
-#     return norm_data
+
 def get_normalized_data(
-    variable, experiment, folder, idx_lats, idx_lons, level):
+        variable, experiment, folder, idx_lats, idx_lons, level):
     """
     Returns normalized data for one level
     """
@@ -153,6 +126,7 @@ def get_normalized_data(
     else:
         return normalize(level_data)
 
+    
 def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
     data = list()
     for var in var_list:
@@ -173,6 +147,7 @@ def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
             if var.dimensions == 2:     
                 break # Stop loading data after the first level
     return data
+
 
 def load_data_concat(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
     data = list()
@@ -245,6 +220,6 @@ def save_results(results, file):
 
 
 def load_results(file):
-    print(f"Loading results from \"{file}\"")
+#     print(f"Loading results from \"{file}\"")
     with open(file, "rb") as f:
         return pickle.load(f)
