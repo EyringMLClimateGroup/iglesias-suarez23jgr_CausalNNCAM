@@ -44,7 +44,6 @@ class Setup():
         ## Model's grid
         self.levels, latitudes, longitudes = utils.read_ancilaries(
                 Path(DATA_FOLDER, ANCIL_FILE))
-
         
         ## Latitude / Longitude indexes
         self.idx_lats = [
