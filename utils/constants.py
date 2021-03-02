@@ -14,23 +14,23 @@ class SPCAM_Vars(Enum):
     def __repr__(self):
         return f"({self._name_}, {self.dimensions}, {self.type})"
     
-    tbp = (3, 'in', "Surf. Temperature")            # "Surf. Temperature"
-    qbp = (3, 'in', "Surf. Q")            # "Surf. Q"
-    vbp = (3, 'in', "Surf. V")            # "Surf. V"
+    tbp = (3, 'in', "Temperature")
+    qbp = (3, 'in', "Specific humidity")
+    vbp = (3, 'in', "Meridional wind")
     
-    ps = (2, 'in', "Surf. Pressure")              # "Surf. Pressure"
-    solin = (2, 'in', "Solar incoming")        # "Solar incoming"
-    shflx = (2, 'in', "Sensible heat flx")        # "Sensible heat flx"
-    lhflx = (2, 'in', "Latent heat flx")        # "Latent heat flx"
+    ps = (2, 'in', "Surf. Pressure")
+    solin = (2, 'in', "Incoming solar radiation")
+    shflx = (2, 'in', "Sensible heat flux")
+    lhflx = (2, 'in', "Latent heat flux")
     
-    tphystnd = (3, 'out', "Temperature tendency") # "Temperature tendency"
-    phq = (3, 'out', "Specific humidity tendency")           # "Specific humidity tendency"
+    tphystnd = (3, 'out', "Temperature tendency")
+    phq = (3, 'out', "Specific humidity tendency")
     
-    fsnt = (2, 'out', "Net solar flux at top of model")         # "Net solar flux at top of model"
-    fsns = (2, 'out', "Net solar flux at surface")         # "Net solar flux at surface"
-    flnt = (2, 'out', "Net longwave flux at top of model")         # "Net longwave flux at top of model"
-    flns = (2, 'out', "Net longwave flux at surface")         # "Net longwave flux at surface"
-    prect = (2, 'out', "Precipitation")       # "Precipitation"
+    fsnt = (2, 'out', "Net solar flux at top of model")
+    fsns = (2, 'out', "Net solar flux at surface")
+    flnt = (2, 'out', "Net longwave flux at top of model")
+    flns = (2, 'out', "Net longwave flux at surface")
+    prect = (2, 'out', "Precipitation")
 
 
 EXPERIMENT          = '002_train_1_year'
