@@ -1,10 +1,9 @@
 import numpy                          as np
 import utils.links                    as links
-from utils.constants              import TAU_MIN, TAU_MAX, SIGNIFICANCE
+from utils.constants              import TAU_MIN, TAU_MAX
 import tigramite
 from tigramite import data_processing as pp
 from tigramite.pcmci              import PCMCI
-from tigramite.independence_tests import ParCorr, GPDC, CMIknn, CMIsymb
 
 
 def run_pc_stable(pcmci, selected_links, list_pc_alpha):
@@ -78,7 +77,7 @@ def run_pc_stable_3(pcmci, list_pc_alpha):
     # For each parent you may get a different pc_alpha        
         
 
-def find_links(list_var_data, list_pc_alpha, verbosity = 0):
+def find_links(list_var_data, list_pc_alpha, cond_ind_test, verbosity = 0):
     spcam_data, var_names, parents, children = links.prepare_tigramite_data(
             list_var_data)
     
@@ -91,10 +90,9 @@ def find_links(list_var_data, list_pc_alpha, verbosity = 0):
             var_names= var_names
     )
 
-    parcorr = ParCorr(significance = SIGNIFICANCE)
     pcmci = PCMCI(
             dataframe=dataframe, 
-            cond_ind_test=parcorr,
+            cond_ind_test=cond_ind_test,
             verbosity = verbosity
     )
     

@@ -73,7 +73,11 @@ class Setup():
         self.var_parents = [
                 var for var in self.var_list if var.type == "in"]
         self.var_children = [
-                var for var in self.var_list if var.type == "out"]  
+                var for var in self.var_list if var.type == "out"]
+        
+        self.independence_test = yml_cfg['independence_test']
+        # Loaded here so errors are found during setup
+        self.cond_ind_test = INDEPENDENCE_TESTS[self.independence_test]
 
 
 def _calculate_gridpoints(region):
