@@ -2,12 +2,12 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=sgl_phq_16-20_lats_lon-0
+#SBATCH --job-name=sgl_phq_16-20_lats_lons14-16
 #SBATCH --partition=shared
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --output=LOG.sgl_phq_16-20_lats_lon-0-%j.o
-#SBATCH --error=LOG.sgl_phq_16-20_lats_lon-0-%j.o
+#SBATCH --output=LOG.sgl_phq_16-20_lats_lons14-16-%j.o
+#SBATCH --error=LOG.sgl_phq_16-20_lats_lons14-16-%j.o
 ##SBATCH --exclusive
 #SBATCH --mail-type=FAIL
 #SBATCH --time=24:00:00
@@ -28,7 +28,7 @@ echo ""
 
 cd $scriptPath
 
-logFile=`ls LOG.sgl_phq_16-20_lats_lon-0-*`
+logFile=`ls LOG.sgl_phq_16-20_lats_lons14-16-*`
 cat $scriptPath/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then

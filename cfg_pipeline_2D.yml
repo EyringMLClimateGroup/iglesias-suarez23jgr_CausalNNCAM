@@ -26,7 +26,7 @@ analysis       : 'single' # 'single': gridpoints individually;
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['prect','fsns','flns','fsnt','flnt']
 pc_alphas      : [0.001,0.01,0.1]
-region         : [ [-90,90] , [0,0] ]
+region         : [ [-90,90] , [14.,16.8] ]
 lim_levels     : False
 target_levels  : False
 output_folder  : "./causal_links"
