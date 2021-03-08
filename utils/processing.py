@@ -12,6 +12,7 @@ def single(
         var_parents,
         var_children,
         cond_ind_test,
+        ind_test_name, 
         pc_alphas,
         levels,
         parents_idx_levs,
@@ -44,7 +45,7 @@ def single(
             
             for level in child_levels:
                 results_file = utils.generate_results_filename_single(
-                    child, level[-1], lat, lon, EXPERIMENT,
+                    child, level[-1], lat, lon, ind_test_name, EXPERIMENT,
                     output_file_pattern, output_folder)
 
                 if not overwrite and results_file.is_file():
@@ -107,6 +108,7 @@ def concat(
         var_parents,
         var_children,
         cond_ind_test,
+        ind_test_name, 
         pc_alphas,
         levels,
         parents_idx_levs,
@@ -134,7 +136,7 @@ def concat(
         for level in child_levels:
             
             results_file = utils.generate_results_filename_concat(
-                    child, level[-1], gridpoints, EXPERIMENT,
+                    child, level[-1], gridpoints, ind_test_name, EXPERIMENT,
                     output_file_pattern, output_folder)
     
             if not overwrite and results_file.is_file():

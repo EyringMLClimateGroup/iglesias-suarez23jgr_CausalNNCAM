@@ -54,15 +54,13 @@ independence_test : "parcorr"
 region         : [ [-90,90] , [120,120] ] # Lons: 120, 118
 lim_levels     : False # [950, 750] # False
 target_levels  : [957.485] # [3.643, 54.595, 103.317, 197.908, 379.100, 524.687, 763.404, 859.534, 912.644, 957.485] # False
-output_folder  : "./causal_links"
-#output_folder  : "./test_causal_links"
 verbosity      : 2
 #output_folder  : "./causal_links"
 output_folder  : "./test_causal_links"
 plots_folder : "./test_causal_links/plots"
 output_file_pattern :
-  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{experiment}.obj"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{experiment}.obj"
+  single: "{var_name}_{level}_lat-{lat}_lon-{lon}-{ind_test}_{experiment}.obj"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}-{ind_test}_{experiment}.obj"
 plot_file_pattern : 
-  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{experiment}.png"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{experiment}.png" # Unused
+  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}-{ind_test}_{experiment}.png"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}-{ind_test}_{experiment}.png" # Unused
