@@ -42,6 +42,6 @@ TAU_MAX             = 1
 SIGNIFICANCE        = 'analytic'
 
 INDEPENDENCE_TESTS = {
-    "parcorr" : ParCorr(significance = SIGNIFICANCE),
-    "gpdc_torch" : GPDCTorch(recycle_residuals=True)
+    "parcorr" : lambda: ParCorr(significance = SIGNIFICANCE),
+    "gpdc_torch" : lambda: GPDCTorch(recycle_residuals=True)
 }
