@@ -17,5 +17,6 @@ dependencies:
 # Jupyter
   - ipykernel
 # CausalNNCAM
+  - netcdf4
   - pyyaml
 
