@@ -1,5 +1,4 @@
 from enum import Enum
-from tigramite.independence_tests import ParCorr, GPDCTorch
 
 class SPCAM_Vars(Enum):
     def __init__(self, dimensions, var_type, label):
@@ -40,8 +39,3 @@ FILENAME_PATTERN    = "{var_name}_{level}_{experiment}.nc"
 TAU_MIN             = 1
 TAU_MAX             = 1
 SIGNIFICANCE        = 'analytic'
-
-INDEPENDENCE_TESTS = {
-    "parcorr" : lambda: ParCorr(significance = SIGNIFICANCE),
-    "gpdc_torch" : lambda: GPDCTorch(recycle_residuals=True)
-}

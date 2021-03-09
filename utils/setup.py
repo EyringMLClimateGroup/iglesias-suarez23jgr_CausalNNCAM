@@ -1,9 +1,15 @@
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
-from .constants import EXPERIMENT
+from .constants import EXPERIMENT, SIGNIFICANCE
 from . import utils
 import getopt
 import yaml
 from pathlib import Path
+from tigramite.independence_tests import ParCorr
+
+INDEPENDENCE_TESTS = {
+    "parcorr" : lambda: ParCorr(significance = SIGNIFICANCE),
+    "gpdc_torch" : lambda: _build_GPDCTorch(recycle_residuals=True)
+}
 
 class Setup():
     
@@ -77,7 +83,8 @@ class Setup():
         
         self.ind_test_name = yml_cfg['independence_test']
         # Loaded here so errors are found during setup
-        self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]
+        # Note the parenthesis, INDEPENDENCE_TESTS returns functions
+        self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
 
 
 def _calculate_gridpoints(region):
@@ -101,3 +108,11 @@ def _calculate_children_level_indices(levels, target_levels, parents_idx_levs):
     else:
         children_idx_levs = parents_idx_levs
     return children_idx_levs
+
+def _build_GPDCTorch(*args):
+    """
+    Helper function to isolate the GPDCTorch import, as it's not
+    present in the master version of Tigramite
+    """
+    from tigramite.independence_tests import GPDCTorch
+    return GPDCTorch(*args)
