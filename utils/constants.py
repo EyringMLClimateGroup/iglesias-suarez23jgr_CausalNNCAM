@@ -32,7 +32,6 @@ class SPCAM_Vars(Enum):
     flns = (2, 'out', "Net longwave flux at surface")
     prect = (2, 'out', "Precipitation")
 
-
 EXPERIMENT          = '002_train_1_year'
 DATA_FOLDER         = "/work/bd0854/b309172/data/SPCAM_recons"
 ANCIL_FILE          = "ancil_spcam.nc"
