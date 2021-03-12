@@ -4,11 +4,13 @@ from . import utils
 import getopt
 import yaml
 from pathlib import Path
-from tigramite.independence_tests import ParCorr
+from tigramite.independence_tests import ParCorr, GPDC
 
 INDEPENDENCE_TESTS = {
     "parcorr" : lambda: ParCorr(significance = SIGNIFICANCE),
-    "gpdc_torch" : lambda: _build_GPDCTorch(recycle_residuals=True)
+    "gpdc" : lambda: GPDC(recycle_residuals=True),
+    "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=True)
+#     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
 }
 
 class Setup():
@@ -109,10 +111,10 @@ def _calculate_children_level_indices(levels, target_levels, parents_idx_levs):
         children_idx_levs = parents_idx_levs
     return children_idx_levs
 
-def _build_GPDCTorch(*args):
+def _build_GPDCtorch(**kwargs):
     """
-    Helper function to isolate the GPDCTorch import, as it's not
+    Helper function to isolate the GPDCtorch import, as it's not
     present in the master version of Tigramite
     """
-    from tigramite.independence_tests import GPDCTorch
-    return GPDCTorch(*args)
+    from tigramite.independence_tests import GPDCtorch
+    return GPDCtorch(**kwargs)
