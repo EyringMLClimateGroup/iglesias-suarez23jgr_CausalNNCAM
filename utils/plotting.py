@@ -24,7 +24,8 @@ def plot_links(link_matrix,
                arrow_linewidth = 5,
                save_name = None,
                figsize = (16, 16),
-               node_size = 0.15
+               node_size = 0.15,
+               show_colorbar = False
               ):
     """
     This function is copied from the basic tutorial, but it may not be
@@ -66,5 +67,5 @@ def plot_links(link_matrix,
         arrow_linewidth = arrow_linewidth,
         node_size = node_size,
         save_name = save_name,
-        show_colorbar = True
+        show_colorbar = show_colorbar
     ); plt.show()
