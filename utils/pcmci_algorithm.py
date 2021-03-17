@@ -20,17 +20,17 @@ def run_pc_stable(pcmci, selected_links, list_pc_alpha):
             # causal parents for each variable like selected_links, but
             # only with the actual links
 
-            link_matrix = pcmci.return_significant_links(
-                    pq_matrix=pcmci.p_matrix,
-                    val_matrix=pcmci.val_matrix,
-                    alpha_level=pc_alpha
-            )['link_matrix']
+#             link_matrix = pcmci.return_significant_links(
+#                     pq_matrix=pcmci.p_matrix,
+#                     val_matrix=pcmci.val_matrix,
+#                     alpha_level=pc_alpha
+#             )['link_matrix']
 
             results = {
                 "links"       : links,
                 "p_matrix"    : pcmci.p_matrix,
                 "val_matrix"  : pcmci.val_matrix,
-                "link_matrix" : link_matrix,
+#                 "link_matrix" : link_matrix,
                 "var_names"   : pcmci.var_names
             }
         except ValueError as e:
