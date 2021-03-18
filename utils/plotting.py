@@ -32,11 +32,15 @@ def build_link_matrix(links):
 def plot_links(links,
                var_names,
                val_matrix = None,
+               vmin_edges = -1,
+               vmax_edges = 1,
+               edge_ticks = 0.4,
                link_width = None,
                arrow_linewidth = 5,
                save_name = None,
                figsize = (16, 16),
-               node_size = 0.15
+               node_size = 0.15,
+               show_colorbar = False
               ):
     """
     This function is copied from the basic tutorial, but it may not be
@@ -66,13 +70,19 @@ def plot_links(links,
     tp.plot_graph(
         figsize = figsize,
         val_matrix = val_matrix,
+        vmin_edges = vmin_edges,
+        vmax_edges = vmax_edges,
+        edge_ticks = edge_ticks,
         link_matrix = filtered_link_matrix,
         var_names = var_names,
-        link_colorbar_label = 'cross-MCI',
-        node_colorbar_label = 'auto-MCI',
+        # Not MCI
+#         link_colorbar_label = 'cross-MCI',
+#         node_colorbar_label = 'auto-MCI',
+        link_colorbar_label = 'cross',
+        node_colorbar_label = 'auto',
         link_width = link_width,
         arrow_linewidth = arrow_linewidth,
         node_size = node_size,
         save_name = save_name,
-        show_colorbar = False
+        show_colorbar = show_colorbar
     ); plt.show()
