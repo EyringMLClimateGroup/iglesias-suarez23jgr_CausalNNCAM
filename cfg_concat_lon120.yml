@@ -35,9 +35,8 @@ verbosity      : 2
 output_folder  : "./pc-alphas_causal_links"
 plots_folder : "./test_causal_links/plots"
 output_file_pattern :
-  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{experiment}.obj"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{experiment}.obj"
-plot_file_pattern : "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{experiment}.png"
+  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
 plot_file_pattern : 
-  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{experiment}.png"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{experiment}.obj"
+  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"
