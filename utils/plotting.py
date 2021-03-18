@@ -13,8 +13,23 @@ def find_linked_variables(links):
     return list(linked_variables)
 
 
-def plot_links(link_matrix,
-               links,
+def build_link_matrix(links):
+    size_matrix = len(links)
+    min_lag = 0
+    for link in links.values():
+        for parent, lag in link:
+            if lag < min_lag:
+                min_lag = lag
+    
+    link_matrix = np.array(
+            [[[False] * abs(min_lag-1)] * size_matrix] * size_matrix)
+    for child, link in links.items():
+        for parent, lag in link:
+            link_matrix[parent][child][abs(lag)] = True
+    return link_matrix
+
+
+def plot_links(links,
                var_names,
                val_matrix = None,
                link_width = None,
@@ -31,6 +46,8 @@ def plot_links(link_matrix,
     var_names = np.array(var_names)
     
     linked_variables = find_linked_variables(links)
+    
+    link_matrix = build_link_matrix(links)
     
     if len(linked_variables) != 0:
         # Raise an exception if there is a different number of links
