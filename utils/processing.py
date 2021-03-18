@@ -3,14 +3,16 @@ from datetime                     import datetime as dt
 import numpy                          as np
 from pathlib                      import Path
 import utils.utils                    as utils
-from   utils.constants            import DATA_FOLDER, ANCIL_FILE, experiment
-import utils.pcmci_algorithm          as algorithm
+from   utils.constants            import DATA_FOLDER, ANCIL_FILE, EXPERIMENT
+from utils.pcmci_algorithm        import find_links
 
 
 def single(
         gridpoints,
         var_parents,
         var_children,
+        cond_ind_test,
+        ind_test_name, 
         pc_alphas,
         levels,
         parents_idx_levs,
@@ -19,7 +21,8 @@ def single(
         idx_lons,
         output_file_pattern,
         output_folder,
-        overwrite
+        overwrite,
+        verbosity
 ):
     
     ## Processing
@@ -42,13 +45,12 @@ def single(
             
             for level in child_levels:
                 results_file = utils.generate_results_filename_single(
-                    child, level[-1], lat, lon, experiment,
+                    child, level[-1], lat, lon, ind_test_name, EXPERIMENT,
                     output_file_pattern, output_folder)
 
                 if not overwrite and results_file.is_file():
                     print(f"{dt.now()} Found file {results_file}, skipping.")
                     continue # Ignore this level
-
 
                 # Only load parents if necessary to analyze a child
                 # they stay loaded until the next gridpoint
@@ -61,7 +63,7 @@ def single(
                     t_before_load_parents = time.time()
                     data_parents = utils.load_data(
                         var_parents,
-                        experiment,
+                        EXPERIMENT,
                         DATA_FOLDER,
                         parents_idx_levs,
                         idx_lat,
@@ -72,7 +74,7 @@ def single(
 
                 # Process child
                 data_child = utils.load_data([child],
-                                             experiment,
+                                             EXPERIMENT,
                                              DATA_FOLDER,
                                              [level],
                                              idx_lat,
@@ -82,7 +84,7 @@ def single(
                 # Find links
                 print(f"{dt.now()} Finding links for {child.name} at level {level[-1]+1}")
                 t_before_find_links = time.time()
-                results = algorithm.find_links(data, pc_alphas, 0)
+                results = find_links(data, pc_alphas, cond_ind_test, verbosity)
                 time_links = datetime.timedelta(
                         seconds = time.time() - t_before_find_links)
                 total_time = datetime.timedelta(seconds = time.time() - t_start)
@@ -102,19 +104,22 @@ def single(
     
 
 def concat(
-    gridpoints,
-    var_parents,
-    var_children,
-    pc_alphas,
-    levels,
-    parents_idx_levs,
-    children_idx_levs,
-    idx_lats,
-    idx_lons,
-    output_file_pattern,
-    output_folder,
-    overwrite
-          ):
+        gridpoints,
+        var_parents,
+        var_children,
+        cond_ind_test,
+        ind_test_name, 
+        pc_alphas,
+        levels,
+        parents_idx_levs,
+        children_idx_levs,
+        idx_lats,
+        idx_lons,
+        output_file_pattern,
+        output_folder,
+        overwrite,
+        verbosity
+):
     
     ## Processing
     len_grid     = len(gridpoints)
@@ -131,14 +136,13 @@ def concat(
         for level in child_levels:
             
             results_file = utils.generate_results_filename_concat(
-                    child, level[-1], gridpoints, experiment,
+                    child, level[-1], gridpoints, ind_test_name, EXPERIMENT,
                     output_file_pattern, output_folder)
     
             if not overwrite and results_file.is_file():
                 print(f"{dt.now()} Found file {results_file}, skipping.")
                 continue # Ignore this level
     
-
             # Only load parents if necessary to analyze a child
             # they stay loaded until the next gridpoint
             if data_parents is None:
@@ -156,7 +160,7 @@ def concat(
 
                     normalized_parents = utils.load_data_concat(
                             var_parents,
-                            experiment,
+                            EXPERIMENT,
                             DATA_FOLDER,
                             parents_idx_levs,
                             idx_lat,
@@ -173,7 +177,6 @@ def concat(
                         seconds = time.time() - t_before_load_parents)
                 print(f"{dt.now()} All parents loaded. Time: {time_load_parents}"); print("")
             
-            
             # Process data child
             print(f"Load {child.name}...")
             t_before_load_child = time.time()
@@ -188,7 +191,7 @@ def concat(
                 
                 normalized_child = utils.load_data_concat(
                         [child],
-                        experiment,
+                        EXPERIMENT,
                         DATA_FOLDER,
                         [level],
                         idx_lat,
@@ -208,10 +211,11 @@ def concat(
             # Find links
             print(f"{dt.now()} Finding links for {child.name} at level {level[-1]+1}")
             t_before_find_links = time.time()
-            results = algorithm.find_links(data, pc_alphas, 0)
+            results = find_links(data, pc_alphas, cond_ind_test, verbosity)
             time_links = datetime.timedelta(seconds = time.time() - t_before_find_links)
             total_time = datetime.timedelta(seconds = time.time() - t_start)
-            print(f"{dt.now()} Links found. Time: {time_links}" + f" Total time so far: {total_time}")
+            print(f"{dt.now()} Links found. Time: {time_links}"
+                  + f" Total time so far: {total_time}")
             print()
             
             # Store causal links

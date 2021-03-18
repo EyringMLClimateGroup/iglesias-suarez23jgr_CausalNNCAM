@@ -1,5 +1,7 @@
 .ipynb_checkpoints/
-causal_links
 __pycache__/
-test_causal_links/
-logs/
+causal_links
+test_causal_links
+pc-alphas_causal_links
+logs
+
