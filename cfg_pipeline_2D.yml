@@ -32,5 +32,5 @@ target_levels  : False
 output_folder  : "./causal_links"
 verbosity      : 2
 output_file_pattern :
-  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{experiment}.obj"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{experiment}.obj"
+  single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
+  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
