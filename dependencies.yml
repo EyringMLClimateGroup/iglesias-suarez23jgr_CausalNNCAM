@@ -12,11 +12,15 @@ dependencies:
   - matplotlib>=3.1.1
   - networkx>=2.4
   - cython>=0.26
+# Tigramite - GPDC Torch
   - torch>=1.7
   - gpytorch>=1.4
 # Jupyter
   - ipykernel
+# FortranKerasBridge
+  - h5py
 # CausalNNCAM
   - netcdf4
   - pyyaml
+  - tensorflow
 
