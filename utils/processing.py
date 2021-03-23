@@ -65,7 +65,7 @@ def single(
 
                     print(
                         f"{dt.now()} Gridpoint {i_grid+1}/{len_grid}:"
-                        + f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
+                        f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
                     )
 
                     print(f"Load Parents (state fields)...")
@@ -91,7 +91,8 @@ def single(
 
                 # Find links
                 print(
-                    f"{dt.now()} Finding links for {child.name} at level {level[-1]+1}"
+                    f"{dt.now()}"
+                    f"Finding links for {child.name} at level {level[-1]+1}"
                 )
                 t_before_find_links = time.time()
                 results = find_links(data, pc_alphas, cond_ind_test, verbosity)
@@ -101,7 +102,7 @@ def single(
                 total_time = datetime.timedelta(seconds=time.time() - t_start)
                 print(
                     f"{dt.now()} Links found. Time: {time_links}"
-                    + f" Total time so far: {total_time}"
+                    f" Total time so far: {total_time}"
                 )
 
                 # Store causal links
@@ -111,9 +112,9 @@ def single(
         total_time = datetime.timedelta(seconds=time.time() - t_start)
         print(
             f"{dt.now()} All links in gridpoint found. Time: {time_point}."
-            + f" Total time so far: {total_time}"
+            f" Total time so far: {total_time}"
         )
-        print("")
+        print()
 
     print(f"{dt.now()} Execution complete. Total time: {total_time}")
 
@@ -179,7 +180,7 @@ def concat(
 
                     print(
                         f"{dt.now()} Gridpoint {i_grid+1}/{len_grid}:"
-                        + f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
+                        f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
                     )
 
                     normalized_parents = utils.load_data_concat(
@@ -206,7 +207,7 @@ def concat(
                     seconds=time.time() - t_before_load_parents
                 )
                 print(f"{dt.now()} All parents loaded. Time: {time_load_parents}")
-                print("")
+                print()
 
             # Process data child
             print(f"Load {child.name}...")
@@ -219,7 +220,7 @@ def concat(
 
                 print(
                     f"{dt.now()} Gridpoint {i_grid+1}/{len_grid}:"
-                    + f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
+                    f" lat={lat} ({idx_lat}), lon={lon} ({idx_lon})"
                 )
 
                 normalized_child = utils.load_data_concat(
@@ -234,7 +235,7 @@ def concat(
                 seconds=time.time() - t_before_load_child
             )
             print(f"{dt.now()} Child loaded. Time: {time_load_child}")
-            print("")
+            print()
 
             # Format data
             data_child = utils.format_data(data_child, [child], [level])
@@ -248,7 +249,7 @@ def concat(
             total_time = datetime.timedelta(seconds=time.time() - t_start)
             print(
                 f"{dt.now()} Links found. Time: {time_links}"
-                + f" Total time so far: {total_time}"
+                f" Total time so far: {total_time}"
             )
             print()
 
