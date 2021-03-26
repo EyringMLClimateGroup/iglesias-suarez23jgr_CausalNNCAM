@@ -76,12 +76,12 @@ class Setup():
         ## Variables
         spcam_parents     = yml_cfg['spcam_parents']
         spcam_children    = yml_cfg['spcam_children']
-        self.var_list = [var for var in SPCAM_Vars
+        self.list_spcam = [var for var in SPCAM_Vars
                          if var.name in spcam_parents + spcam_children]
-        self.var_parents = [
-                var for var in self.var_list if var.type == "in"]
-        self.var_children = [
-                var for var in self.var_list if var.type == "out"]
+        self.spcam_inputs = [
+                var for var in self.list_spcam if var.type == "in"]
+        self.spcam_outputs = [
+                var for var in self.list_spcam if var.type == "out"]
         
         self.ind_test_name = yml_cfg['independence_test']
         # Loaded here so errors are found during setup
