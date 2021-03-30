@@ -1,4 +1,4 @@
-name: tigramite
+name: causalnncam
 channels:
   - pytorch
   - conda-forge
