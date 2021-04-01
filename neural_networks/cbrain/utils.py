@@ -29,30 +29,62 @@ def return_var_bool(ds, var_list):
     return var_bool
 
 
-def return_var_idxs(ds, var_list, var_cut_off=None):
+# def return_var_idxs(ds, var_list, var_cut_off=None):
+#     """
+#     To be used on stacked variable dimension. Returns indices array
+
+#     Parameters
+#     ----------
+#     ds: xarray dataset
+#     var_list: list of variables
+
+#     Returns
+#     -------
+#     var_idxs: indices array
+
+#     """
+#     if var_cut_off is None:
+#         var_idxs = np.concatenate([np.where(ds.var_names == v)[0] for v in var_list])
+#     else:
+#         idxs_list = []
+#         for v in var_list:
+#             i = np.where(ds.var_names == v)[0]
+#             if v in var_cut_off.keys():
+#                 i = i[var_cut_off[v] :]
+#             idxs_list.append(i)
+#         var_idxs = np.concatenate(idxs_list)
+#     return var_idxs
+
+
+def return_var_idxs(ds, var_dict):
     """
     To be used on stacked variable dimension. Returns indices array
 
     Parameters
     ----------
     ds: xarray dataset
-    var_list: list of variables
+    var_dict: dictionary of variable and list of level indices for that
+        variable
 
     Returns
     -------
     var_idxs: indices array
 
     """
-    if var_cut_off is None:
-        var_idxs = np.concatenate([np.where(ds.var_names == v)[0] for v in var_list])
-    else:
-        idxs_list = []
-        for v in var_list:
-            i = np.where(ds.var_names == v)[0]
-            if v in var_cut_off.keys():
-                i = i[var_cut_off[v] :]
+    
+#     if var_cut_off is None:
+#         var_idxs = np.concatenate([np.where(ds.var_names == v)[0] for v in var_list])
+#     else:
+    idxs_list = []
+    for v, levels in var_dict.items():
+        i = np.where(ds.var_names == v)[0]
+        if levels != None:
+            for level in levels:
+                idx = i[level]
+                idxs_list.append(idx)
+        else:
             idxs_list.append(i)
-        var_idxs = np.concatenate(idxs_list)
+    var_idxs = np.concatenate(idxs_list)
     return var_idxs
 
 
