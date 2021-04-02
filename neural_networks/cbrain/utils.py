@@ -71,20 +71,17 @@ def return_var_idxs(ds, var_dict):
     var_idxs: indices array
 
     """
-    
-#     if var_cut_off is None:
-#         var_idxs = np.concatenate([np.where(ds.var_names == v)[0] for v in var_list])
-#     else:
-    idxs_list = []
+
+    var_idxs = []
     for v, levels in var_dict.items():
-        i = np.where(ds.var_names == v)[0]
+        i = np.where(ds.var_names == v)[0]  # Indices of the variable v
         if levels != None:
             for level in levels:
-                idx = i[level]
-                idxs_list.append(idx)
+                idx = i[level]  # TODO: Assumes that order is the same. Is it?
+                var_idxs.append(idx)
         else:
-            idxs_list.append(i)
-    var_idxs = np.concatenate(idxs_list)
+            var_idxs.extend(i)
+    var_idxs = np.array(var_idxs)
     return var_idxs
 
 
