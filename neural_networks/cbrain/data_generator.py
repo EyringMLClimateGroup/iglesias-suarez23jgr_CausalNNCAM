@@ -60,10 +60,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         elif type(input_transform) is tuple:
             self.input_transform = InputNormalizer(
                 self.norm_ds,
-                self.input_vars,
+                self.input_vars_dict,
                 input_transform[0],
                 input_transform[1],
-                var_cut_off,
+                #                 var_cut_off,
             )
         else:
             self.input_transform = (
@@ -74,7 +74,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             self.output_transform = Normalizer()
         elif type(output_transform) is dict:
             self.output_transform = DictNormalizer(
-                self.norm_ds, self.output_vars, output_transform
+                self.norm_ds, self.output_vars_dict, output_transform
             )
         else:
             self.output_transform = (
@@ -112,3 +112,10 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.indices = np.arange(self.n_batches)
         if self.shuffle:
             np.random.shuffle(self.indices)
+
+    def __enter__(self):
+        # TODO Move code to retrieve data here
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.data_ds.close()
