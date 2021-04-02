@@ -7,6 +7,7 @@ class SPCAM_Vars(Enum):
         self.dimensions = dimensions
         self.type = var_type
         self.label = label
+        self.ds_name = self._name_.upper()
 
     def __str__(self):
         return f"{self.__repr__()}, {self.label}"
