@@ -142,7 +142,8 @@ def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
                 var_data = VarData(var, norm_data, target_lvl)
             elif var.dimensions == 2:
                 var_data = VarData(var, norm_data)
-            data.append(var_data)
+            if var.type == "out" or np.count_nonzero(norm_data) > 0:
+                data.append(var_data)
 
             if var.dimensions == 2:
                 break  # Stop loading data after the first level
