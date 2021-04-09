@@ -44,7 +44,10 @@ plot_file_pattern :
   single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"
 
+
 # Neural Network configuration
+# ============================
+
 # nn_type : "SingleNN"
 # nn_type : "CausalSingleNN"
 nn_type : "all"
