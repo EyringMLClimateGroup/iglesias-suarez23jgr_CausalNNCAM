@@ -34,16 +34,18 @@ class Setup:
         self.yml_filename = yml_cfgFilenm
         yml_cfgFile = open(self.yml_filename)
         yml_cfg = yaml.load(yml_cfgFile, Loader=yaml.FullLoader)
+        
+        self._setup_pc_analysis(yml_cfg)
+        self._setup_results_aggregation(yml_cfg)
+        self._setup_neural_networks(yml_cfg)
 
+    def _setup_pc_analysis(self, yml_cfg):
         # Load specifications
         self.analysis = yml_cfg["analysis"]
         self.pc_alphas = yml_cfg["pc_alphas"]
         self.verbosity = yml_cfg["verbosity"]
         self.output_folder = yml_cfg["output_folder"]
-        self.plots_folder = yml_cfg["plots_folder"]
         self.output_file_pattern = yml_cfg["output_file_pattern"][self.analysis]
-        self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
-        self.overwrite = False
         self.experiment = EXPERIMENT
 
         region = yml_cfg["region"]
@@ -87,6 +89,26 @@ class Setup:
         # Loaded here so errors are found during setup
         # Note the parenthesis, INDEPENDENCE_TESTS returns functions
         self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
+    
+    def _setup_results_aggregation(self, yml_cfg):
+        self.plots_folder = yml_cfg["plots_folder"]
+        self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
+        self.overwrite = False
+        
+    def _setup_neural_networks(self, yml_cfg):
+        nn_type = yml_cfg["nn_type"]
+        self.do_single_nn = self.do_causal_single_nn = False
+        if nn_type == "SingleNN":
+            self.do_single_nn = True
+        elif nn_type == "CausalSingleNN":
+            self.do_causal_single_nn = True
+        elif nn_type == "all":
+            self.do_single_nn = self.do_causal_single_nn = True
+#         self.hidden_layers = yml_cfg["hidden_layers"]
+#         self.
+        # TODO
+        
+        
 
 
 def _calculate_gridpoints(region):
