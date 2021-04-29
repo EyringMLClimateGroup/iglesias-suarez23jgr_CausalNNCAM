@@ -108,6 +108,10 @@ class Setup:
 #         self.
         # TODO
         
+        input_order = yml_cfg["input_order"]
+        self.input_order = [SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"]
+        output_order = yml_cfg["output_order"]
+        self.output_order = [SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"]
         
 
 
