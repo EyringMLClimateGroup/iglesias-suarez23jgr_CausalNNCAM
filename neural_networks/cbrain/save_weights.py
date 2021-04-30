@@ -39,13 +39,19 @@ def save2txt(weight_file, save_dir):
             )
 
 
-def save_norm(input_transform, output_transform, save_dir):
+def save_norm(input_transform, output_transform, save_dir, filename):
     """Save normalization arrays to text file."""
     for name, arr in input_transform.transform_arrays.items():
         np.savetxt(
-            save_dir + f"/inp_{name}.txt", arr.reshape(1, -1), fmt=fmt, delimiter=","
+            save_dir + f"/{filename}_inp_{name}.txt",
+            arr.reshape(1, -1),
+            fmt=fmt,
+            delimiter=",",
         )
     for name, arr in output_transform.transform_arrays.items():
         np.savetxt(
-            save_dir + f"/out_{name}.txt", arr.reshape(1, -1), fmt=fmt, delimiter=","
+            save_dir + f"/{filename}_out_{name}.txt",
+            arr.reshape(1, -1),
+            fmt=fmt,
+            delimiter=",",
         )
