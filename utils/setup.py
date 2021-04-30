@@ -104,6 +104,8 @@ class Setup:
             self.do_causal_single_nn = True
         elif nn_type == "all":
             self.do_single_nn = self.do_causal_single_nn = True
+
+        self.nn_output_path = yml_cfg["nn_output_path"]
 #         self.hidden_layers = yml_cfg["hidden_layers"]
 #         self.
         # TODO
@@ -112,6 +114,26 @@ class Setup:
         self.input_order = [SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"]
         output_order = yml_cfg["output_order"]
         self.output_order = [SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"]
+        self.hidden_layers = yml_cfg["hidden_layers"]
+        self.activation = yml_cfg["activation"]
+        self.epochs = yml_cfg["epochs"]
+
+        # Training configuration
+        self.train_verbose = yml_cfg["train_verbose"]
+        self.tensorboard_folder = yml_cfg["tensorboard_folder"]
+
+        self.train_data_folder = yml_cfg["train_data_folder"]
+        self.train_data_fn = yml_cfg["train_data_fn"]
+        self.valid_data_fn = yml_cfg["valid_data_fn"]
+
+        self.normalization_folder = yml_cfg["normalization_folder"]
+        self.normalization_fn = yml_cfg["normalization_fn"]
+
+        self.input_sub = yml_cfg["input_sub"]
+        self.input_div = yml_cfg["input_div"]
+        self.out_scale_dict_folder = yml_cfg["out_scale_dict_folder"]
+        self.out_scale_dict_fn = yml_cfg["out_scale_dict_fn"]
+        self.batch_size = yml_cfg["batch_size"]
         
 
 

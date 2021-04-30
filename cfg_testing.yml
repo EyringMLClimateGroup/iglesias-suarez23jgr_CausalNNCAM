@@ -53,3 +53,36 @@ plot_file_pattern :
 nn_type : "all"
 input_order : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
 output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
+
+nn_output_path : models
+
+hidden_layers : [32, 32, 32]   # Arbitrary, I choose them because it's a small NN
+activation : relu
+
+
+# Training configuration
+# ----------------------
+
+train_data_folder : /work/bd1083/b309162/preprocessed_data
+# Monthly data, for testing
+train_data_fn : 002_train_1_month.nc
+valid_data_fn : 000_valid_1_month.nc
+# Yearly data
+# train_data_fn : 002_train_1_year.nc
+# valid_data_fn : 005_valid_1_year.nc
+epochs : 4 # From 006_8col_pnas_exact.yml
+epochs : 1 # For testing
+train_verbose : 0 # Silent
+train_verbose : 1 # Continuous update
+# train_verbose : 2 # Summary on epoch
+tensorboard_folder : tensorboard
+
+# From Tom https://github.com/tbeucler/CBRAIN-CAM/tree/master/notebooks/tbeucler_devlog/UW_DATA
+normalization_folder : /work/bd1179/b309198/causal_discovery/rasp-et-al/data
+normalization_fn : 001_norm.nc
+
+input_sub : mean # From 006_8col_pnas_exact.yml
+input_div : maxrs # From 006_8col_pnas_exact.yml
+out_scale_dict_folder : /work/bd1179/b309198/causal_discovery/rasp-et-al/CBRAIN-CAM/
+out_scale_dict_fn : nn_config/scale_dicts/002_pnas_scaling.pkl # From 006_8col_pnas_exact.yml
+batch_size : 1024
