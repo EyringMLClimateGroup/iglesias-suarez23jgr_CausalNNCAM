@@ -27,12 +27,12 @@ spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','prect','fsns','flns','fsnt','flnt']
 spcam_children : ['tphystnd','flnt']
 spcam_children : ['phq','flns']
-pc_alphas      : [0.001,0.002,0.005,0.01,0.02,0.05,0.1,0.2]
+pc_alphas      : [0.001,0.01,0.1]
 independence_test : "parcorr"
 #pc_alphas      : [0.01]
 region         : [ [-90,90] , [0, 360] ] # Lons: 120, 118
 lim_levels     : False # [950, 750] # False
-target_levels  : [3.643, 54.595, 103.317, 197.908, 379.100, 524.687, 763.404, 859.534, 912.644, 957.485] # False
+target_levels  : [103.317] # False
 output_folder  : "/work/bd1179/b309172/analysis/usmile/causality_convection/python/causalnncam/causal_links/"
 plots_folder : "./test_causal_links/plots"
 #output_folder  : "./test_causal_links"
@@ -40,10 +40,15 @@ verbosity      : 0
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
+
+
+
+# Aggregated analysis
+# ===================
+thresholds : [.3, .5]
 plot_file_pattern : 
   single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"
-
 
 # Neural Network configuration
 # ============================

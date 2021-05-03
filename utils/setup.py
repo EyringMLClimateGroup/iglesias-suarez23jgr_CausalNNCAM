@@ -91,6 +91,7 @@ class Setup:
         self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
     
     def _setup_results_aggregation(self, yml_cfg):
+        self.thresholds = yml_cfg["thresholds"]
         self.plots_folder = yml_cfg["plots_folder"]
         self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
         self.overwrite = False
