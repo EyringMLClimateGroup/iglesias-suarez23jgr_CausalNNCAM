@@ -1,5 +1,6 @@
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from .constants import EXPERIMENT, SIGNIFICANCE
+from .variable import Variable
 from . import utils
 import getopt
 import yaml
@@ -113,6 +114,7 @@ class Setup:
         
         input_order = yml_cfg["input_order"]
         self.input_order = [SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"]
+        self.input_order_list = _make_order_list(self.input_order, self.levels)
         output_order = yml_cfg["output_order"]
         self.output_order = [SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"]
         self.hidden_layers = yml_cfg["hidden_layers"]
@@ -136,6 +138,11 @@ class Setup:
         self.out_scale_dict_fn = yml_cfg["out_scale_dict_fn"]
         self.batch_size = yml_cfg["batch_size"]
         
+        self.init_lr = yml_cfg["init_lr"]
+        self.step_lr = yml_cfg["step_lr"]
+        self.divide_lr = yml_cfg["divide_lr"]
+        
+        self.train_patience = yml_cfg["train_patience"]
 
 
 def _calculate_gridpoints(region):
@@ -170,3 +177,20 @@ def _build_GPDCtorch(**kwargs):
     from tigramite.independence_tests import GPDCtorch
 
     return GPDCtorch(**kwargs)
+
+def _make_order_list(order, levels):
+    # TODO? Move this out of here, to a utils module
+    order_list = list()
+    for i_var, spcam_var in enumerate(order):
+        if spcam_var.dimensions == 3:
+            n_levels = len(levels)
+        elif spcam_var.dimensions == 2:
+            n_levels = 1
+        for i_lvl in range(n_levels):
+            if spcam_var.dimensions == 3:
+                level = levels[i_lvl]
+                var = Variable(spcam_var, level, i_lvl)
+            elif spcam_var.dimensions == 2:
+                var = Variable(spcam_var, None, None)
+            order_list.append(var)
+    return order_list
