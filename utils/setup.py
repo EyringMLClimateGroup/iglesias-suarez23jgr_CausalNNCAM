@@ -1,5 +1,6 @@
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from .constants import EXPERIMENT, SIGNIFICANCE
+from .variable import Variable
 from . import utils
 import getopt
 import yaml
@@ -34,16 +35,18 @@ class Setup:
         self.yml_filename = yml_cfgFilenm
         yml_cfgFile = open(self.yml_filename)
         yml_cfg = yaml.load(yml_cfgFile, Loader=yaml.FullLoader)
+        
+        self._setup_pc_analysis(yml_cfg)
+        self._setup_results_aggregation(yml_cfg)
+        self._setup_neural_networks(yml_cfg)
 
+    def _setup_pc_analysis(self, yml_cfg):
         # Load specifications
         self.analysis = yml_cfg["analysis"]
         self.pc_alphas = yml_cfg["pc_alphas"]
         self.verbosity = yml_cfg["verbosity"]
         self.output_folder = yml_cfg["output_folder"]
-        self.plots_folder = yml_cfg["plots_folder"]
         self.output_file_pattern = yml_cfg["output_file_pattern"][self.analysis]
-        self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
-        self.overwrite = False
         self.experiment = EXPERIMENT
 
         region = yml_cfg["region"]
@@ -87,6 +90,59 @@ class Setup:
         # Loaded here so errors are found during setup
         # Note the parenthesis, INDEPENDENCE_TESTS returns functions
         self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
+    
+    def _setup_results_aggregation(self, yml_cfg):
+        self.thresholds = yml_cfg["thresholds"]
+        self.plots_folder = yml_cfg["plots_folder"]
+        self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
+        self.overwrite = False
+        
+    def _setup_neural_networks(self, yml_cfg):
+        nn_type = yml_cfg["nn_type"]
+        self.do_single_nn = self.do_causal_single_nn = False
+        if nn_type == "SingleNN":
+            self.do_single_nn = True
+        elif nn_type == "CausalSingleNN":
+            self.do_causal_single_nn = True
+        elif nn_type == "all":
+            self.do_single_nn = self.do_causal_single_nn = True
+
+        self.nn_output_path = yml_cfg["nn_output_path"]
+#         self.hidden_layers = yml_cfg["hidden_layers"]
+#         self.
+        # TODO
+        
+        input_order = yml_cfg["input_order"]
+        self.input_order = [SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"]
+        self.input_order_list = _make_order_list(self.input_order, self.levels)
+        output_order = yml_cfg["output_order"]
+        self.output_order = [SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"]
+        self.hidden_layers = yml_cfg["hidden_layers"]
+        self.activation = yml_cfg["activation"]
+        self.epochs = yml_cfg["epochs"]
+
+        # Training configuration
+        self.train_verbose = yml_cfg["train_verbose"]
+        self.tensorboard_folder = yml_cfg["tensorboard_folder"]
+
+        self.train_data_folder = yml_cfg["train_data_folder"]
+        self.train_data_fn = yml_cfg["train_data_fn"]
+        self.valid_data_fn = yml_cfg["valid_data_fn"]
+
+        self.normalization_folder = yml_cfg["normalization_folder"]
+        self.normalization_fn = yml_cfg["normalization_fn"]
+
+        self.input_sub = yml_cfg["input_sub"]
+        self.input_div = yml_cfg["input_div"]
+        self.out_scale_dict_folder = yml_cfg["out_scale_dict_folder"]
+        self.out_scale_dict_fn = yml_cfg["out_scale_dict_fn"]
+        self.batch_size = yml_cfg["batch_size"]
+        
+        self.init_lr = yml_cfg["init_lr"]
+        self.step_lr = yml_cfg["step_lr"]
+        self.divide_lr = yml_cfg["divide_lr"]
+        
+        self.train_patience = yml_cfg["train_patience"]
 
 
 def _calculate_gridpoints(region):
@@ -121,3 +177,20 @@ def _build_GPDCtorch(**kwargs):
     from tigramite.independence_tests import GPDCtorch
 
     return GPDCtorch(**kwargs)
+
+def _make_order_list(order, levels):
+    # TODO? Move this out of here, to a utils module
+    order_list = list()
+    for i_var, spcam_var in enumerate(order):
+        if spcam_var.dimensions == 3:
+            n_levels = len(levels)
+        elif spcam_var.dimensions == 2:
+            n_levels = 1
+        for i_lvl in range(n_levels):
+            if spcam_var.dimensions == 3:
+                level = levels[i_lvl]
+                var = Variable(spcam_var, level, i_lvl)
+            elif spcam_var.dimensions == 2:
+                var = Variable(spcam_var, None, None)
+            order_list.append(var)
+    return order_list
