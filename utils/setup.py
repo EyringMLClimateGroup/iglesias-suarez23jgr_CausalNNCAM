@@ -10,7 +10,7 @@ INDEPENDENCE_TESTS = {
     "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
     "gpdc": lambda: GPDC(recycle_residuals=True),
     "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-    #     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+#     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
 }
 
 
