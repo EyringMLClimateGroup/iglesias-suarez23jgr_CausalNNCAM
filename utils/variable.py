@@ -29,8 +29,7 @@ class Variable:
 
     @staticmethod
     def parse_var_name(var_name):
-        """
-        Parses a string of variable and name to a Variable object
+        """Parses a string of variable and name to a Variable object
         
         Parameters
         ----------
@@ -72,3 +71,6 @@ class Variable:
             return self.var == other.var and self.level_idx == other.level_idx
         else:
             return False
+
+    def __hash__(self):
+        return hash(str(self))
