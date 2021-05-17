@@ -79,6 +79,8 @@ def plot_links(
 #         node_colorbar_label = 'auto-MCI',
         link_colorbar_label="cross",
         node_colorbar_label="auto",
+        cmap_edges='RdBu_r', #'Reds', # 'winter', #'RdBu_r',
+        cmap_nodes='OrRd',
         link_width=link_width,
         arrow_linewidth=arrow_linewidth,
         node_size=node_size,
