@@ -8,17 +8,19 @@ from .variable import Variable
 
 # Collect results
 
+
 def get_parents_from_links(links):
     """ Return a list of variables that are parents, given a
     dictionary of links of the form {variable : [(parent, lag)]}
     """
 
-    linked_variables = set() # Avoids duplicates and sorts when iterated
+    linked_variables = set()  # Avoids duplicates and sorts when iterated
     for parents_list in links.values():
         if len(parents_list) > 0:
             for parent in parents_list:
-                linked_variables.add(parent[0]) # Remove the lag
-    return [(i in linked_variables)  for i in range(len(links))]
+                linked_variables.add(parent[0])  # Remove the lag
+    return [(i in linked_variables) for i in range(len(links))]
+
 
 def record_error(file, error_type, errors):
     """Record if a file has failed with a given error type"""
@@ -34,7 +36,7 @@ def collect_in_dict(_dict, key, value):
 
     collected_values = _dict.get(key, list())
     collected_values.append(value)
-    _dict[key] = collected_values    
+    _dict[key] = collected_values
 
 
 def collect_results_file(key, results_file, collected_results, errors):
@@ -88,18 +90,20 @@ def collect_results_file(key, results_file, collected_results, errors):
     collected_results[key] = collected_pc_alpha
     # Doesn't return, instead modifies the received `collected results` object
 
+
 def count_total_variables(var_children, levels):
-    """
-    
+    """ Return the total number of variables given a list of spcam
+    variables and a list of levels of for 3D variables
     """
     total = 0
     for child in var_children:
-        
+
         if child.dimensions == 2:
             total += 1
         elif child.dimensions == 3:
             total += len(levels)
     return total
+
 
 def collect_results(setup):
     """Collect the pcmci results defined in the setup in a file"""
@@ -165,21 +169,23 @@ def collect_results(setup):
 
     return collected_results, errors
 
+
 def print_errors(errors):
     """Prints the error dictionary according to type"""
-    
+
     print("ERRORS\n======")
     for error_type, error_list in errors.items():
         msg = "{}: {} of {} files ({:.2f}%)".format(
-                error_type,
-                len(error_list),
-                total_files,
-                len(error_list)/total_files*100
+            error_type,
+            len(error_list),
+            total_files,
+            len(error_list) / total_files * 100,
         )
         print(msg)
         print("-" * len(msg))
         for file in error_list:
             print(file)
+
 
 def aggregate_results(collected_results, setup):
     # Configuration
@@ -340,6 +346,7 @@ def build_plot_matrices(var_names_parents, aggregated_results):
 
 # Plotting
 
+
 def recommend_sizes(links):
     """
     
@@ -356,10 +363,10 @@ def recommend_sizes(links):
         figsize = (32, 32)
         node_size = 0.10
     else:
-        #Big
+        # Big
         figsize = (48, 48)
         node_size = 0.05
-    
+
     return figsize, node_size
 
 
@@ -377,17 +384,17 @@ def scale_link_width(o_link_width, threshold):
     as the minimum
     """
     min_val = threshold
-#     min_val = o_link_width[o_link_width >= threshold].min()
+    # min_val = o_link_width[o_link_width >= threshold].min()
     smallest_link = 0.05
     link_width = o_link_width + smallest_link
     link_width -= min_val
-    link_width[o_link_width < threshold] = 0 
-    return link_width/link_width.max()
+    link_width[o_link_width < threshold] = 0
+    return link_width / link_width.max()
 
 
 def plot_aggregated_results(var_names_parents, aggregated_results, setup):
     Path(setup.plots_folder).mkdir(parents=True, exist_ok=True)
-    
+
     dict_combinations = build_plot_matrices(var_names_parents, aggregated_results)
 
     for combination, combination_results in dict_combinations.items():
