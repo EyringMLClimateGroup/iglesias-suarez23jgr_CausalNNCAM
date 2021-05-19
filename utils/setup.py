@@ -1,6 +1,6 @@
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from .constants import EXPERIMENT, SIGNIFICANCE
-from .variable import Variable
+from .variable import Variable_Lev_Metadata
 from . import utils
 import getopt
 import yaml
@@ -189,8 +189,8 @@ def _make_order_list(order, levels):
         for i_lvl in range(n_levels):
             if spcam_var.dimensions == 3:
                 level = levels[i_lvl]
-                var = Variable(spcam_var, level, i_lvl)
+                var = Variable_Lev_Metadata(spcam_var, level, i_lvl)
             elif spcam_var.dimensions == 2:
-                var = Variable(spcam_var, None, None)
+                var = Variable_Lev_Metadata(spcam_var, None, None)
             order_list.append(var)
     return order_list

@@ -3,7 +3,7 @@ from pathlib import Path
 
 from . import utils
 from .plotting import plot_links, find_linked_variables
-from .variable import Variable
+from .variable import Variable_Lev_Metadata
 
 
 # Collect results
@@ -120,12 +120,12 @@ def collect_results(setup):
         print(f"Variable: {child.name}")
         if child.dimensions == 2:
             child_levels = [[setup.levels[-1], 0]]
-            child_var = Variable(child, None, None)
+            child_var = Variable_Lev_Metadata(child, None, None)
         elif child.dimensions == 3:
             child_levels = setup.children_idx_levs
         for level in child_levels:
             if child.dimensions == 3:
-                child_var = Variable(child, level[0], level[1])
+                child_var = Variable_Lev_Metadata(child, level[0], level[1])
             if setup.analysis == "single":
                 for i_grid, (lat, lon) in enumerate(setup.gridpoints):
                     results_file = utils.generate_results_filename_single(

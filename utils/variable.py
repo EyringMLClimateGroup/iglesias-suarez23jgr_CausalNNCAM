@@ -2,7 +2,7 @@ from pathlib import Path
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from . import utils
 
-class Variable:
+class Variable_Lev_Metadata:
     """
     Object that stores a SPCAM variable and one specific level.
     
@@ -29,7 +29,8 @@ class Variable:
 
     @staticmethod
     def parse_var_name(var_name):
-        """Parses a string of variable and name to a Variable object
+        """Parses a string of variable and name to a
+        Variable_Lev_Metadata object
         
         Parameters
         ----------
@@ -39,9 +40,9 @@ class Variable:
         
         Returns
         -------
-        Variable
-            Variable object that contains the information referenced
-            in the string
+        Variable_Lev_Metadata
+            Variable_Lev_Metadata object that contains the information
+            referenced in the string
         """
         values = var_name.split("-")
         spcam_name = values[0]
@@ -55,7 +56,7 @@ class Variable:
             level_altitude = float(values[1])
             level_idx = utils.find_closest_value(levels, level_altitude)
 
-        return Variable(spcam_var, level_altitude, level_idx)
+        return Variable_Lev_Metadata(spcam_var, level_altitude, level_idx)
 
     def __str__(self):
         if self.var.dimensions == 2:
