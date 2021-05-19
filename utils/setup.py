@@ -11,7 +11,7 @@ INDEPENDENCE_TESTS = {
     "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
     "gpdc": lambda: GPDC(recycle_residuals=True),
     "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-#     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+    #     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
 }
 
 
@@ -35,7 +35,7 @@ class Setup:
         self.yml_filename = yml_cfgFilenm
         yml_cfgFile = open(self.yml_filename)
         yml_cfg = yaml.load(yml_cfgFile, Loader=yaml.FullLoader)
-        
+
         self._setup_pc_analysis(yml_cfg)
         self._setup_results_aggregation(yml_cfg)
         self._setup_neural_networks(yml_cfg)
@@ -90,13 +90,13 @@ class Setup:
         # Loaded here so errors are found during setup
         # Note the parenthesis, INDEPENDENCE_TESTS returns functions
         self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
-    
+
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds = yml_cfg["thresholds"]
         self.plots_folder = yml_cfg["plots_folder"]
         self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
         self.overwrite = False
-        
+
     def _setup_neural_networks(self, yml_cfg):
         nn_type = yml_cfg["nn_type"]
         self.do_single_nn = self.do_causal_single_nn = False
@@ -108,15 +108,16 @@ class Setup:
             self.do_single_nn = self.do_causal_single_nn = True
 
         self.nn_output_path = yml_cfg["nn_output_path"]
-#         self.hidden_layers = yml_cfg["hidden_layers"]
-#         self.
-        # TODO
-        
+
         input_order = yml_cfg["input_order"]
-        self.input_order = [SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"]
+        self.input_order = [
+            SPCAM_Vars[x] for x in input_order if SPCAM_Vars[x].type == "in"
+        ]
         self.input_order_list = _make_order_list(self.input_order, self.levels)
         output_order = yml_cfg["output_order"]
-        self.output_order = [SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"]
+        self.output_order = [
+            SPCAM_Vars[x] for x in output_order if SPCAM_Vars[x].type == "out"
+        ]
         self.hidden_layers = yml_cfg["hidden_layers"]
         self.activation = yml_cfg["activation"]
         self.epochs = yml_cfg["epochs"]
@@ -137,11 +138,11 @@ class Setup:
         self.out_scale_dict_folder = yml_cfg["out_scale_dict_folder"]
         self.out_scale_dict_fn = yml_cfg["out_scale_dict_fn"]
         self.batch_size = yml_cfg["batch_size"]
-        
+
         self.init_lr = yml_cfg["init_lr"]
         self.step_lr = yml_cfg["step_lr"]
         self.divide_lr = yml_cfg["divide_lr"]
-        
+
         self.train_patience = yml_cfg["train_patience"]
 
 
@@ -177,6 +178,7 @@ def _build_GPDCtorch(**kwargs):
     from tigramite.independence_tests import GPDCtorch
 
     return GPDCtorch(**kwargs)
+
 
 def _make_order_list(order, levels):
     # TODO? Move this out of here, to a utils module
