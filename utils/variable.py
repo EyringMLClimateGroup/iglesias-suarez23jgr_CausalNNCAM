@@ -29,7 +29,7 @@ class Variable_Lev_Metadata:
 
     @staticmethod
     def parse_var_name(var_name):
-        """Parses a string of variable and name to a
+        """Parses a string of variable and level to a
         Variable_Lev_Metadata object
         
         Parameters
@@ -44,6 +44,8 @@ class Variable_Lev_Metadata:
             Variable_Lev_Metadata object that contains the information
             referenced in the string
         """
+        if type(var_name) is Variable_Lev_Metadata:
+            return var_name
         values = var_name.split("-")
         spcam_name = values[0]
         dict_spcam_vars = {v.name: v for v in SPCAM_Vars}
