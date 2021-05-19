@@ -173,6 +173,10 @@ def collect_results(setup):
 def print_errors(errors):
     """Prints the error dictionary according to type"""
 
+    if len(errors) == 0:
+        print("No errors were found")
+        return
+    
     print("ERRORS\n======")
     for error_type, error_list in errors.items():
         msg = "{}: {} of {} files ({:.2f}%)".format(
