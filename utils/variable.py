@@ -3,8 +3,7 @@ from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from . import utils
 
 class Variable_Lev_Metadata:
-    """
-    Object that stores a SPCAM variable and one specific level.
+    """Object that stores a SPCAM variable and one specific level.
     
     Both the level in hPa and its index in ancillaries are stored.
     
