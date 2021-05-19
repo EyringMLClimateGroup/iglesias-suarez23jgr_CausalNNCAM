@@ -2,6 +2,7 @@ from pathlib import Path
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from . import utils
 
+
 class Variable_Lev_Metadata:
     """Object that stores a SPCAM variable and one specific level.
     
@@ -67,7 +68,7 @@ class Variable_Lev_Metadata:
 
     def __repr__(self):
         return repr(str(self))
-    
+
     def __eq__(self, other):
         if type(self) is type(other):
             return self.var == other.var and self.level_idx == other.level_idx
