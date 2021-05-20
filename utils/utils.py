@@ -89,10 +89,11 @@ def normalize(values):
     if std != 0:
         return anom / std
     else:
-#        return values
+        # return values
         # Adding random noise avoids causal links,
         # while allowing pcmci to run
         return np.random.normal(scale=1.0, size=values.shape)
+
 
 def log_normalize(values):
     values = ma.log(values)
@@ -102,8 +103,8 @@ def log_normalize(values):
     if std != 0:
         return anom / std
     else:
-#         print(f"Values for prect are zero; check data. Stop processing!")
-#         exit()
+        # print(f"Values for prect are zero; check data. Stop processing!")
+        # exit()
         raise ValueError("Values for prect are zero; check data.")
 
 
@@ -222,6 +223,6 @@ def save_results(results, file):
 
 
 def load_results(file):
-#     print(f"Loading results from \"{file}\"")
+    # print(f"Loading results from \"{file}\"")
     with open(file, "rb") as f:
         return pickle.load(f)
