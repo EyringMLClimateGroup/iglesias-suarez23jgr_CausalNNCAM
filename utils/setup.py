@@ -11,7 +11,7 @@ INDEPENDENCE_TESTS = {
     "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
     "gpdc": lambda: GPDC(recycle_residuals=True),
     "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-    #     "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+    # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
 }
 
 
@@ -76,7 +76,6 @@ class Setup:
 
         self.ind_test_name = yml_cfg["independence_test"]
 
-
         # # Loaded here so errors are found during setup
         # # Note the parenthesis, INDEPENDENCE_TESTS returns functions
         # self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
@@ -130,6 +129,8 @@ class SetupPCAnalysis(Setup):
         # Note the parenthesis, INDEPENDENCE_TESTS returns functions
         self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
 
+        self.overwrite_pc = yml_cfg.get("overwrite_pc", False)
+
 
 class SetupPCMCIAggregation(Setup):
     def __init__(self, argv):
@@ -143,7 +144,7 @@ class SetupPCMCIAggregation(Setup):
     def _setup_plots(self, yml_cfg):
         self.plots_folder = yml_cfg["plots_folder"]
         self.plot_file_pattern = yml_cfg["plot_file_pattern"][self.analysis]
-        self.overwrite = False
+        self.overwrite_plots = yml_cfg.get("overwrite_plot", False)
 
 
 class SetupNeuralNetworks(Setup):

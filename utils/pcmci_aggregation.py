@@ -176,7 +176,7 @@ def print_errors(errors):
     if len(errors) == 0:
         print("No errors were found")
         return
-    
+
     print("ERRORS\n======")
     for error_type, error_list in errors.items():
         msg = "{}: {} of {} files ({:.2f}%)".format(
@@ -407,7 +407,7 @@ def plot_aggregated_results(var_names_parents, aggregated_results, setup):
             cfg=setup.yml_filename.rsplit(".")[0], combination=combination
         )
         plot_file = Path(setup.plots_folder, plot_filename)
-        if not setup.overwrite and plot_file.is_file():
+        if not setup.overwrite_plots and plot_file.is_file():
             print(f"Found file {plot_file}, skipping.")
             continue  # Ignore this result
         links = combination_results["links"]
