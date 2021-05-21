@@ -38,16 +38,8 @@ class ModelDescription:
     #TODO
     
     """
-    
-    def __init__(
-        self,
-        output,
-        parents,
-        model_type,
-        pc_alpha,
-        threshold,
-        setup
-    ):
+
+    def __init__(self, output, parents, model_type, pc_alpha, threshold, setup):
         """
         Parameters
         ----------
@@ -70,7 +62,9 @@ class ModelDescription:
         self.setup = setup
         self.output = Variable_Lev_Metadata.parse_var_name(output)
         parents = [Variable_Lev_Metadata.parse_var_name(p) for p in parents]
-        self.parents = sorted(parents, key=lambda x: self.setup.input_order_list.index(x))
+        self.parents = sorted(
+            parents, key=lambda x: self.setup.input_order_list.index(x)
+        )
         self.model_type = model_type
         self.pc_alpha = pc_alpha
         self.threshold = threshold
@@ -94,12 +88,12 @@ class ModelDescription:
         )
         model.compile(
             # TODO? Move to configuration
-            optimizer = "adam", # From train.py (default)
-            loss = "mse", # From 006_8col_pnas_exact.yml
-            metrics = [tf.keras.losses.mse], # From train.py (default)
+            optimizer="adam",  # From train.py (default)
+            loss="mse",  # From 006_8col_pnas_exact.yml
+            metrics=[tf.keras.losses.mse],  # From train.py (default)
         )
         return model
-    
+
     @staticmethod
     def _build_vars_dict(list_variables):
         """
@@ -123,7 +117,7 @@ class ModelDescription:
         """
         vars_dict = dict()
         for variable in list_variables:
-            ds_name = variable.var.ds_name # Name used in the dataset
+            ds_name = variable.var.ds_name  # Name used in the dataset
             if variable.var.dimensions == 2:
                 vars_dict[ds_name] = None
             elif variable.var.dimensions == 3:
@@ -131,39 +125,42 @@ class ModelDescription:
                 levels.append(variable.level_idx)
                 vars_dict[ds_name] = levels
         return vars_dict
-    
-    def fit_model(self, x, validation_data, epochs, callbacks, verbose = 1):
+
+    def fit_model(self, x, validation_data, epochs, callbacks, verbose=1):
         self.model.fit(
-            x = x,
-            validation_data = validation_data,
-            epochs = epochs,
-            callbacks = callbacks,
-            verbose = verbose,
+            x=x,
+            validation_data=validation_data,
+            epochs=epochs,
+            callbacks=callbacks,
+            verbose=verbose,
         )
-    
+
     def get_path(self, base_path):
         path = Path(base_path, self.model_type)
         if self.model_type == "CausalSingleNN":
-            path = path / Path("a{pc_alpha}-t{threshold}/".format(
-                pc_alpha = self.pc_alpha,
-                threshold = self.threshold
-            ))
+            path = path / Path(
+                "a{pc_alpha}-t{threshold}/".format(
+                    pc_alpha=self.pc_alpha, threshold=self.threshold
+                )
+            )
         str_hl = str(self.setup.hidden_layers).replace(", ", "_")
         str_hl = str_hl.replace("[", "").replace("]", "")
-        path = path / Path("hl_{hidden_layers}-act_{activation}-e_{epochs}/".format(
-            hidden_layers = str_hl,
-            activation = self.setup.activation,
-            epochs = self.setup.epochs
-        ))
+        path = path / Path(
+            "hl_{hidden_layers}-act_{activation}-e_{epochs}/".format(
+                hidden_layers=str_hl,
+                activation=self.setup.activation,
+                epochs=self.setup.epochs,
+            )
+        )
         return path
-    
+
     def get_filename(self):
         i_var = self.setup.output_order.index(self.output.var)
         i_level = self.output.level_idx
         if i_level is None:
             i_level = 0
         return f"{i_var}_{i_level}"
-    
+
     def save_model(self, base_path):
         folder = self.get_path(base_path)
         filename = self.get_filename()
@@ -174,13 +171,13 @@ class ModelDescription:
         self.model.save_weights(Path(folder, f"{filename}_weights.h5"))
         # Save input list
         self.save_input_list(folder, filename)
-        
+
     def save_input_list(self, folder, filename):
         input_list = self.get_input_list()
         with open(Path(folder, f"{filename}_input_list.txt"), "w") as f:
             for line in input_list:
-                print(str(line), file = f)
-        
+                print(str(line), file=f)
+
     def get_input_list(self):
         return [int(var in self.parents) for var in self.setup.input_order_list]
 
@@ -217,11 +214,12 @@ def dense_nn(input_shape, output_shape, hidden_layers, activation):
 
 def generate_single_nn(setup):
     from utils.constants import SPCAM_Vars
+
     # TODO Only parents & children in configuration
-    
+
     model_descriptions = list()
-    
-    parents = list() # TODO Parents and levels
+
+    parents = list()  # TODO Parents and levels
     for spcam_var in setup.spcam_inputs:
         if spcam_var.dimensions == 3:
             for level, _ in setup.parents_idx_levs:
@@ -232,7 +230,7 @@ def generate_single_nn(setup):
         elif spcam_var.dimensions == 2:
             var_name = spcam_var.name
             parents.append(var_name)
-    
+
     output_list = list()
     for spcam_var in setup.spcam_outputs:
         if spcam_var.dimensions == 3:
@@ -242,25 +240,20 @@ def generate_single_nn(setup):
                 var_name = f"{spcam_var.name}-{round(level, 2)}"
         elif spcam_var.dimensions == 2:
             var_name = spcam_var.name
-        output_list.append(var_name)    
+        output_list.append(var_name)
 
     for output in output_list:
         model_description = ModelDescription(
-            output,
-            parents,
-            "SingleNN",
-            pc_alpha = None,
-            threshold = None,
-            setup = setup,
+            output, parents, "SingleNN", pc_alpha=None, threshold=None, setup=setup,
         )
         model_descriptions.append(model_description)
     return model_descriptions
 
 
 def generate_causal_single_nn(setup, aggregated_results):
-    
+
     model_descriptions = list()
-    
+
     for output, pc_alpha_dict in aggregated_results.items():
         print(output)
         if len(pc_alpha_dict) == 0:  # May be empty
@@ -272,12 +265,7 @@ def generate_causal_single_nn(setup, aggregated_results):
             for threshold, parent_idxs in pc_alpha_results["parents"].items():
                 parents = var_names[parent_idxs]
                 model_description = ModelDescription(
-                    output,
-                    parents,
-                    "CausalSingleNN",
-                    pc_alpha,
-                    threshold,
-                    setup = setup,
+                    output, parents, "CausalSingleNN", pc_alpha, threshold, setup=setup,
                 )
                 model_descriptions.append(model_description)
     return model_descriptions
@@ -285,15 +273,16 @@ def generate_causal_single_nn(setup, aggregated_results):
 
 def generate_models(setup):
     model_descriptions = list()
-    
+
     if setup.do_single_nn:
         model_descriptions.extend(generate_single_nn(setup))
-    
+
     if setup.do_causal_single_nn:
         collected_results, errors = aggregation.collect_results(setup)
         aggregation.print_errors(errors)
         aggregated_results, var_names_parents = aggregation.aggregate_results(
-            collected_results, setup)
+            collected_results, setup
+        )
         model_descriptions.extend(generate_causal_single_nn(setup, aggregated_results))
-        
+
     return model_descriptions
