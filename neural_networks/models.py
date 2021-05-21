@@ -188,7 +188,7 @@ class ModelDescription:
                 print(str(line), file = f)
         
     def get_input_list(self):
-        return [int(var in self.parents) for var in setup.input_order_list]
+        return [int(var in self.parents) for var in self.setup.input_order_list]
 
     def __str__(self):
         name = f"{self.model_type}: {self.output}"
