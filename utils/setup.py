@@ -5,14 +5,7 @@ from . import utils
 import getopt
 import yaml
 from pathlib import Path
-from tigramite.independence_tests import ParCorr, GPDC
 
-INDEPENDENCE_TESTS = {
-    "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
-    "gpdc": lambda: GPDC(recycle_residuals=True),
-    "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-    # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
-}
 
 
 class Setup:
@@ -82,6 +75,16 @@ class Setup:
 
 
 class SetupPCAnalysis(Setup):
+    from tigramite.independence_tests import ParCorr, GPDC
+
+    INDEPENDENCE_TESTS = {
+        "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
+        "gpdc": lambda: GPDC(recycle_residuals=True),
+        "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
+        # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+    }
+    
+    
     def __init__(self, argv):
         super().__init__(argv)
         self._setup_pc_analysis(self.yml_cfg)
@@ -90,7 +93,7 @@ class SetupPCAnalysis(Setup):
         # Load specifications
         # self.analysis = yml_cfg["analysis"]
         self.pc_alphas = yml_cfg["pc_alphas"]
-        self.verbosity = yml_cfg["verbosity"]
+        self.verbosity_pc = yml_cfg["verbosity"]
         # self.output_folder = yml_cfg["output_folder"]
         # self.output_file_pattern = yml_cfg["output_file_pattern"][self.analysis]
         # self.experiment = EXPERIMENT
