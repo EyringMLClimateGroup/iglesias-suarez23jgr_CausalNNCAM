@@ -92,7 +92,7 @@ class SetupPCAnalysis(Setup):
     def _setup_pc_analysis(self, yml_cfg):
         # Load specifications
         # self.analysis = yml_cfg["analysis"]
-        self.pc_alphas = yml_cfg["pc_alphas"]
+        # self.pc_alphas = yml_cfg["pc_alphas"]
         self.verbosity_pc = yml_cfg["verbosity"]
         # self.output_folder = yml_cfg["output_folder"]
         # self.output_file_pattern = yml_cfg["output_file_pattern"][self.analysis]
