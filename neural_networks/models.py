@@ -9,11 +9,6 @@ from utils.variable import Variable_Lev_Metadata
 import utils.pcmci_aggregation as aggregation
 
 
-# # NOTE: This will generate a lot of models, it may be better to put
-# # them on different folders
-# MODEL_FILENAME_PATTERN = "model-{variable}-a{pc_alpha}-t{threshold}.h5"
-
-
 class ModelDescription:
     """
     Object that stores a Keras model and metainformation about it.
@@ -108,8 +103,8 @@ class ModelDescription:
     @staticmethod
     def _build_vars_dict(list_variables):
         """
-        Convert the given list of Variable_Lev_Metadata into a dictionary to be used
-        on the data generator.
+        Convert the given list of Variable_Lev_Metadata into a
+        dictionary to be used on the data generator.
         
         Parameters
         ----------
@@ -147,7 +142,6 @@ class ModelDescription:
         )
     
     def get_path(self, base_path):
-        # TODO? Separate "filename" from full path, to use in Tensorboard
         path = Path(base_path, self.model_type)
         if self.model_type == "CausalSingleNN":
             path = path / Path("a{pc_alpha}-t{threshold}/".format(
@@ -196,7 +190,6 @@ class ModelDescription:
             # pc_alpha and threshold should be either both None or both not None
             name += f", a{self.pc_alpha}-t{self.threshold}"
         return name
-        # return self.get_filename()
 
     def __repr__(self):
         return repr(str(self))
