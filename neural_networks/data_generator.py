@@ -14,7 +14,6 @@ def build_train_generator(input_vars_dict, output_vars_dict, setup):
         data_fn=Path(setup.train_data_folder, setup.train_data_fn),
         input_vars_dict=input_vars_dict,
         output_vars_dict=output_vars_dict,
-        # norm_fn=Path(DATA_FOLDER, NORM_FN),
         norm_fn=Path(setup.normalization_folder, setup.normalization_fn),
         input_transform=input_transform,
         output_transform=out_scale_dict,
