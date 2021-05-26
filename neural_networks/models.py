@@ -5,23 +5,23 @@ from pathlib import Path
 from tensorflow.keras import Sequential, Input
 from tensorflow.keras.layers import Dense
 
+from utils.constants import SPCAM_Vars
 from utils.variable import Variable_Lev_Metadata
 import utils.pcmci_aggregation as aggregation
 
 
 class ModelDescription:
-    """
-    Object that stores a Keras model and metainformation about it.
+    """ Object that stores a Keras model and metainformation about it.
     
     Attributes
     ----------
     output : Variable_Lev_Metadata
         Output variable of the model.
     pc_alpha : str
-        Meta information. PC alpha used to find the parents.
+        Meta information. PC alpha used to find the inputs.
     threshold : str
-        Meta information. Gridpoint threshold used to select the parents.
-    parents : list(Variable)
+        Meta information. Gridpoint threshold used to select the inputs.
+    inputs : list(Variable)
         List of the variables (and variable level) that cause the output
         variable.
     hidden_layers : list(int)
@@ -34,26 +34,27 @@ class ModelDescription:
         Model created using the given information.
         See `_build_model()`.
     input_vars_dict:
+    output_vars_dict:
     
     #TODO
     
     """
 
-    def __init__(self, output, parents, model_type, pc_alpha, threshold, setup):
+    def __init__(self, output, inputs, model_type, pc_alpha, threshold, setup):
         """
         Parameters
         ----------
         output : str
             Output variable of the model in string format. See Variable_Lev_Metadata.
-        parents : list(str)
+        inputs : list(str)
             List of strings for the variables that cause the output variable.
             See Variable_Lev_Metadata.
         model_type : str
             # TODO
         pc_alpha : str
-            Meta information. PC alpha used to find the parents.
+            Meta information. PC alpha used to find the inputs.
         threshold : str
-            Meta information. Gridpoint threshold used to select the parents.
+            Meta information. Gridpoint threshold used to select the inputs.
         hidden_layers : list(int)
             Description of the hidden dense layers of the model.
         activation : Keras-compatible activation function
@@ -61,24 +62,23 @@ class ModelDescription:
         """
         self.setup = setup
         self.output = Variable_Lev_Metadata.parse_var_name(output)
-        parents = [Variable_Lev_Metadata.parse_var_name(p) for p in parents]
-        self.parents = sorted(
-            parents, key=lambda x: self.setup.input_order_list.index(x)
+        self.inputs = sorted(
+            [Variable_Lev_Metadata.parse_var_name(p) for p in inputs],
+            key=lambda x: self.setup.input_order_list.index(x)
         )
         self.model_type = model_type
         self.pc_alpha = pc_alpha
         self.threshold = threshold
         self.model = self._build_model()
-        self.input_vars_dict = ModelDescription._build_vars_dict(self.parents)
+        self.input_vars_dict = ModelDescription._build_vars_dict(self.inputs)
         self.output_vars_dict = ModelDescription._build_vars_dict([self.output])
 
     def _build_model(self):
-        """
-        Build a Keras model with the given information.
+        """ Build a Keras model with the given information.
         
         Some parameters are not configurable, taken from Rasp et al.
         """
-        input_shape = len(self.parents)
+        input_shape = len(self.inputs)
         input_shape = (input_shape,)
         model = dense_nn(
             input_shape=input_shape,
@@ -96,8 +96,7 @@ class ModelDescription:
 
     @staticmethod
     def _build_vars_dict(list_variables):
-        """
-        Convert the given list of Variable_Lev_Metadata into a
+        """ Convert the given list of Variable_Lev_Metadata into a
         dictionary to be used on the data generator.
         
         Parameters
@@ -127,6 +126,7 @@ class ModelDescription:
         return vars_dict
 
     def fit_model(self, x, validation_data, epochs, callbacks, verbose=1):
+        """ Train the model """
         self.model.fit(
             x=x,
             validation_data=validation_data,
@@ -136,6 +136,7 @@ class ModelDescription:
         )
 
     def get_path(self, base_path):
+        """ Generate a path based on this model metadata """
         path = Path(base_path, self.model_type)
         if self.model_type == "CausalSingleNN":
             path = path / Path(
@@ -155,6 +156,7 @@ class ModelDescription:
         return path
 
     def get_filename(self):
+        """ Generate a filename to save the model """
         i_var = self.setup.output_order.index(self.output.var)
         i_level = self.output.level_idx
         if i_level is None:
@@ -162,6 +164,7 @@ class ModelDescription:
         return f"{i_var}_{i_level}"
 
     def save_model(self, base_path):
+        """ Save model, weights and input list """
         folder = self.get_path(base_path)
         filename = self.get_filename()
         print(f"Using filename {filename}.")
@@ -173,13 +176,15 @@ class ModelDescription:
         self.save_input_list(folder, filename)
 
     def save_input_list(self, folder, filename):
+        """ Save input list """
         input_list = self.get_input_list()
         with open(Path(folder, f"{filename}_input_list.txt"), "w") as f:
             for line in input_list:
                 print(str(line), file=f)
 
     def get_input_list(self):
-        return [int(var in self.parents) for var in self.setup.input_order_list]
+        """ Generate input list """
+        return [int(var in self.inputs) for var in self.setup.input_order_list]
 
     def __str__(self):
         name = f"{self.model_type}: {self.output}"
@@ -199,9 +204,7 @@ class ModelDescription:
 
 
 def dense_nn(input_shape, output_shape, hidden_layers, activation):
-    """
-    Creates a dense NN in base of the parameters received
-    """
+    """ Create a dense NN in base of the parameters received """
     model = Sequential()
     model.add(Input(shape=input_shape))
 
@@ -212,24 +215,21 @@ def dense_nn(input_shape, output_shape, hidden_layers, activation):
     return model
 
 
-def generate_single_nn(setup):
-    from utils.constants import SPCAM_Vars
-
-    # TODO Only parents & children in configuration
-
+def generate_all_single_nn(setup):
+    """ Generate all NN with one output and all inputs specified in the setup"""
     model_descriptions = list()
 
-    parents = list()  # TODO Parents and levels
+    inputs = list()  # TODO Parents and levels
     for spcam_var in setup.spcam_inputs:
         if spcam_var.dimensions == 3:
             for level, _ in setup.parents_idx_levs:
                 # There's enough info to build a Variable_Lev_Metadata list
                 # However, it could be better to do a bigger reorganization
                 var_name = f"{spcam_var.name}-{round(level, 2)}"
-                parents.append(var_name)
+                inputs.append(var_name)
         elif spcam_var.dimensions == 2:
             var_name = spcam_var.name
-            parents.append(var_name)
+            inputs.append(var_name)
 
     output_list = list()
     for spcam_var in setup.spcam_outputs:
@@ -244,13 +244,14 @@ def generate_single_nn(setup):
 
     for output in output_list:
         model_description = ModelDescription(
-            output, parents, "SingleNN", pc_alpha=None, threshold=None, setup=setup,
+            output, inputs, "SingleNN", pc_alpha=None, threshold=None, setup=setup,
         )
         model_descriptions.append(model_description)
     return model_descriptions
 
 
-def generate_causal_single_nn(setup, aggregated_results):
+def generate_all_causal_single_nn(setup, aggregated_results):
+    """ Generate all NN with one output and selected inputs from a pc analysis """
 
     model_descriptions = list()
 
@@ -272,6 +273,7 @@ def generate_causal_single_nn(setup, aggregated_results):
 
 
 def generate_models(setup):
+    """ Generate all NN models specified in setup """
     model_descriptions = list()
 
     if setup.do_single_nn:
