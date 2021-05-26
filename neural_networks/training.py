@@ -8,11 +8,14 @@ from .data_generator import build_train_generator, build_valid_generator
 
 
 def train_all_models(model_descriptions, setup):
+    """ Train and save all the models """
     for model_description in model_descriptions:
         train_model(model_description, setup)
+        save_model(model_description, setup)
 
 
 def train_model(model_description, setup):
+    """ Train a model """
     print(f"Training {model_description}")
 
     input_vars_dict = model_description.input_vars_dict
@@ -47,12 +50,16 @@ def train_model(model_description, setup):
             callbacks=[lrs, tensorboard, early_stop],
             verbose=setup.train_verbose,
         )
-        model_description.save_model(setup.nn_output_path)
-        # Doing this after saving the model avoids having to create
-        # the folder ourserlves
-        save_norm(
-            input_transform=train_gen.input_transform,
-            output_transform=train_gen.output_transform,
-            save_dir=str(model_description.get_path(setup.nn_output_path)),
-            filename=model_description.get_filename(),
-        )
+
+
+def save_model(model_description, setup):
+    """ Save all model information necessary for CAM """
+    model_description.save_model(setup.nn_output_path)
+    # Doing this after saving the model avoids having to create
+    # the folder ourserlves
+    save_norm(
+        input_transform=train_gen.input_transform,
+        output_transform=train_gen.output_transform,
+        save_dir=str(model_description.get_path(setup.nn_output_path)),
+        filename=model_description.get_filename(),
+    )
