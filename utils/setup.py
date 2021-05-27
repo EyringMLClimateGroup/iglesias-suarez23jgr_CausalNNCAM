@@ -5,7 +5,7 @@ from . import utils
 import getopt
 import yaml
 from pathlib import Path
-
+from tigramite.independence_tests import ParCorr, GPDC
 
 
 class Setup:
@@ -75,7 +75,6 @@ class Setup:
 
 
 class SetupPCAnalysis(Setup):
-    from tigramite.independence_tests import ParCorr, GPDC
 
     INDEPENDENCE_TESTS = {
         "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
@@ -83,8 +82,7 @@ class SetupPCAnalysis(Setup):
         "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
         # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
     }
-    
-    
+
     def __init__(self, argv):
         super().__init__(argv)
         self._setup_pc_analysis(self.yml_cfg)
@@ -130,7 +128,7 @@ class SetupPCAnalysis(Setup):
 
         # Loaded here so errors are found during setup
         # Note the parenthesis, INDEPENDENCE_TESTS returns functions
-        self.cond_ind_test = INDEPENDENCE_TESTS[self.ind_test_name]()
+        self.cond_ind_test = self.INDEPENDENCE_TESTS[self.ind_test_name]()
 
         self.overwrite_pc = yml_cfg.get("overwrite_pc", False)
 
