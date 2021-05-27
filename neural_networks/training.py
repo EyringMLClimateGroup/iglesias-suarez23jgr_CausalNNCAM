@@ -5,16 +5,20 @@ from tensorflow.keras.callbacks import LearningRateScheduler, EarlyStopping
 from .cbrain.learning_rate_schedule import LRUpdate
 from .cbrain.save_weights import save_norm
 from .data_generator import build_train_generator, build_valid_generator
+from datetime import datetime
 
 
 def train_all_models(model_descriptions, setup):
     """ Train and save all the models """
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     for model_description in model_descriptions:
-        train_model(model_description, setup)
+        train_model(model_description, setup, timestamp)
         save_model(model_description, setup)
 
 
-def train_model(model_description, setup):
+def train_model(
+    model_description, setup, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S")
+):
     """ Train a model """
     print(f"Training {model_description}")
 
@@ -32,7 +36,9 @@ def train_model(model_description, setup):
         tensorboard = tf.keras.callbacks.TensorBoard(
             log_dir=Path(
                 model_description.get_path(setup.tensorboard_folder),
-                model_description.get_filename(),
+                "{timestamp}-{filename}".format(
+                    timestamp=timestamp, filename=model_description.get_filename()
+                ),
             ),
             histogram_freq=0,
             write_graph=True,
@@ -55,7 +61,7 @@ def train_model(model_description, setup):
 def save_model(model_description, setup):
     """ Save all model information necessary for CAM """
     model_description.save_model(setup.nn_output_path)
-    # Doing this after saving the model avoids having to create
+    # Saving norm after saving the model avoids having to create
     # the folder ourserlves
     save_norm(
         input_transform=train_gen.input_transform,
