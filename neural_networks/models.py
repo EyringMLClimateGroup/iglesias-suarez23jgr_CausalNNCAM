@@ -64,7 +64,7 @@ class ModelDescription:
         self.output = Variable_Lev_Metadata.parse_var_name(output)
         self.inputs = sorted(
             [Variable_Lev_Metadata.parse_var_name(p) for p in inputs],
-            key=lambda x: self.setup.input_order_list.index(x)
+            key=lambda x: self.setup.input_order_list.index(x),
         )
         self.model_type = model_type
         self.pc_alpha = pc_alpha
@@ -277,7 +277,7 @@ def generate_models(setup):
     model_descriptions = list()
 
     if setup.do_single_nn:
-        model_descriptions.extend(generate_single_nn(setup))
+        model_descriptions.extend(generate_all_single_nn(setup))
 
     if setup.do_causal_single_nn:
         collected_results, errors = aggregation.collect_results(setup)
@@ -285,6 +285,8 @@ def generate_models(setup):
         aggregated_results, var_names_parents = aggregation.aggregate_results(
             collected_results, setup
         )
-        model_descriptions.extend(generate_causal_single_nn(setup, aggregated_results))
+        model_descriptions.extend(
+            generate_all_causal_single_nn(setup, aggregated_results)
+        )
 
     return model_descriptions
