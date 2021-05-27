@@ -12,14 +12,13 @@ def train_all_models(model_descriptions, setup):
     """ Train and save all the models """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
     for model_description in model_descriptions:
-        train_model(model_description, setup, timestamp)
-        save_model(model_description, setup)
+        train_save_model(model_description, setup, timestamp)
 
 
-def train_model(
+def train_save_model(
     model_description, setup, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S")
 ):
-    """ Train a model """
+    """ Train a model and save all information necessary for CAM """
     print(f"Training {model_description}")
 
     input_vars_dict = model_description.input_vars_dict
@@ -57,15 +56,12 @@ def train_model(
             verbose=setup.train_verbose,
         )
 
-
-def save_model(model_description, setup):
-    """ Save all model information necessary for CAM """
-    model_description.save_model(setup.nn_output_path)
-    # Saving norm after saving the model avoids having to create
-    # the folder ourserlves
-    save_norm(
-        input_transform=train_gen.input_transform,
-        output_transform=train_gen.output_transform,
-        save_dir=str(model_description.get_path(setup.nn_output_path)),
-        filename=model_description.get_filename(),
-    )
+        model_description.save_model(setup.nn_output_path)
+        # Saving norm after saving the model avoids having to create
+        # the folder ourserlves
+        save_norm(
+            input_transform=train_gen.input_transform,
+            output_transform=train_gen.output_transform,
+            save_dir=str(model_description.get_path(setup.nn_output_path)),
+            filename=model_description.get_filename(),
+        )
