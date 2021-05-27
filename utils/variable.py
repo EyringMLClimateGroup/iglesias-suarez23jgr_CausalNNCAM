@@ -2,9 +2,9 @@ from pathlib import Path
 from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
 from . import utils
 
-class Variable:
-    """
-    Object that stores a SPCAM variable and one specific level.
+
+class Variable_Lev_Metadata:
+    """Object that stores a SPCAM variable and one specific level.
     
     Both the level in hPa and its index in ancillaries are stored.
     
@@ -29,8 +29,8 @@ class Variable:
 
     @staticmethod
     def parse_var_name(var_name):
-        """
-        Parses a string of variable and name to a Variable object
+        """Parses a string of variable and level to a
+        Variable_Lev_Metadata object
         
         Parameters
         ----------
@@ -40,10 +40,12 @@ class Variable:
         
         Returns
         -------
-        Variable
-            Variable object that contains the information referenced
-            in the string
+        Variable_Lev_Metadata
+            Variable_Lev_Metadata object that contains the information
+            referenced in the string
         """
+        if type(var_name) is Variable_Lev_Metadata:
+            return var_name
         values = var_name.split("-")
         spcam_name = values[0]
         dict_spcam_vars = {v.name: v for v in SPCAM_Vars}
@@ -56,7 +58,7 @@ class Variable:
             level_altitude = float(values[1])
             level_idx = utils.find_closest_value(levels, level_altitude)
 
-        return Variable(spcam_var, level_altitude, level_idx)
+        return Variable_Lev_Metadata(spcam_var, level_altitude, level_idx)
 
     def __str__(self):
         if self.var.dimensions == 2:
@@ -66,9 +68,12 @@ class Variable:
 
     def __repr__(self):
         return repr(str(self))
-    
+
     def __eq__(self, other):
         if type(self) is type(other):
             return self.var == other.var and self.level_idx == other.level_idx
         else:
             return False
+
+    def __hash__(self):
+        return hash(str(self))

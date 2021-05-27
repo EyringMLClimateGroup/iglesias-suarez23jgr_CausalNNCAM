@@ -116,7 +116,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         if not self.xarray:
             self.data_ds.close()
             self.data_ds = h5py.File(self.data_fn, "r")
-        
+
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -124,7 +124,7 @@ class DataGenerator(tf.keras.utils.Sequence):
             self.data_ds.close()
         except:
             pass
-#         try:
-#             self.norm_ds.close()
-#         except:
-#             pass
+        try:
+            self.norm_ds.close()
+        except:
+            pass
