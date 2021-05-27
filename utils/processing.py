@@ -7,6 +7,70 @@ from utils.constants import DATA_FOLDER, ANCIL_FILE, EXPERIMENT
 from utils.pcmci_algorithm import find_links
 
 
+def proc_analysis(
+    analysis,
+    gridpoints,
+    var_parents,
+    var_children,
+    cond_ind_test,
+    ind_test_name,
+    pc_alphas,
+    levels,
+    parents_idx_levs,
+    children_idx_levs,
+    idx_lats,
+    idx_lons,
+    output_file_pattern,
+    output_folder,
+    overwrite,
+    verbosity,
+):
+    if analysis == "single":
+        print("Analysis: single")
+        print()
+        single(
+            gridpoints,
+            var_parents,
+            var_children,
+            cond_ind_test,
+            ind_test_name,
+            pc_alphas,
+            levels,
+            parents_idx_levs,
+            children_idx_levs,
+            idx_lats,
+            idx_lons,
+            output_file_pattern,
+            output_folder,
+            overwrite,
+            verbosity,
+        )
+    elif analysis == "concat":
+        print("Analysis: concat")
+        print()
+        concat(
+            gridpoints,
+            var_parents,
+            var_children,
+            cond_ind_test,
+            ind_test_name,
+            pc_alphas,
+            levels,
+            parents_idx_levs,
+            children_idx_levs,
+            idx_lats,
+            idx_lons,
+            output_file_pattern,
+            output_folder,
+            overwrite,
+            verbosity,
+        )
+    else:
+        raise TypeError(
+            "Please specify a valid analysis, i.e., 'single' or 'concat'; stop script"
+        )
+
+
 def single(
     gridpoints,
     var_parents,
@@ -91,7 +155,7 @@ def single(
 
                 # Find links
                 print(
-                    f"{dt.now()}"
+                    f"{dt.now()} "
                     f"Finding links for {child.name} at level {level[-1]+1}"
                 )
                 t_before_find_links = time.time()
