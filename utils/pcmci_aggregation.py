@@ -27,7 +27,7 @@ def record_error(file, error_type, errors):
 
     error_list = errors.get(error_type, list())
     if file not in error_list:
-        error_list.append(results_file)
+        error_list.append(file)
         errors[error_type] = error_list
 
 
@@ -179,11 +179,12 @@ def print_errors(errors):
 
     print("ERRORS\n======")
     for error_type, error_list in errors.items():
-        msg = "{}: {} of {} files ({:.2f}%)".format(
+        # msg = "{}: {} of {} files ({:.2f}%)".format(
+        msg = "{}: {} files".format(
             error_type,
             len(error_list),
-            total_files,
-            len(error_list) / total_files * 100,
+            # total_files,
+            # len(error_list) / total_files * 100,
         )
         print(msg)
         print("-" * len(msg))

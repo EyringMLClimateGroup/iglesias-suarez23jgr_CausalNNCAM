@@ -238,6 +238,7 @@ def generate_all_single_nn(setup):
                 # There's enough info to build a Variable_Lev_Metadata list
                 # However, it could be better to do a bigger reorganization
                 var_name = f"{spcam_var.name}-{round(level, 2)}"
+                output_list.append(var_name)
         elif spcam_var.dimensions == 2:
             var_name = spcam_var.name
         output_list.append(var_name)
