@@ -19,37 +19,33 @@ documentation:
     - usmile
 
 
-# Specifications
+# Common
+# ======
 analysis       : 'single' # 'single': gridpoints individually; 
                           # 'concat': gridpoints contatenated into a 
                           #           single time-series; 
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','prect','fsns','flns','fsnt','flnt']
-# spcam_children : ['tphystnd','flnt']
-# spcam_children : ['phq','flns']
+# # spcam_children : ['tphystnd','flnt']
+spcam_children : ['phq','flns']
 pc_alphas      : [0.001,0.01,0.1]
 independence_test : "parcorr"
-#pc_alphas      : [0.01]
+# #pc_alphas      : [0.01]
 region         : [ [-90,90] , [0, 360] ] # Lons: 120, 118
 lim_levels     : False # [950, 750] # False
 target_levels  : [3.643, 54.595, 103.317, 197.908, 379.100, 524.687, 763.404, 859.534, 912.644, 957.485] # False
-target_levels  :  False
+# # target_levels  :  False
 output_folder  : "/work/bd1179/b309172/analysis/usmile/causality_convection/python/causalnncam/causal_links/"
-plots_folder : "./deleteme/test_causal_links/test_plots"
-#output_folder  : "./test_causal_links"
-verbosity      : 0
+# #output_folder  : "./test_causal_links"
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
 
 
-
 # Aggregated analysis
 # ===================
 thresholds : [.3, .5]
-plot_file_pattern : 
-  single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
-  concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"
+
 
 # Neural Network configuration
 # ============================
@@ -57,11 +53,12 @@ plot_file_pattern :
 nn_type : "SingleNN"
 # nn_type : "CausalSingleNN"
 # nn_type : "all"
-input_order : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
-input_order : [tbp, qbp, vbp, ps, solin, shflx, lhflx]
-output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
 nn_output_path : delete_me_2/models
+
+input_order : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
+# input_order : [tbp, qbp, vbp, ps, solin, shflx, lhflx]
+output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
 hidden_layers : [32, 32, 32]   # Arbitrary, I choose them because it's a small NN
 activation : relu
