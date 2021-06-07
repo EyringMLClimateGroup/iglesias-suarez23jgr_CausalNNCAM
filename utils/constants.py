@@ -2,12 +2,29 @@ from enum import Enum
 
 
 class SPCAM_Vars(Enum):
+    """ Information about the SPCAM variables that are used
+    
+    Attributes
+    ----------
+    name: str
+        Variable name. Used for storage and retrieval.
+    ds_name: str
+        Variable name as it is present in the dataset. Used for
+        retrieval with xarray.
+    dimensions: `2` or `3`
+        Number of dimensions the variable has.
+    type: `in` or `out`
+        Identifies if the variable is an input or an output to the NN.
+    label: str
+        Full name of the variable.
+    """
+
     def __init__(self, dimensions, var_type, label):
         self._value_ = self._name_
+        self.ds_name = self._name_.upper()
         self.dimensions = dimensions
         self.type = var_type
         self.label = label
-        self.ds_name = self._name_.upper()
 
     def __str__(self):
         return f"{self.__repr__()}, {self.label}"
