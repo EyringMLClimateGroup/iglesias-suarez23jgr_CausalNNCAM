@@ -12,8 +12,11 @@ dependencies:
   - matplotlib>=3.1.1
   - networkx>=2.4
   - cython>=0.26
+# Tigramite - GPDC
+  - dcor
 # Tigramite - GPDC Torch
-  - torch>=1.7
+#  - torch>=1.7
+  - pytorch>=1.7
   - gpytorch>=1.4
 # Jupyter
   - ipykernel
@@ -23,4 +26,6 @@ dependencies:
   - netcdf4
   - pyyaml
   - tensorflow
+# Cbrain
+  - xarray
 
