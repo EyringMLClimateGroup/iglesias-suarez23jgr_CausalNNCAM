@@ -399,13 +399,12 @@ def scale_link_width(o_link_width, threshold):
 
 def plot_aggregated_results(var_names_parents, aggregated_results, setup):
     Path(setup.plots_folder).mkdir(parents=True, exist_ok=True)
-
     dict_combinations = build_plot_matrices(var_names_parents, aggregated_results)
 
     for combination, combination_results in dict_combinations.items():
         print(combination)
         plot_filename = "{cfg}_{combination}.png".format(
-            cfg=setup.yml_filename.rsplit(".")[0], combination=combination
+            cfg=Path(setup.yml_filename).name.rsplit(".")[0], combination=combination
         )
         plot_file = Path(setup.plots_folder, plot_filename)
         if not setup.overwrite_plots and plot_file.is_file():
