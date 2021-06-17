@@ -6,14 +6,20 @@ from .cbrain.learning_rate_schedule import LRUpdate
 from .cbrain.save_weights import save_norm
 from .data_generator import build_train_generator, build_valid_generator
 from datetime import datetime
+import os
 
 
 def train_all_models(model_descriptions, setup):
     """ Train and save all the models """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+#    import pdb; pdb.set_trace()
     for model_description in model_descriptions:
-        train_save_model(model_description, setup, timestamp)
-
+        outModel = model_description.get_filename()+'_model.h5'
+        outPath  = str(model_description.get_path(setup.nn_output_path))
+        if not os.path.isfile(outPath+'/'+outModel):
+            train_save_model(model_description, setup, timestamp)
+        else:
+            print(outPath+'/'+outModel, ' exists; skipping...')
 
 def train_save_model(
     model_description, setup, timestamp=datetime.now().strftime("%Y%m%d-%H%M%S")

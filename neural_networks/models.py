@@ -169,6 +169,7 @@ class ModelDescription:
         filename = self.get_filename()
         print(f"Using filename {filename}.")
         # Save model
+        Path(folder).mkdir(parents=True, exist_ok=True)
         self.model.save(Path(folder, f"{filename}_model.h5"))
         # Save weights
         self.model.save_weights(Path(folder, f"{filename}_weights.h5"))
