@@ -26,7 +26,7 @@ analysis       : 'single' # 'single': gridpoints individually;
                           #           single time-series; 
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','prect','fsns','flns','fsnt','flnt']
-spcam_children : ['phq']
+spcam_children : ['']
 pc_alphas      : [0.001] # [0.001,0.01,0.1]
 independence_test : "parcorr"
 region         : [ [-90,90] , [0, 140] ] # Lons: 120, 118

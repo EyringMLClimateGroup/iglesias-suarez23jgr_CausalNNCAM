@@ -1,15 +1,13 @@
 #!/bin/bash
 # mistral cpu batch job parameters
 # --------------------------------
-#SBATCH --account=bd1083
-#SBATCH --job-name=cNN-all
-#SBATCH --partition=gpu
-#SBATCH --nodes=1
-#SBATCH --constraint=k80
+#SBATCH --account=bd1179
+#SBATCH --job-name=sNN-q103
+#SBATCH --partition=prepost
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.cNN-all.%j.o
-#SBATCH --error=LOG.cNN-all.%j.o
+#SBATCH --output=LOG.sNN-q103%j.o
+#SBATCH --error=LOG.sNN-q103%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=12:00:00
 
@@ -20,7 +18,7 @@ logPath=${scriptPath}/logs
 
 # Scripts
 pyScript=NN_Creation
-cfgFile=cfg_causalsinglenns_neural_networks_pnas_1month.yml
+cfgFile=cfg_singlenns_neural_networks_pnas.yml
 
 ## PROCESSING
 #
@@ -29,7 +27,7 @@ echo ""
 
 cd $scriptPath
 
-logFile=`ls LOG.cNN-all.*`
+logFile=`ls LOG.sNN-q103*`
 cat $scriptPath/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then

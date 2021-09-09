@@ -206,6 +206,17 @@ class SetupNeuralNetworks(Setup):
         self.train_patience = yml_cfg["train_patience"]
 
 
+class SetupSherpa(SetupNeuralNetworks):
+    def __init__(self, argv):
+        super().__init__(argv)
+        self._setup_sherpa(self.yml_cfg)
+    
+    def _setup_sherpa(self, yml_cfg):
+        self.sherpa_hyper   = yml_cfg["sherpa_hyper"]
+        self.nn_type        = yml_cfg["sherpa_nn_type"]
+        self.nn_sherpa_path = yml_cfg["nn_sherpa_path"]
+
+
 def _calculate_gridpoints(region):
     ## Region / Gridpoints
     if region is False:

@@ -69,6 +69,9 @@ class ModelDescription:
         self.model_type = model_type
         self.pc_alpha = pc_alpha
         self.threshold = threshold
+        if hasattr(setup, 'sherpa_hyper'):
+            self.setup.hidden_layers = [setup.num_nodes] * setup.num_layers
+            # TODO: setup activation coefficient
         self.model = self._build_model()
         self.input_vars_dict = ModelDescription._build_vars_dict(self.inputs)
         self.output_vars_dict = ModelDescription._build_vars_dict([self.output])
@@ -86,14 +89,25 @@ class ModelDescription:
             hidden_layers=self.setup.hidden_layers,
             activation=self.setup.activation,
         )
+        
+        optimizer = tf.keras.optimizers.Adam(
+            learning_rate=0.001,
+            beta_1=0.9,
+            beta_2=0.999,
+            epsilon=1e-07,
+            amsgrad=False,
+            name="Adam",
+        )
+        
         model.compile(
             # TODO? Move to configuration
-            optimizer="adam",  # From train.py (default)
+            optimizer=optimizer,
             loss="mse",  # From 006_8col_pnas_exact.yml
             metrics=[tf.keras.losses.mse],  # From train.py (default)
         )
         return model
 
+    
     @staticmethod
     def _build_vars_dict(list_variables):
         """ Convert the given list of Variable_Lev_Metadata into a
@@ -292,3 +306,64 @@ def generate_models(setup):
         )
 
     return model_descriptions
+
+
+def generate_model_sherpa(setup, parents=False, pc_alpha=None, threshold=None):
+    """ Generate NN model for hyperparameter tuning via Sherpa """
+
+    if setup.do_causal_single_nn and parents == False:
+        parents = get_parents_sherpa(setup)
+        
+    model_description = ModelDescription(
+        setup.output, parents, setup.nn_type, pc_alpha, threshold, setup=setup,
+    )
+    return model_description
+
+
+def generate_input_list(setup):
+    """ Generate input list for hyperparameter tuning via Sherpa """
+    inputs = list()
+    for spcam_var in setup.spcam_inputs:
+        if spcam_var.dimensions == 3:
+            for level, _ in setup.parents_idx_levs:
+                var_name = f"{spcam_var.name}-{round(level, 2)}"
+                inputs.append(var_name)
+        elif spcam_var.dimensions == 2:
+            var_name = spcam_var.name
+            inputs.append(var_name)
+    return inputs
+            
+
+def generate_output_list(setup):
+    """ Generate output list for hyperparameter tuning via Sherpa """
+    output_list = list()
+    for spcam_var in setup.spcam_outputs:
+        if spcam_var.dimensions == 3:
+            for level, _ in setup.children_idx_levs:
+                var_name = f"{spcam_var.name}-{round(level, 2)}"
+                output_list.append(var_name)
+        elif spcam_var.dimensions == 2:
+            var_name = spcam_var.name
+            output_list.append(var_name)
+    return output_list
+
+
+def get_parents_sherpa(setup):
+    
+    collected_results, errors = aggregation.collect_results(setup)
+    aggregation.print_errors(errors)
+    aggregated_results, var_names_parents = aggregation.aggregate_results(
+        collected_results, setup
+    )
+    output      = list(aggregated_results.keys())[0]
+    if str(setup.output) == str(output):
+        pass
+    else:
+        print(f"output from output_list and output from aggregated results do not match; stop")
+        import pdb; pdb.set_trace()
+    pc_alpha    = list(aggregated_results[output].keys())[0]
+    threshold   = list(aggregated_results[output][pc_alpha]['parents'].keys())[0]
+    var_names   = np.array(aggregated_results[output][pc_alpha]['var_names'])
+    parent_idxs = aggregated_results[output][pc_alpha]['parents'][threshold]
+    parents     = var_names[parent_idxs]    
+    return parents, pc_alpha, threshold

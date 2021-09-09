@@ -10,7 +10,7 @@ import xarray as xr
 import numpy as np
 import h5py
 from .utils import return_var_idxs
-from .normalization import InputNormalizer, DictNormalizer
+from .normalization import InputNormalizer, DictNormalizer, Normalizer
 
 
 class DataGenerator(tf.keras.utils.Sequence):
@@ -45,7 +45,7 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def __len__(self):
         return self.n_batches
-
+    
     def __getitem__(self, index):
         # Compute start and end indices for batch
         start_idx = index * self.batch_size

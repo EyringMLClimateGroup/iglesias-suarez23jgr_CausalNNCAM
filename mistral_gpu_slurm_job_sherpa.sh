@@ -1,15 +1,14 @@
 #!/bin/bash
 # mistral cpu batch job parameters
 # --------------------------------
-#SBATCH --account=bd1083
-#SBATCH --job-name=cNN-all
+#SBATCH --account=bd1179
+#SBATCH --job-name=sherpa
 #SBATCH --partition=gpu
-#SBATCH --nodes=1
 #SBATCH --constraint=k80
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.cNN-all.%j.o
-#SBATCH --error=LOG.cNN-all.%j.o
+#SBATCH --output=LOG.sherpa.%j.o
+#SBATCH --error=LOG.sherpa.%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=12:00:00
 
@@ -19,8 +18,8 @@ scriptPath=`pwd`
 logPath=${scriptPath}/logs
 
 # Scripts
-pyScript=NN_Creation
-cfgFile=cfg_causalsinglenns_neural_networks_pnas_1month.yml
+pyScript=sherpa_hyperparameter_tuning
+cfgFile="nn_config/cfg_sherpa.yml"
 
 ## PROCESSING
 #
@@ -29,7 +28,7 @@ echo ""
 
 cd $scriptPath
 
-logFile=`ls LOG.cNN-all.*`
+logFile=`ls LOG.sherpa.*`
 cat $scriptPath/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then
@@ -40,7 +39,7 @@ if [ ! -f ${scriptPath}/${pyScript}.py ]; then
     echo ""
 fi
 
-echo "Create NNs"
+echo "Sherpa hyperparameter tuning"
 source /pf/b/b309172/.bashrc
 conda activate causalnncam
 python ${pyScript}.py -c $cfgFile
