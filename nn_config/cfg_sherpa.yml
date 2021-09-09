@@ -26,13 +26,13 @@ analysis       : 'single' # 'single': gridpoints individually;
                           #           single time-series; 
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 #spcam_children : ['tphystnd','phq','fsnt','fsns','flnt','flns','prect']
-spcam_children : ['tphystnd','fsnt']
+spcam_children : ['fsnt']
 pc_alphas      : [0.001] # [0.001,0.01,0.1]
 independence_test : "parcorr"
-region         : [ [-90,90] , [0, 395] ] # Lons: 0, 359
+region         : [ [-90,90] , [0, 180] ] # Lons: up to 359
 # Model levels : [3.643, 7.595, 14.357, 24.612, 38.268, 54.595, 72.012, 87.821, 103.317, 121.547, 142.994, 168.225, 197.908, 232.829, 273.911, 322.242, 379.101, 445.993, 524.687, 609.779, 691.389, 763.404, 820.858, 859.535, 887.020, 912.645, 936.198, 957.485, 976.325, 992.556]
 lim_levels     : False # e.g., [912.644, 957.485]
-target_levels  : [72.012, 87.821] # False # e.g., [912.644, 957.485]
+target_levels  : [14.357, 54.595, 103.317, 197.908, 322.242, 524.687, 763.404, 887.020, 957.485, 992.556] # False # [87.821]
 output_folder  : "/work/bd1179/b309172/analysis/usmile/causality_convection/python/causalnncam/causal_links/"
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
@@ -47,8 +47,8 @@ thresholds : [.15] # [.15, .2, .25]
 # Neural Network configuration
 # ============================
 
-# nn_type : "SingleNN"
-nn_type : "CausalSingleNN"
+nn_type : "SingleNN"
+# nn_type : "CausalSingleNN"
 # nn_type : "all"
 
 nn_output_path : models
@@ -88,3 +88,10 @@ divide_lr : 5 # From train.py (default)
 
 # Early Stopping
 train_patience : 5 # TODO: This number was chosen arbitrarily
+
+
+# Sherpa configuration
+# ============================
+sherpa_hyper   : True # False; True
+sherpa_nn_type : "CausalSingleNN" # "CausalSingleNN"; or "SingleNN"
+nn_sherpa_path : sherpa

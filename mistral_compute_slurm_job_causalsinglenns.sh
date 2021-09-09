@@ -2,16 +2,15 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1083
-#SBATCH --job-name=cNN-all
-#SBATCH --partition=gpu
+#SBATCH --job-name=cNN-tq976-992
+#SBATCH --partition=compute
 #SBATCH --nodes=1
-#SBATCH --constraint=k80
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.cNN-all.%j.o
-#SBATCH --error=LOG.cNN-all.%j.o
+#SBATCH --output=LOG.cNN-tq976-992.%j.o
+#SBATCH --error=LOG.cNN-tq976-992.%j.o
 #SBATCH --mail-type=FAIL
-#SBATCH --time=12:00:00
+#SBATCH --time=08:00:00
 
 
 # Paths
@@ -29,7 +28,7 @@ echo ""
 
 cd $scriptPath
 
-logFile=`ls LOG.cNN-all.*`
+logFile=`ls LOG.cNN-tq976-992.*`
 cat $scriptPath/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then
