@@ -1,5 +1,5 @@
-from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
-from .constants import EXPERIMENT, SIGNIFICANCE
+from .constants import SPCAM_Vars, ANCIL_FILE # DATA_FOLDER 
+from .constants import SIGNIFICANCE           # EXPERIMENT
 from .variable import Variable_Lev_Metadata
 from . import utils
 import getopt
@@ -38,14 +38,15 @@ class Setup:
         #         self.verbosity = yml_cfg["verbosity"]
         self.output_folder = yml_cfg["output_folder"]
         self.output_file_pattern = yml_cfg["output_file_pattern"][self.analysis]
-        self.experiment = EXPERIMENT
+        self.experiment  = yml_cfg["experiment"]
+        self.data_folder = yml_cfg["data_folder"]
 
         region = yml_cfg["region"]
         self.gridpoints = _calculate_gridpoints(region)
 
         ## Model's grid
         self.levels, latitudes, longitudes = utils.read_ancilaries(
-            Path(DATA_FOLDER, ANCIL_FILE)
+            Path(ANCIL_FILE)
         )
 
         ## Level indexes (children & parents)
@@ -101,7 +102,7 @@ class SetupPCAnalysis(Setup):
 
         ## Model's grid
         self.levels, latitudes, longitudes = utils.read_ancilaries(
-            Path(DATA_FOLDER, ANCIL_FILE)
+            Path(ANCIL_FILE)
         )
 
         ## Latitude / Longitude indexes

@@ -1,7 +1,7 @@
 import numpy as np
 import numpy.ma as ma
 from pathlib import Path
-from .constants import DATA_FOLDER, ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars
+from .constants import ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars # DATA_FOLDER
 from netCDF4 import Dataset
 import pickle
 
@@ -30,7 +30,7 @@ def find_closest_longitude(longitudes, target):
 
 def get_gridpoints(region):
     gridpoints = []
-    levels, latitudes, longitudes = read_ancilaries(Path(DATA_FOLDER, ANCIL_FILE))
+    levels, latitudes, longitudes = read_ancilaries(Path(ANCIL_FILE))
     idx_lats = [find_closest_value(latitudes, lat) for lat in region[0]]
     lats_lim = latitudes[idx_lats[0] : idx_lats[-1] + 1]
     for iLat in lats_lim:
@@ -42,7 +42,7 @@ def get_gridpoints(region):
 
 
 def get_levels(pres):
-    levels, latitudes, longitudes = read_ancilaries(Path(DATA_FOLDER, ANCIL_FILE))
+    levels, latitudes, longitudes = read_ancilaries(Path(ANCIL_FILE))
     idx_levs = [find_closest_value(levels, lev) for lev in pres]
     levs_lim = levels[idx_levs[-1] : idx_levs[0] + 1]
     return levs_lim
@@ -120,6 +120,7 @@ def get_normalized_data(variable, experiment, folder, idx_lats, idx_lons, level)
             experiment=experiment,
         ),
     )
+    print('Using: ', filename)
     data = read_spcam_file(filename, variable.name)
 
     if variable.dimensions == 3:

@@ -34,9 +34,9 @@ class SPCAM_Vars(Enum):
     prect = (2, "out", "Precipitation")
 
 
-EXPERIMENT = "002_train_1_year"
-DATA_FOLDER = "/work/bd0854/b309172/data/SPCAM_recons"
-ANCIL_FILE = "ancil_spcam.nc"
+#EXPERIMENT = "002_train_1_year"
+#DATA_FOLDER = "/work/bd0854/b309172/data/SPCAM_recons"
+ANCIL_FILE = "./data/ancil_spcam.nc"
 FILENAME_PATTERN = "{var_name}_{level}_{experiment}.nc"
 TAU_MIN = 1
 TAU_MAX = 1
