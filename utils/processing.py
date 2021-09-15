@@ -3,7 +3,7 @@ from datetime import datetime as dt
 import numpy as np
 from pathlib import Path
 import utils.utils as utils
-from utils.constants import DATA_FOLDER, ANCIL_FILE, EXPERIMENT
+from utils.constants import ANCIL_FILE        # DATA_FOLDER, EXPERIMENT
 from utils.pcmci_algorithm import find_links
 
 
@@ -20,6 +20,8 @@ def proc_analysis(
     children_idx_levs,
     idx_lats,
     idx_lons,
+    data_folder,
+    experiment,
     output_file_pattern,
     output_folder,
     overwrite,
@@ -40,6 +42,8 @@ def proc_analysis(
             children_idx_levs,
             idx_lats,
             idx_lons,
+            data_folder,
+            experiment,
             output_file_pattern,
             output_folder,
             overwrite,
@@ -60,6 +64,8 @@ def proc_analysis(
             children_idx_levs,
             idx_lats,
             idx_lons,
+            data_folder,
+            experiment,
             output_file_pattern,
             output_folder,
             overwrite,
@@ -83,6 +89,8 @@ def single(
     children_idx_levs,
     idx_lats,
     idx_lons,
+    data_folder,
+    experiment,
     output_file_pattern,
     output_folder,
     overwrite,
@@ -114,7 +122,7 @@ def single(
                     lat,
                     lon,
                     ind_test_name,
-                    EXPERIMENT,
+                    experiment,
                     output_file_pattern,
                     output_folder,
                 )
@@ -136,8 +144,8 @@ def single(
                     t_before_load_parents = time.time()
                     data_parents = utils.load_data(
                         var_parents,
-                        EXPERIMENT,
-                        DATA_FOLDER,
+                        experiment,
+                        data_folder,
                         parents_idx_levs,
                         idx_lat,
                         idx_lon,
@@ -149,7 +157,7 @@ def single(
 
                 # Process child
                 data_child = utils.load_data(
-                    [child], EXPERIMENT, DATA_FOLDER, [level], idx_lat, idx_lon
+                    [child], experiment, data_folder, [level], idx_lat, idx_lon
                 )
                 data = [*data_parents, *data_child]
 
@@ -195,6 +203,8 @@ def concat(
     children_idx_levs,
     idx_lats,
     idx_lons,
+    data_folder,
+    experiment,
     output_file_pattern,
     output_folder,
     overwrite,
@@ -220,7 +230,7 @@ def concat(
                 level[-1],
                 gridpoints,
                 ind_test_name,
-                EXPERIMENT,
+                experiment,
                 output_file_pattern,
                 output_folder,
             )
@@ -249,8 +259,8 @@ def concat(
 
                     normalized_parents = utils.load_data_concat(
                         var_parents,
-                        EXPERIMENT,
-                        DATA_FOLDER,
+                        experiment,
+                        data_folder,
                         parents_idx_levs,
                         idx_lat,
                         idx_lon,
@@ -288,7 +298,7 @@ def concat(
                 )
 
                 normalized_child = utils.load_data_concat(
-                    [child], EXPERIMENT, DATA_FOLDER, [level], idx_lat, idx_lon
+                    [child], experiment, data_folder, [level], idx_lat, idx_lon
                 )
                 if data_child is None:
                     data_child = normalized_child

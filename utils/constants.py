@@ -18,11 +18,14 @@ class SPCAM_Vars(Enum):
     tbp = (3, "in", "Temperature")
     qbp = (3, "in", "Specific humidity")
     vbp = (3, "in", "Meridional wind")
+    rh  = (3, "in", "Relative humidity")
+    bmse = (3, "in", "TODO")
 
     ps = (2, "in", "Surf. Pressure")
     solin = (2, "in", "Incoming solar radiation")
     shflx = (2, "in", "Sensible heat flux")
     lhflx = (2, "in", "Latent heat flux")
+    lhf_nsdelq = (2, "in", "TODO")
 
     tphystnd = (3, "out", "Temperature tendency")
     phq = (3, "out", "Specific humidity tendency")
@@ -34,9 +37,9 @@ class SPCAM_Vars(Enum):
     prect = (2, "out", "Precipitation")
 
 
-EXPERIMENT = "002_train_1_year"
-DATA_FOLDER = "/work/bd0854/b309172/data/SPCAM_recons"
-ANCIL_FILE = "ancil_spcam.nc"
+#EXPERIMENT = "002_train_1_year"
+#DATA_FOLDER = "/work/bd0854/b309172/data/SPCAM_recons"
+ANCIL_FILE = "./data/ancil_spcam.nc"
 FILENAME_PATTERN = "{var_name}_{level}_{experiment}.nc"
 TAU_MIN = 1
 TAU_MAX = 1

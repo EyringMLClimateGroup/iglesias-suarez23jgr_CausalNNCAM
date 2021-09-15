@@ -1,5 +1,5 @@
 from pathlib import Path
-from .constants import SPCAM_Vars, DATA_FOLDER, ANCIL_FILE
+from .constants import SPCAM_Vars, ANCIL_FILE # DATA_FOLDER
 from . import utils
 
 
@@ -54,7 +54,8 @@ class Variable_Lev_Metadata:
         if spcam_var.dimensions == 2:
             level_altitude = level_idx = None
         elif spcam_var.dimensions == 3:
-            levels, _, _ = utils.read_ancilaries(Path(DATA_FOLDER, ANCIL_FILE))
+#            levels, _, _ = utils.read_ancilaries(Path(self.data_folder, ANCIL_FILE))
+            levels, _, _ = utils.read_ancilaries(Path(ANCIL_FILE))
             level_altitude = float(values[1])
             level_idx = utils.find_closest_value(levels, level_altitude)
 
