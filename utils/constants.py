@@ -18,11 +18,14 @@ class SPCAM_Vars(Enum):
     tbp = (3, "in", "Temperature")
     qbp = (3, "in", "Specific humidity")
     vbp = (3, "in", "Meridional wind")
+    rh  = (3, "in", "Relative humidity")
+    bmse = (3, "in", "TODO")
 
     ps = (2, "in", "Surf. Pressure")
     solin = (2, "in", "Incoming solar radiation")
     shflx = (2, "in", "Sensible heat flux")
     lhflx = (2, "in", "Latent heat flux")
+    lhf_nsdelq = (2, "in", "TODO")
 
     tphystnd = (3, "out", "Temperature tendency")
     phq = (3, "out", "Specific humidity tendency")

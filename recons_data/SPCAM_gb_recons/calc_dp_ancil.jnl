@@ -1,0 +1,88 @@
+\cancel mode verify
+!
+! HISTORY:
+! 26-Jun-2020 Adapted for SPCAM (dp & area), FIS
+! 15-Feb-2017 Fixed units issue (Pa),        FIS
+! 21-Aug-2015 Written,                       FIS
+!
+! DESCRIPTION:
+! Calculate variables used to extract ozone budgets:
+!
+!    OutVar    DESCRIPTION
+!    dp        Height of grid cell, Pa
+!    area      Area of grid cell, m2
+!
+! NOTES:
+! Run this script after running spcam_prepro_var!
+
+cancel mode upcase
+!set memory/size=260
+
+
+!! PROCESSING
+!
+
+! DATA
+let dataPath = "/pf/b/b309172/SPCAM_recons"
+use "`dataPath`/ancil_spcam.nc"
+
+
+! PRESSURE AXIS
+define axis/z/depth plev = z[gz=lev]
+let pres    = z[gz=plev]                                         ! True pressure (hPa)
+define att/output pres.units = "hPa"
+define att/output pres.long_name = "Pressure"
+
+! dp
+let lnp     = ln(pres)                                          ! Convert to ln(plev)
+let nlev    = `lnp,return=kend`                                 ! Number of levels
+let lndelta = (lnp[k=@shf] - lnp)*0.5                           ! Mid points between levels
+let lntop1  = lnp - lndelta[k=@shf:-1]                          ! Top of each "box"
+let lnbot1  = lntop1[k=@shf]                                    ! Bottom of each "box"
+
+!...now deal with lowest and highest boxes (symmetric)
+let lnbot   = if z[gz=lnp] eq z[gz=lnp,k=`nlev`] then lnp[k=`nlev`] + lndelta[k=`nlev-1`] else lnbot1
+let lntop   = if z[gz=lnp] eq z[gz=lnp,k=1] then lnp[k=1] - lndelta[k=1] else lntop1
+
+let bot     = exp(lnbot)                                         ! Convert back to hPa
+let top     = exp(lntop)
+let dp      = abs(bot - top)                                     ! dp in Pa for each box
+define att/output dp.units = "hPa"
+define att/output dp.long_name = "Pressure height for grid boxes (positive value)"
+!cancel att/output dp.long_name_mod
+
+! dp-weights
+let dp_weights = dp / dp[z=@sum]
+define att/output dp_weights.long_name = "dp weights compare to the whole atm"
+!cancel att/output dp_weights.long_name_mod
+
+
+! Area
+let pi=4*atan(1)
+let latRad = y[gy=lat]*pi/180                                   ! Lats as radians
+let dlat = ybox[gy=lat]*pi/180                                  ! lat spacing in radians
+let dlon = xbox[gx=lon]*pi/180                                  ! ...lon spacing
+let RR = (6371.E3)^2                                            ! Earth's radius (m) squared
+let area = RR * cos(latRad) * dlon * 2 * sin(dlat/2)            ! area (lon,lat) in m2
+define att/output area.long_name = "Grid cell areas"
+define att/output area.units = "m2"
+!cancel att/output area.long_name_mod
+
+! area-weights
+let area_weights = area / area[x=@sum, y=@sum]
+define att/output area_weights.long_name = "area weights compare to the whole globe"
+!cancel att/output area_weights.long_name_mod
+
+
+! Save output
+save/file="`dataPath`/out_file.nc"/clobber/quiet dp, dp_weights, area, area_weights
+
+! NCO
+spawn "ncrename -h -d plev,lev -v plev,lev `dataPath`/out_file.nc"
+spawn "ncks -h -A `dataPath`/out_file.nc `dataPath`/ancil_spcam_ext.nc"
+spawn "ncatted -h -O -a long_name_mod,,d,, `dataPath`/ancil_spcam_ext.nc"
+!spawn "ncatted -h -O -a long_name_mod,dp_weights,d,, `dataPath`/ancil_spcam_ext.nc"
+!spawn "ncatted -h -O -a long_name_mod,area,d,, `dataPath`/ancil_spcam_ext.nc"
+!spawn "ncatted -h -O -a long_name_mod,area_weights,d,, `dataPath`/ancil_spcam_ext.nc"
+
+set mode/last verify
