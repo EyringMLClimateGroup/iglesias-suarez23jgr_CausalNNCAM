@@ -138,6 +138,7 @@ class ModelDescription:
                 levels.append(variable.level_idx)
                 vars_dict[ds_name] = levels
         return vars_dict
+        
 
     def fit_model(self, x, validation_data, epochs, callbacks, verbose=1):
         """ Train the model """

@@ -2,14 +2,14 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=NN_Create
+#SBATCH --job-name=NN_q11-15
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --constraint=k80
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.NN_Create_%j.o
-#SBATCH --error=LOG.NN_Create_%j.o
+#SBATCH --output=LOG.NN_tb_Rasp_q11-15_%j.o
+#SBATCH --error=LOG.NN_tb_Rasp_q11-15_%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=12:00:00
 # -------------------------------
@@ -24,14 +24,14 @@ logPath=logs
 
 # Scripts
 pyScript=NN_Creation
-cfgFile=cfg_NN_Creation.yml
+cfgFile=cfg_NN_Creation_rasp_phq_11-15.yml
 
 ## PROCESSING
 #
 echo "---------- Starting $0 ----------"
 echo ""
 
-logFile=`ls LOG.NN_Create_*`
+logFile=`ls LOG.NN_tb_Rasp_q11-15_*`
 cat ./nn_config/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then

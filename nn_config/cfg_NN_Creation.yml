@@ -69,7 +69,8 @@ nn_output_path : models
 input_order  : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
 output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
-hidden_layers : [32, 32, 32]   # Arbitrary, I choose them because it's a small NN
+# Hidden layers: [32, 32, 32]; [256,256,256,256,256,256,256,256,256]
+hidden_layers : [32, 32, 32]
 activation : relu
 
 

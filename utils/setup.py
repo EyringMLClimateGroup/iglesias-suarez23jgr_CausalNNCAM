@@ -207,6 +207,17 @@ class SetupNeuralNetworks(Setup):
         self.train_patience = yml_cfg["train_patience"]
 
 
+class SetupDiagnostics(SetupNeuralNetworks):
+    def __init__(self, argv):
+        super().__init__(argv)
+        self._setup_diagnostics(self.yml_cfg)
+    
+    def _setup_diagnostics(self, yml_cfg):
+        self.test_data_folder = yml_cfg["test_data_folder"]
+        self.diagnostics      = yml_cfg["diagnostics"]
+        self.diagnostics_time = yml_cfg["diagnostics_time"]
+
+
 class SetupSherpa(SetupNeuralNetworks):
     def __init__(self, argv):
         super().__init__(argv)

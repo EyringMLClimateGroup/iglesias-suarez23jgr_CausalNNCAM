@@ -37,19 +37,19 @@ lim_levels     : False
 target_levels  : False
 # Rasp. GB: "./causal_links"; TB: "./causal_links_tb"
 # ClInv. TB: "./ClInv_causal_links"
-output_folder  : "./causal_links"
-plots_folder   : "./causal_links/plots"
+output_folder  : "./causal_links_tb"
+plots_folder   : "./causal_links_tb/plots"
 verbosity      : 2
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
 ## DATASETS. 
 # Gunnar's: SPCAM_gb_recons; Tom's: SPCAM_tb_recons
-data_folder: "/work/bd1179/b309172/data/SPCAM_gb_recons"
+data_folder: "/work/bd1179/b309172/data/SPCAM_tb_recons"
 # Gunnar's: 002_train_1_year
 # Tom's. Rasp: 2021_09_02_TRAIN_For_Nando; 
 #       ClInv: 2021_09_03_TRAIN_For_Nando_ClInv
-experiment:  "002_train_1_year"
+experiment:  "2021_09_02_TRAIN_For_Nando"
 
 
 # Aggregated analysis

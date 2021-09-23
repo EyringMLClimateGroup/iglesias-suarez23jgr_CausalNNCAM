@@ -62,14 +62,15 @@ thresholds : [.15, .2, .25]
 
 nn_type : "all" # "all"; SingleNN"; "CausalSingleNN"
 
-nn_output_path : models
+nn_output_path : models_tb
 
 # Rasp et at.: [qbp, tbp, vbp, ps, solin, shflx, lhflx] 
 # Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
 input_order  : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
 output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
-hidden_layers : [32, 32, 32]   # Arbitrary, I choose them because it's a small NN
+# Hidden layers: [32, 32, 32]; [256,256,256,256,256,256,256,256,256]
+hidden_layers : [256,256,256,256,256,256,256,256,256]
 activation : relu
 
 
@@ -77,15 +78,15 @@ activation : relu
 # ----------------------
 ## DATASETS.
 # Gunnar's: SPCAM_gb_prepoc; Tom's: SPCAM_tb_prepoc
-train_data_folder : "/work/bd1179/b309172/data/SPCAM_gb_preproc"
+train_data_folder : "/work/bd1179/b309172/data/SPCAM_tb_preproc"
 # Gunnar's. Train (year/month): 002_train_1_<year/month>.nc 002_train_1_<year/month>_shuffle.nc
 #           Valid (year/month): 000_valid_1_<year/month>.nc
 # Tom's. Case: TRAIN/VALID. Rasp: 2021_09_02_TRAIN_For_Nando_shuffle.nc
 #                                 2021_09_02_VALID_For_Nando.nc
 #                          ClInv: 2021_09_03_TRAIN_For_Nando_ClInv_shuffle.nc
 #                                 2021_09_03_VALID_For_Nando_ClInv.nc
-train_data_fn : 002_train_1_year.nc
-valid_data_fn : 000_valid_1_month.nc
+train_data_fn : 2021_09_02_TRAIN_For_Nando_shuffle.nc
+valid_data_fn : 2021_09_02_VALID_For_Nando.nc
 epochs        : 15
 train_verbose : 1 # 0:Silent; 1:Continuous update; 2:Summary on epochs
 tensorboard_folder : tensorboard
@@ -104,7 +105,7 @@ batch_size : 1024
 
 # Learning Rate Scheduler
 init_lr   : 0.001 # From train.py (default)
-step_lr   : 1 # From 006_8col_pnas_exact.yml
+step_lr   : 2 # From 006_8col_pnas_exact.yml
 divide_lr : 5 # From train.py (default)
 
 # Early Stopping
