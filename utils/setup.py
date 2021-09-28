@@ -216,6 +216,7 @@ class SetupDiagnostics(SetupNeuralNetworks):
         self.test_data_folder = yml_cfg["test_data_folder"]
         self.diagnostics      = yml_cfg["diagnostics"]
         self.diagnostics_time = yml_cfg["diagnostics_time"]
+        self.diagnostics_time = yml_cfg["diagnostics_time"]
 
 
 class SetupSherpa(SetupNeuralNetworks):
@@ -226,7 +227,6 @@ class SetupSherpa(SetupNeuralNetworks):
     def _setup_sherpa(self, yml_cfg):
         self.sherpa_hyper   = yml_cfg["sherpa_hyper"]
         self.nn_type        = yml_cfg["sherpa_nn_type"]
-        self.nn_sherpa_path = yml_cfg["nn_sherpa_path"]
 
 
 def _calculate_gridpoints(region):
