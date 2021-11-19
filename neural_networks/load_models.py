@@ -8,10 +8,12 @@ def get_path(setup, model_type, *, pc_alpha=None, threshold=None):
     """ Generate a path based on this model metadata """
     path = Path(setup.nn_output_path, model_type)
     if model_type == "CausalSingleNN":
+        if setup.area_weighted:
+            cfg_str = "a{pc_alpha}-t{threshold}-latwts/" 
+        else: 
+            cfg_str = "a{pc_alpha}-t{threshold}/"
         path = path / Path(
-            "a{pc_alpha}-t{threshold}/".format(
-                pc_alpha=pc_alpha, threshold=threshold
-            )
+            cfg_str.format(pc_alpha=pc_alpha, threshold=threshold)
         )
     str_hl = str(setup.hidden_layers).replace(", ", "_")
     str_hl = str_hl.replace("[", "").replace("]", "")

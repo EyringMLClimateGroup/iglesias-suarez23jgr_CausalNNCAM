@@ -7,6 +7,7 @@ from neural_networks.data_generator        import build_valid_generator
 from neural_networks.cbrain.utils          import load_pickle
 from neural_networks.cbrain.cam_constants  import *
 import numpy                               as     np
+from math                                  import pi
 import numpy.ma                            as     ma
 import pandas                              as     pd
 import matplotlib.pyplot                   as     plt
@@ -20,7 +21,7 @@ else:
 
     
 cThemes = {'tphystnd':'coolwarm',
-           'phq':'coolwarm',
+           'phq':'RdBu',
            'fsns':'Reds',
            'flns':'Reds',
            'fsnt':'Reds',
@@ -39,7 +40,13 @@ class ModelDiagnostics():
         self.levels, self.latitudes, self.longitudes = read_ancilaries(
             Path(ANCIL_FILE)
         )
-        self.lat_weights = get_weights(self.latitudes)
+        self.lat_weights = np.cos(self.latitudes*pi/180.)
+
+        
+#     def get_weights(self, latitudes, norm=False):
+#         AreaWeight = np.cos(latitudes[:]*pi/180.)
+#         return AreaWeight
+        
         
     def reshape_ngeo(self, x, nTime=False):
 #        return x.reshape(self.nlat, self.nlon, -1)
@@ -47,6 +54,7 @@ class ModelDiagnostics():
             return x.reshape(nTime, self.nlat, self.nlon)
         else:
             return x.reshape(self.nlat, self.nlon)
+    
     
     def get_output_var_idx(self, var):
         var_idxs = self.valid_gen.norm_ds.var_names[self.valid_gen.output_idxs]
@@ -138,7 +146,8 @@ class ModelDiagnostics():
             t, 
             p, 
             itime, 
-            varname=varname, 
+            varname=varname,
+            stype='xy',
             save=save, 
             diff=diff,
             stats=[False,stats][stats is not False],
@@ -182,6 +191,8 @@ class ModelDiagnostics():
                 if stats is not False:
                     hor_tsqmean   = true_sqmean[:,ilon]
                     hor_tmean     = true_mean[:,ilon]
+                    hor_psqmean   = pred_sqmean[:,ilon]
+                    hor_pmean     = pred_mean[:,ilon]
                     hor_mse       = mse[:,ilon]
             elif ilon == 'mean':
                 truth[iLev,:] = np.mean(t, axis=1)
@@ -189,9 +200,13 @@ class ModelDiagnostics():
                 if stats is not False:
                     hor_tsqmean   = np.mean(true_sqmean,axis=1)
                     hor_tmean     = np.mean(true_mean,axis=1)
+                    hor_psqmean   = np.mean(pred_sqmean,axis=1)
+                    hor_pmean     = np.mean(pred_mean,axis=1)
                     hor_mse       = np.mean(mse,axis=1)
+                    hor_rmse      = np.sqrt(np.mean(mse,axis=1))
             if stats is not False:
                 hor_tvar = hor_tsqmean - hor_tmean ** 2
+                hor_pvar = hor_psqmean - hor_pmean ** 2
                 hor_r2   = 1 - (hor_mse / hor_tvar)
                 mean_stats[iLev,:] = locals()['hor_'+stats]
                 
@@ -225,16 +240,25 @@ class ModelDiagnostics():
         n_slices  = [3,2][diff is False]
         n_slices  = [n_slices+1,n_slices][stats is False]
         fig, axes = plt.subplots(1, n_slices, figsize=(12, 5))
-        
-        vmin = np.min([np.min(p),np.min(t)])
-        vmax = np.max([np.max(p),np.max(t)])
-        if varname in ['tphystnd','phq']:
-            vlim = np.max([np.abs(vmin),np.abs(vmax)])/2.
-            vmin = -vlim; vmax = vlim
-        elif varname in ['fsns','fsnt','prect']:
-            vmin = 0
 
-        cmap = cThemes[varname]
+        extend='both'
+        if 'vmin' in kwargs.keys() and 'vmax' in kwargs.keys():
+            vmin, vmax = kwargs['vmin'], kwargs['vmax']
+            kwargs.pop('vmin', None); kwargs.pop('vmax', None)
+        else:
+            vmin = np.min([np.min(p),np.min(t)])
+            vmax = np.max([np.max(p),np.max(t)])
+            if varname in ['tphystnd','phq']:
+                vlim = np.max([np.abs(vmin),np.abs(vmax)])/2.
+                vmin = -vlim; vmax = vlim
+            elif varname in ['fsns','fsnt','flns','flnt','prect']:
+                vmin = 0
+                extend='max'
+        
+        if 'cmap' in kwargs.keys():
+            cmap = kwargs['cmap']; kwargs.pop('cmap', None)
+        else:
+            cmap = cThemes[varname]
         cmap_diff = 'coolwarm'
         
         vars_to_plot = [np.array([p, t]),np.array([p, t, p-t])][diff is True]
@@ -247,28 +271,43 @@ class ModelDiagnostics():
             var_to_plot = vars_to_plot[iSlice]
             lab_to_plot = labs_to_plot[iSlice]
             if lab_to_plot == 'Prediction - SPCAM':
-                lmin=-vmax/2.; lmax=vmax/2.
-                cmap_theme=cmap_diff
+                vmin, vmax = -vmax/1.2, vmax/1.2
+                cmap=cmap_diff
+                extend = 'both'
             elif lab_to_plot == 'r2':
-                lmin=-1; lmax=1
-                cmap_theme='coolwarm'
-            elif lab_to_plot == 'mse':
-                lmin=0; lmax=np.max(stats[1])
-                cmap_theme='Reds'
-            else:
-                lmin=vmin; lmax=vmax
-                cmap_theme=cmap
-            I  = axes[iSlice].imshow(
-                var_to_plot, 
-                vmin=lmin,
-                vmax=lmax,
-                cmap=cmap_theme,
-                **kwargs
-            )
-            cb = fig.colorbar(I, ax=axes[iSlice], orientation='horizontal')
+                vmin=0.; vmax=1.
+                extend='min'
+                cmap='Spectral_r'
+            elif 'var' in lab_to_plot:
+#                 vmin=0; vmax=np.max(stats[1])
+                vmin=0; vmax=3.5e-8
+                cmap='Spectral_r'
+                extend='max'
+            elif lab_to_plot == 'rmse':
+#                 vmin=0; vmax=np.max(stats[1])
+#                 vmin=0; vmax=1.e-4 # tphystnd
+                vmin=0; vmax=1.5e-7  # phq
+                cmap='magma_r'
+                extend='max'
+#             else:
+#                 lmin=vmin; lmax=vmax
+#                 cmap_theme=cmap
+            I  = axes[iSlice].imshow(var_to_plot,vmin=vmin,vmax=vmax,cmap=cmap,**kwargs)
+            cb = fig.colorbar(I, ax=axes[iSlice], orientation='horizontal',extend=extend)
             cb.set_label(unit)
             axes[iSlice].set_title(lab_to_plot)
-            if stype == 'yz':
+            if stype == 'xy':
+                lat_ticks  = [int(l) for l in range(len(self.latitudes)) if l %9 ==0]
+                lat_labels = [str(int(l)) for i, l in enumerate(self.latitudes) if i %9 == 0]
+                axes[iSlice].set_yticks(lat_ticks)
+                axes[iSlice].set_yticklabels(lat_labels)
+                axes[iSlice].set_ylabel('Latitude')
+                lon_ticks  = [int(l) for l in range(len(self.longitudes)) if l %9 ==0]
+                lon_labels = [str(int(l)) for i, l in enumerate(self.longitudes) if i %9 == 0]
+                axes[iSlice].set_xticks(lon_ticks)
+                axes[iSlice].set_xticklabels(lon_labels)
+                axes[iSlice].set_xlabel('Longitude')
+            elif stype == 'yz':
                 P_ticks = [int(press) for press in range(len(P)) if press %5 ==0]
                 P_label = [str(int(press)) for i, press in enumerate(P) if i %5 == 0]
                 axes[iSlice].set_yticks(P_ticks)
@@ -284,7 +323,7 @@ class ModelDiagnostics():
         plt.tight_layout()
         if save:
             Path(save).mkdir(parents=True, exist_ok=True)
-            fig.savefig(f"{save}/{var}_map_time-{itime}.png")
+            fig.savefig(f"{save}/{varname}_map_time-{itime}.png")
         return fig, axes
 
 
@@ -318,11 +357,11 @@ class ModelDiagnostics():
             t, p = self.get_truth_pred(itime, var, nTime=nTime)
             
             truth[:, iLev] = np.average(
-                np.mean(t[idx_lats[0]:idx_lats[-1]+1, idx_lons[0]:idx_lons[-1]+1],axis=2),
+                np.mean(t[:,idx_lats[0]:idx_lats[-1]+1, idx_lons[0]:idx_lons[-1]+1],axis=2),
                 weights=self.lat_weights[idx_lats[0]:idx_lats[-1]+1],axis=1
             )
             pred[:, iLev] = np.average(
-                np.mean(p[idx_lats[0]:idx_lats[-1]+1, idx_lons[0]:idx_lons[-1]+1],axis=2),
+                np.mean(p[:,idx_lats[0]:idx_lats[-1]+1, idx_lons[0]:idx_lons[-1]+1],axis=2),
                 weights=self.lat_weights[idx_lats[0]:idx_lats[-1]+1],axis=1
             )
             
@@ -626,13 +665,14 @@ def plot_profiles(
                 **kwargs
             )
             truth = True
-        ax1.plot(
-            np.mean(vars_dict[iMod][varname]['p'],axis=0),
-            P,
-            label=vars_dict[iMod][varname]['lab'],
-            alpha=.8,
-            **kwargs
-        )
+        if iMod == 'SingleNN' or iMod == 'CausalNN':
+            ax1.plot(
+                np.mean(vars_dict[iMod][varname]['p'],axis=0),
+                P,
+                label=vars_dict[iMod][varname]['lab'],
+                alpha=.8,
+                **kwargs
+            )
         if stats is not False:
             ax2.plot(
                 vars_dict[iMod][varname][stats][1],

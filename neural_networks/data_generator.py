@@ -37,7 +37,7 @@ def build_valid_generator(input_vars_dict, output_vars_dict, setup, nlat=64, nlo
     
     ngeo = nlat * nlon
     valid_gen = DataGenerator(
-        data_fn=Path(setup.train_data_folder, setup.valid_data_fn),
+        data_fn=Path(data_fn, filenm),
         input_vars_dict=input_vars_dict,
         output_vars_dict=output_vars_dict,
         norm_fn=Path(setup.normalization_folder, setup.normalization_fn),

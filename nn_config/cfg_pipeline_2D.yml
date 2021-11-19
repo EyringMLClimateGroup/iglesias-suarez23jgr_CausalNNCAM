@@ -32,9 +32,9 @@ pc_alphas      : [0.001,0.01,0.1]
 region         : [ [-90,90] , [0.,359.] ]
 lim_levels     : False
 target_levels  : False
-# Rasp. GB: "./causal_links"; TB: "./causal_links_tb"
-# ClInv. TB: "./ClInv_causal_links"
-output_folder  : "./causal_links"
+# Rasp. GB: "./SPCAM_Rasp_causal_links_1yr"; TB: "./SPCAM_Rasp_causal_links_3mth"
+# ClInv. TB: "./SPCAM_ClInv_causal_links_3mth"
+output_folder  : "./SPCAM_Rasp_causal_links_3mth"
 verbosity      : 2
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"

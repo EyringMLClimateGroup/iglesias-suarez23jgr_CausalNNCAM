@@ -12,7 +12,6 @@ import os
 def train_all_models(model_descriptions, setup):
     """ Train and save all the models """
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-#    import pdb; pdb.set_trace()
     for model_description in model_descriptions:
         outModel = model_description.get_filename()+'_model.h5'
         outPath  = str(model_description.get_path(setup.nn_output_path))
@@ -29,7 +28,7 @@ def train_save_model(
 
     input_vars_dict = model_description.input_vars_dict
     output_vars_dict = model_description.output_vars_dict
-
+    
     with build_train_generator(
         input_vars_dict, output_vars_dict, setup
     ) as train_gen, build_valid_generator(
@@ -57,7 +56,6 @@ def train_save_model(
         )
         
         early_stop = EarlyStopping(monitor="val_loss", patience=setup.train_patience)
-        
         model_description.fit_model(
             x=train_gen,
             validation_data=valid_gen,

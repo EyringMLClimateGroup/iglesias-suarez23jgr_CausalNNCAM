@@ -141,7 +141,8 @@ class SetupPCMCIAggregation(Setup):
         self._setup_plots(self.yml_cfg)
 
     def _setup_results_aggregation(self, yml_cfg):
-        self.thresholds = yml_cfg["thresholds"]
+        self.thresholds    = yml_cfg["thresholds"]
+        self.area_weighted = yml_cfg["area_weighted"]
 
     def _setup_plots(self, yml_cfg):
         self.plots_folder = yml_cfg["plots_folder"]
@@ -157,6 +158,7 @@ class SetupNeuralNetworks(Setup):
 
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds = yml_cfg["thresholds"]
+        self.area_weighted = yml_cfg["area_weighted"]
 
     def _setup_neural_networks(self, yml_cfg):
         self.nn_type = yml_cfg["nn_type"]

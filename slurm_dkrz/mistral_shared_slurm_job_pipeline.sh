@@ -4,8 +4,8 @@
 #SBATCH --account=bd1179
 #SBATCH --job-name=Rasp
 #SBATCH --partition=shared
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=2
 #SBATCH --output=LOG.Rasp_tb_pipeline_%j.o
 #SBATCH --error=LOG.Rasp_tb_pipeline_%j.o
 ##SBATCH --exclusive

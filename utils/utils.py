@@ -49,13 +49,17 @@ def get_levels(pres):
     return levs_lim
 
 
-def get_weights(latitudes,norm=False):
+def get_weights(region, lat, norm=False):
+    
+    levels, latitudes, longitudes = read_ancilaries(Path(ANCIL_FILE))
+    idx_lats = [find_closest_value(latitudes, ilat) for ilat in region[0]]
+    idx_lat  = find_closest_value(latitudes[idx_lats[0]:idx_lats[-1]+1], lat)
     # Use cross section to get at the latitude data
-    AreaWeight = np.cos(latitudes[:]*pi/180.)
+    AreaWeight = np.cos(latitudes[idx_lats[0]:idx_lats[-1]+1]*pi/180.)
     # Get the Area Weighted normalised to 1
     if norm == True:
-        AreaWeight = AreaWeight/sum(AreaWeight)
-    return AreaWeight
+        AreaWeight = AreaWeight/np.mean(AreaWeight)
+    return AreaWeight[idx_lat]
 
 
 #########################
