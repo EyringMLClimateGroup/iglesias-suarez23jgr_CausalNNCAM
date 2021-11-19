@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 
-from tensorflow.keras import Sequential, Input
-from tensorflow.keras.layers import Dense
+from tensorflow.keras        import Sequential, Input
+from tensorflow.keras.layers import Dense, Activation
 
 from utils.constants import SPCAM_Vars
 from utils.variable import Variable_Lev_Metadata
@@ -132,12 +132,14 @@ class ModelDescription:
         for variable in list_variables:
             ds_name = variable.var.ds_name  # Name used in the dataset
             if variable.var.dimensions == 2:
+                ds_name = 'LHF_nsDELQ' if ds_name == 'LHF_NSDELQ' else ds_name
                 vars_dict[ds_name] = None
             elif variable.var.dimensions == 3:
                 levels = vars_dict.get(ds_name, list())
                 levels.append(variable.level_idx)
                 vars_dict[ds_name] = levels
         return vars_dict
+        
 
     def fit_model(self, x, validation_data, epochs, callbacks, verbose=1):
         """ Train the model """
@@ -153,10 +155,12 @@ class ModelDescription:
         """ Generate a path based on this model metadata """
         path = Path(base_path, self.model_type)
         if self.model_type == "CausalSingleNN":
+            if self.setup.area_weighted:
+                cfg_str = "a{pc_alpha}-t{threshold}-latwts/" 
+            else: 
+                cfg_str = "a{pc_alpha}-t{threshold}/"
             path = path / Path(
-                "a{pc_alpha}-t{threshold}/".format(
-                    pc_alpha=self.pc_alpha, threshold=self.threshold
-                )
+                cfg_str.format(pc_alpha=self.pc_alpha, threshold=self.threshold)
             )
         str_hl = str(self.setup.hidden_layers).replace(", ", "_")
         str_hl = str_hl.replace("[", "").replace("]", "")
@@ -224,7 +228,11 @@ def dense_nn(input_shape, output_shape, hidden_layers, activation):
     model.add(Input(shape=input_shape))
 
     for n_layer_nodes in hidden_layers:
-        model.add(Dense(n_layer_nodes, activation=activation))
+        act = tf.keras.layers.LeakyReLU(alpha=0.3) if activation=='LeakyReLU' else Activation(activation)
+#         act = tf.keras.layers.LeakyReLU(alpha=0.3) if activation=='LeakyReLU' else activation
+#         model.add(Dense(n_layer_nodes, activation=act))
+        model.add(Dense(n_layer_nodes))
+        model.add(act)
 
     model.add(Dense(output_shape))
     return model

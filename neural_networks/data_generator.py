@@ -23,15 +23,21 @@ def build_train_generator(input_vars_dict, output_vars_dict, setup):
     return train_gen
 
 
-def build_valid_generator(input_vars_dict, output_vars_dict, setup, nlat=64, nlon=128):
+def build_valid_generator(input_vars_dict, output_vars_dict, setup, nlat=64, nlon=128, test=False):
     out_scale_dict = load_pickle(
         Path(setup.out_scale_dict_folder, setup.out_scale_dict_fn)
     )
     input_transform = (setup.input_sub, setup.input_div)
-
+    if test:
+        data_fn = setup.test_data_folder
+        filenm  = setup.test_data_fn
+    else:
+        data_fn = setup.train_data_folder
+        filenm  = setup.valid_data_fn
+    
     ngeo = nlat * nlon
     valid_gen = DataGenerator(
-        data_fn=Path(setup.train_data_folder, setup.valid_data_fn),
+        data_fn=Path(data_fn, filenm),
         input_vars_dict=input_vars_dict,
         output_vars_dict=output_vars_dict,
         norm_fn=Path(setup.normalization_folder, setup.normalization_fn),

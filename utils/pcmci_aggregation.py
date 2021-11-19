@@ -2,12 +2,17 @@ import numpy as np
 from pathlib import Path
 
 from . import utils
-from .plotting import plot_links, find_linked_variables
+from .plotting import plot_links, find_linked_variables, plot_links_metrics
 from .variable import Variable_Lev_Metadata
+from .constants import ANCIL_FILE
+
+from collections import defaultdict
 
 
 # Collect results
 
+levels, latitudes, longitudes = utils.read_ancilaries(Path(ANCIL_FILE))
+# lat_wts = utils.get_weights(latitudes,norm=True)
 
 def get_parents_from_links(links):
     """ Return a list of variables that are parents, given a
@@ -39,7 +44,7 @@ def collect_in_dict(_dict, key, value):
     _dict[key] = collected_values
 
 
-def collect_results_file(key, results_file, collected_results, errors):
+def collect_results_file(key, results_file, collected_results, errors, lat_wtg):
     """Collect pcmci results from a file in a dictionary with other
     results.
     
@@ -71,6 +76,7 @@ def collect_results_file(key, results_file, collected_results, errors):
             # Collect parents
             links = alpha_result["links"]
             parents = get_parents_from_links(links)
+            parents = [[lat_wtg,0.][parent == False] for parent in parents]
             collect_in_dict(collected, "parents", parents)
             # Collect val_matrix
             val_matrix = alpha_result["val_matrix"]
@@ -138,9 +144,17 @@ def collect_results(setup):
                         setup.output_file_pattern,
                         setup.output_folder,
                     )
+                    
+                    # Area-weights?
+                    if setup.area_weighted:
+                        lat_wtg = utils.get_weights(setup.region, lat, norm=True)
+                    else:
+                        lat_wtg = 1.
+                        
                     collect_results_file(
-                        child_var, results_file, collected_results, errors
+                        child_var, results_file, collected_results, errors, lat_wtg
                     )
+                    
                     file_progress += 1
                     if file_progress == total_files or (
                         (file_progress / total_files * 100) >= step * step_progress
@@ -204,6 +218,8 @@ def aggregate_results(collected_results, setup):
         dict_pc_alpha_parents = dict()
         for pc_alpha, collected in collected_pc_alpha.items():
             dict_threshold_parents = dict()
+            dict_num_parents = dict()
+            dict_per_parents = dict()
             if pc_alpha not in pc_alphas_filter:
                 continue  # Skip this pc alpha
             val_matrix_list = np.array(collected["val_matrix"])
@@ -229,8 +245,12 @@ def aggregate_results(collected_results, setup):
                     i for i in range(len(parents_filtered)) if parents_filtered[i]
                 ]
                 dict_threshold_parents[str(threshold)] = parents
+                dict_num_parents[str(threshold)]  = len(parents)
+                dict_per_parents[str(threshold)]  = len(parents) * 100. / len(var_names_parents)
             dict_pc_alpha_parents[pc_alpha] = {
                 "parents": dict_threshold_parents,
+                "num_parents": dict_num_parents,
+                "per_parents": dict_per_parents,
                 "val_matrix": val_matrix_mean,
                 "parents_percent": parents_percent,
                 "var_names": var_names,
@@ -249,8 +269,12 @@ def print_aggregated_results(var_names_parents, aggregated_results):
         for pc_alpha, pc_alpha_results in dict_pc_alpha_parents.items():
             print(f"pc_alpha = {pc_alpha}")
             dict_threshold_parents = pc_alpha_results["parents"]
+            dict_num_parents = pc_alpha_results["num_parents"]
+            dict_per_parents = pc_alpha_results["per_parents"]
             for threshold, parents in dict_threshold_parents.items():
-                print(f"* Threshold {threshold}:\t{var_names_np[parents]}")
+                print(f"* Threshold {threshold}:\n \
+                Total number of parents: {dict_num_parents[threshold]} ({dict_per_parents[threshold]:1.1f} %)\n \
+                Parents: {var_names_np[parents]}\n\n")
 
 
 def build_pc_alpha_plot_matrices(var_names_parents, aggregated_results):
@@ -349,6 +373,106 @@ def build_plot_matrices(var_names_parents, aggregated_results):
     return dict_combinations
 
 
+
+def build_links_metrics(setup, aggregated_results):
+
+    pc_alphas  = setup.pc_alphas
+    outputs_nm = [var.name for var in setup.list_spcam if var.type == "out"]
+    
+#     dict_combinations = defaultdict(dict)
+    dict_combinations = {}
+#     dict_combinations = dict.fromkeys(outputs_nm, {})
+#     for iVar in dict_combinations: dict_combinations[iVar] = dict.fromkeys(pc_alphas, {})
+    
+    # Num. of parents (by level in 3D)
+    for i_child, (child, dict_pc_alpha_parents) in enumerate(
+            aggregated_results.items()
+        ):  
+        
+        for pc_alpha, pc_alpha_results in dict_pc_alpha_parents.items():
+            
+            child_main = child.var.name
+            child_lev  = str(child.level)
+            
+            if child_main not in dict_combinations: dict_combinations[child_main] = {}
+            if pc_alpha not in dict_combinations[child_main]: dict_combinations[child_main][pc_alpha] = {}
+
+            dict_threshold_parents = pc_alpha_results["parents"]
+            dict_num_parents       = pc_alpha_results["num_parents"]
+            dict_per_parents       = pc_alpha_results["per_parents"]
+
+            thrs = [float(thr) for thr, nPar in dict_num_parents.items()]
+            nPar = [nPar       for thr, nPar in dict_num_parents.items()]
+            pPar = [pPar       for thr, pPar in dict_per_parents.items()]
+
+            to_be_updated = {child_lev:{'thresholds':thrs,'num_parents':nPar,'per_parents':pPar,}}
+            dict_combinations[child_main][pc_alpha].update(to_be_updated)
+#             dict_combinations[child_main][float(pc_alpha)][child_lev] = {
+#                 'thresholds':thrs,
+#                 'num_parents':nPar,
+#                 'per_parents':pPar,
+#             } 
+    
+#     print(dict_combinations['tphystnd']['0.001']['992.56']['num_parents'])
+#     print(dict_combinations['tphystnd']['0.1']['992.56']['num_parents'])
+    
+    for child_main in dict_combinations.keys():
+        for pc_alpha in dict_combinations[child_main].keys():
+            
+            if len(dict_combinations[child_main][pc_alpha]) > 1:
+            
+                nLevs = len(dict_combinations[child_main][pc_alpha].keys())
+                nPar_mean = np.zeros([nLevs,len(thrs)])
+                pPar_mean = np.zeros([nLevs,len(thrs)])
+                count = 0
+                for i_child in dict_combinations[child_main][pc_alpha].keys():
+                    nPar_mean[count,:] = dict_combinations[child_main][pc_alpha][i_child]['num_parents']
+                    pPar_mean[count,:] = dict_combinations[child_main][pc_alpha][i_child]['per_parents'] 
+                    count += 1
+                nPar_mean, pPar_mean = np.mean(nPar_mean,axis=0), np.mean(pPar_mean,axis=0)
+                to_be_updated = {'mean':{'thresholds':thrs,'num_parents':nPar_mean,'per_parents':pPar_mean,}}
+                dict_combinations[child_main][pc_alpha].update(to_be_updated)
+#                 dict_combinations[child_main][pc_alpha]['mean'] = {
+#                     'thresholds':thrs,
+#                     'num_parents':nPar_mean,
+#                     'per_parents':pPar_mean,
+#                 }
+            
+            else:
+                dict_combinations[child_main][str(pc_alpha)]['mean'] = \
+                dict_combinations[child_main][str(pc_alpha)].pop('None')
+#     print()
+#     print(dict_combinations['tphystnd']['0.001']['992.56']['num_parents'])
+#     print(dict_combinations['tphystnd']['0.1']['992.56']['num_parents'])
+#     print()
+#     print(dict_combinations['tphystnd']['0.001']['mean']['num_parents'])
+#     print(dict_combinations['tphystnd']['0.1']['mean']['num_parents'])
+                
+    dict_combinations['mean'] = {}
+    for j, iPC in enumerate(pc_alphas):
+        nPar_mean = np.zeros([len(outputs_nm),len(thrs)])
+        pPar_mean = np.zeros([len(outputs_nm),len(thrs)])
+        for j, iVar in enumerate(outputs_nm):
+            nPar_mean[j,:] = dict_combinations[iVar][str(iPC)]['mean']['num_parents']
+            pPar_mean[j,:] = dict_combinations[iVar][str(iPC)]['mean']['per_parents']
+        nPar_mean, pPar_mean = np.mean(nPar_mean,axis=0), np.mean(pPar_mean,axis=0)
+        to_be_updated = {str(iPC):{'thresholds':thrs,'num_parents':nPar_mean,'per_parents':pPar_mean,}}
+        dict_combinations['mean'].update(to_be_updated)
+#         dict_combinations['mean'][iPC] = {
+#             'thresholds':thrs,
+#             'num_parents':nPar_mean,
+#             'per_parents':pPar_mean,
+#         }
+    
+#     print()
+#     print(dict_combinations['mean']['0.001']['num_parents'])
+#     print(dict_combinations['mean']['0.1']['num_parents'])
+#     import pdb; pdb.set_trace()
+    
+    return dict_combinations
+
+
+
 # Plotting
 
 
@@ -440,3 +564,26 @@ def plot_aggregated_results(var_names_parents, aggregated_results, setup):
             node_size=node_size,
             show_colorbar=True,
         )
+
+        
+def plot_causal_metrics(
+    aggregated_results, 
+    setup, 
+    save=False,
+):
+    dict_combinations = build_links_metrics(setup, aggregated_results)
+    
+    # Filenm format (folder and figure name)
+    save_dir = setup.plots_folder
+    Path(save_dir).mkdir(parents=True, exist_ok=True)
+    variables = [var.name for var in setup.list_spcam if var.type == "out"]
+    variables = '-'.join(variables)
+    pc_alphas  = [str(iPC) for iPC in setup.pc_alphas]
+    pcs       = '-'.join(pc_alphas)
+    lats = [str(iL) for iL in setup.region[0]];  lats = '-'.join(lats)
+    lons = [str(iL) for iL in setup.region[-1]]; lons = '-'.join(lons)
+    wgt_format = ['.png','_latwts.png'][setup.area_weighted]
+    filenm = variables+'_a-'+pcs+'_lats-'+lats+'_lons'+lons+wgt_format
+    if save: save = save_dir+'/'+filenm
+    
+    plot_links_metrics(setup, dict_combinations, save)

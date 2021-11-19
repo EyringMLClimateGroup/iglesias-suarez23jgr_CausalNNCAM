@@ -1,15 +1,16 @@
-import numpy as np
+import numpy    as np
 import numpy.ma as ma
-from pathlib import Path
+from   math     import pi
+from pathlib    import Path
 from .constants import ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars # DATA_FOLDER
-from netCDF4 import Dataset
+from neural_networks.cbrain.cam_constants  import *
+from netCDF4    import Dataset
 import pickle
 
-#########################
-#    Find region utils
-#########################
 
-
+#########################
+#    Region utils
+#########################
 def find_closest_value(values, target):
     """
     Returns the index of the closest value to the target
@@ -22,7 +23,7 @@ def find_closest_value(values, target):
 
 
 def find_closest_longitude(longitudes, target):
-    """Converts longitudes to 0-360 and returns the index to the closest"""
+    """Converts longitudes to 0-359 and returns the index to the closest"""
 
     target = (target + 360) % 360
     return find_closest_value(longitudes, target)
@@ -46,6 +47,19 @@ def get_levels(pres):
     idx_levs = [find_closest_value(levels, lev) for lev in pres]
     levs_lim = levels[idx_levs[-1] : idx_levs[0] + 1]
     return levs_lim
+
+
+def get_weights(region, lat, norm=False):
+    
+    levels, latitudes, longitudes = read_ancilaries(Path(ANCIL_FILE))
+    idx_lats = [find_closest_value(latitudes, ilat) for ilat in region[0]]
+    idx_lat  = find_closest_value(latitudes[idx_lats[0]:idx_lats[-1]+1], lat)
+    # Use cross section to get at the latitude data
+    AreaWeight = np.cos(latitudes[idx_lats[0]:idx_lats[-1]+1]*pi/180.)
+    # Get the Area Weighted normalised to 1
+    if norm == True:
+        AreaWeight = AreaWeight/np.mean(AreaWeight)
+    return AreaWeight[idx_lat]
 
 
 #########################

@@ -41,8 +41,8 @@ class Setup:
         self.experiment  = yml_cfg["experiment"]
         self.data_folder = yml_cfg["data_folder"]
 
-        region = yml_cfg["region"]
-        self.gridpoints = _calculate_gridpoints(region)
+        self.region     = yml_cfg["region"]
+        self.gridpoints = _calculate_gridpoints(self.region)
 
         ## Model's grid
         self.levels, latitudes, longitudes = utils.read_ancilaries(
@@ -141,7 +141,8 @@ class SetupPCMCIAggregation(Setup):
         self._setup_plots(self.yml_cfg)
 
     def _setup_results_aggregation(self, yml_cfg):
-        self.thresholds = yml_cfg["thresholds"]
+        self.thresholds    = yml_cfg["thresholds"]
+        self.area_weighted = yml_cfg["area_weighted"]
 
     def _setup_plots(self, yml_cfg):
         self.plots_folder = yml_cfg["plots_folder"]
@@ -157,15 +158,16 @@ class SetupNeuralNetworks(Setup):
 
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds = yml_cfg["thresholds"]
+        self.area_weighted = yml_cfg["area_weighted"]
 
     def _setup_neural_networks(self, yml_cfg):
-        nn_type = yml_cfg["nn_type"]
+        self.nn_type = yml_cfg["nn_type"]
         self.do_single_nn = self.do_causal_single_nn = False
-        if nn_type == "SingleNN":
+        if self.nn_type == "SingleNN":
             self.do_single_nn = True
-        elif nn_type == "CausalSingleNN":
+        elif self.nn_type == "CausalSingleNN":
             self.do_causal_single_nn = True
-        elif nn_type == "all":
+        elif self.nn_type == "all":
             self.do_single_nn = self.do_causal_single_nn = True
 
         self.nn_output_path = yml_cfg["nn_output_path"]
@@ -207,6 +209,18 @@ class SetupNeuralNetworks(Setup):
         self.train_patience = yml_cfg["train_patience"]
 
 
+class SetupDiagnostics(SetupNeuralNetworks):
+    def __init__(self, argv):
+        super().__init__(argv)
+        self._setup_diagnostics(self.yml_cfg)
+    
+    def _setup_diagnostics(self, yml_cfg):
+        self.test_data_folder = yml_cfg["test_data_folder"]
+        self.test_data_fn     = yml_cfg["test_data_fn"]
+        self.diagnostics      = yml_cfg["diagnostics"]
+        self.diagnostics_time = yml_cfg["diagnostics_time"]
+
+
 class SetupSherpa(SetupNeuralNetworks):
     def __init__(self, argv):
         super().__init__(argv)
@@ -215,7 +229,6 @@ class SetupSherpa(SetupNeuralNetworks):
     def _setup_sherpa(self, yml_cfg):
         self.sherpa_hyper   = yml_cfg["sherpa_hyper"]
         self.nn_type        = yml_cfg["sherpa_nn_type"]
-        self.nn_sherpa_path = yml_cfg["nn_sherpa_path"]
 
 
 def _calculate_gridpoints(region):

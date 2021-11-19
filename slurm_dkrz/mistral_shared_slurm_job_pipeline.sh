@@ -2,12 +2,12 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=sgl
+#SBATCH --job-name=Rasp
 #SBATCH --partition=shared
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --output=LOG.sgl_%j.o
-#SBATCH --error=LOG.sgl_%j.o
+#SBATCH --ntasks=6
+#SBATCH --cpus-per-task=2
+#SBATCH --output=LOG.Rasp_tb_pipeline_%j.o
+#SBATCH --error=LOG.Rasp_tb_pipeline_%j.o
 ##SBATCH --exclusive
 #SBATCH --mail-type=FAIL
 #SBATCH --time=7-00:00:00
@@ -31,7 +31,7 @@ cfgFile=cfg_${pyScript}.yml
 echo "---------- Starting $0 ----------"
 echo ""
 
-logFile=`ls LOG.sgl_*`
+logFile=`ls LOG.Rasp_tb_pipeline_*`
 cat ./nn_config/$cfgFile > $logFile
 
 if [ ! -f ${pyScript}.py ]; then
@@ -42,7 +42,7 @@ if [ ! -f ${pyScript}.py ]; then
 fi
 echo ""
 
-echo "Run PCMCI"
+echo "Run PCMCI for Rasp et al."
 source /pf/b/b309172/.bashrc
 conda activate causalnncam
 python ${pyScript}.py -c ./nn_config/$cfgFile

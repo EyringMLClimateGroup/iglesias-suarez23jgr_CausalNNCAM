@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from tigramite import plotting as tp
 import numpy as np
+from pathlib import Path
 
 
 def find_linked_variables(links):
@@ -50,7 +52,8 @@ def plot_links(
     var_names = np.array(var_names)
 
     linked_variables = find_linked_variables(links)
-
+    linked_variables.sort() # set() does not work with climate_invariant
+    
     link_matrix = build_link_matrix(links)
 
     if len(linked_variables) != 0:
@@ -88,3 +91,104 @@ def plot_links(
         show_colorbar=show_colorbar,
     )
     plt.show()
+
+    
+def plot_links_metrics(
+    setup,
+    dict_combinations,
+    save=False,
+    figsize=(6.4, 4.8),
+    node_size=0.15,
+    **kwargs
+):
+    
+    pc_alphas  = [str(a) for a in setup.pc_alphas]
+    thresholds = np.array(setup.thresholds)
+    outputs_nm = [var.name for var in setup.list_spcam if var.type == "out"]
+    
+#     fig = plt.figure()
+    fig, ax = plt.subplots(1, figsize=figsize)
+    '''
+    print(plt.style.available)
+    ['Solarize_Light2', '_classic_test_patch', 'bmh', 'classic', 'dark_background', 
+     'fast', 'fivethirtyeight', 'ggplot', 'grayscale', 'seaborn', 'seaborn-bright', 
+     'seaborn-colorblind', 'seaborn-dark', 'seaborn-dark-palette', 'seaborn-darkgrid',
+     'seaborn-deep', 'seaborn-muted', 'seaborn-notebook', 'seaborn-paper', 'seaborn-pastel',
+     'seaborn-poster', 'seaborn-talk', 'seaborn-ticks', 'seaborn-white', 'seaborn-whitegrid',
+     'tableau-colorblind10']
+    '''
+#     plt.style.use('default')
+#     plt.style.use('tableau-colorblind10') # Not really clear 
+    plt.style.use('seaborn-pastel')
+    
+    linestyles = ['dotted','dashed','dashdot']
+    colors     = ['blue','orange','red','purple','brown','pink','gray','olive','cyan']
+
+    for i, iVar in enumerate(outputs_nm):
+        for j, jPC in enumerate(pc_alphas):
+            
+            if len(dict_combinations[iVar][jPC]) > 1:
+                for k, kLev in enumerate(dict_combinations[iVar][jPC].keys()):
+                    if kLev != 'mean':
+                        ax.plot(
+                            thresholds,
+                            dict_combinations[iVar][jPC][str(kLev)]['num_parents'],
+                            linewidth=.1,
+#                             linestyle='-',
+#                             color='k',
+                            linestyle=linestyles[j],
+                            color=colors[i],
+                            alpha=.8,
+                        )
+                        
+            ax.plot(
+                thresholds,
+                dict_combinations[iVar][jPC]['mean']['num_parents'],
+                linewidth=2.,
+                linestyle=linestyles[j],
+                color=colors[i],
+                alpha=.8,
+                label=iVar+' (\u03B1 '+str(jPC)+')',
+            )
+    
+    for j, jPC in enumerate(pc_alphas):
+        ax.plot(
+            thresholds,
+            dict_combinations['mean'][jPC]['num_parents'],
+            linewidth=5.,
+            linestyle=linestyles[j],
+            color='k',
+            alpha=.8,
+            label='pc-alpha (\u03B1 '+str(jPC)+')',
+        )
+    
+
+    
+#     plt.xlim(thresholds[0],thresholds[-1])
+    plt.ylim(0,100)
+    
+    plt.xlabel('Threshols (ratio)')
+    plt.ylabel('Num. Causal links')
+    
+    ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax.xaxis.set_major_locator(MultipleLocator(.05))
+    ax.xaxis.set_minor_locator(MultipleLocator(.01))
+#     ax.yaxis.set_major_locator(MultipleLocator(10))
+    ax.yaxis.set_minor_locator(MultipleLocator(5))
+    
+#     plt.legend(loc=0)
+    plt.legend(ncol=3,bbox_to_anchor=(1.05, -.2))
+    
+    if save:
+        sPath = save.split('/')[0]
+        sName = save.split('/')[-1]
+        Path(sPath).mkdir(parents=True, exist_ok=True)
+        fig.savefig(
+            save, dpi='figure', format=None, metadata=None,
+            bbox_inches=None, pad_inches=0.1,
+            facecolor='auto', edgecolor='auto',
+            backend=None, **kwargs
+       )
+    
+    plt.show()
+    
