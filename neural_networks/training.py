@@ -68,6 +68,7 @@ def train_save_model(
             x=train_gen,
             validation_data=valid_gen,
             epochs=setup.epochs,
+#             callbacks=[lrs, tensorboard, early_stop],
             callbacks=[lrs, tensorboard, early_stop, checkpoint],
             verbose=setup.train_verbose,
         )

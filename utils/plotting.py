@@ -133,7 +133,7 @@ def plot_links_metrics(
                         ax.plot(
                             thresholds,
                             dict_combinations[iVar][jPC][str(kLev)]['num_parents'],
-                            linewidth=.1,
+                            linewidth=.2,
 #                             linestyle='-',
 #                             color='k',
                             linestyle=linestyles[j],

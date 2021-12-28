@@ -2,13 +2,13 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=CIq1
+#SBATCH --job-name=ClInv
 #SBATCH --partition=gpu
 #SBATCH --nodes=1
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.NN_CIq1_%j.o
-#SBATCH --error=LOG.NN_CIq1_%j.o
+#SBATCH --output=LOG.NN_ClInv_%j.o
+#SBATCH --error=LOG.NN_ClInv_%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=12:00:00
 # -------------------------------
@@ -17,23 +17,20 @@
 #    $> sbatch slurm_dkrz/<script>.sh
 # --------------------------------
 
-logFile=`ls LOG.NN_CIq1_*`
-cfgFile=cfg_NN_Creation_climate_invariant_phq_1.yml
-
-###############################################
-
 # Paths
 scriptPath=`pwd`
 logPath=logs
 
 # Scripts
 pyScript=NN_Creation
+cfgFile=cfg_NN_Creation_climate_invariant.yml
 
 ## PROCESSING
 #
 echo "---------- Starting $0 ----------"
 echo ""
 
+logFile=`ls LOG.NN_ClInv_*`
 cat ./nn_config/$cfgFile > $logFile
 
 if [ ! -f ${scriptPath}/${pyScript}.py ]; then

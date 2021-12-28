@@ -226,7 +226,7 @@ class ModelDiagnostics():
     def plot_slices(
         self, 
         t, 
-        p, 
+        pred, 
         itime, 
         title='', 
         unit='', 
@@ -628,6 +628,7 @@ class ModelDiagnostics():
         for variable in list_variables:
             ds_name = variable.var.ds_name  # Name used in the dataset
             if variable.var.dimensions == 2:
+                ds_name = 'LHF_nsDELQ' if ds_name == 'LHF_NSDELQ' else ds_name
                 vars_dict[ds_name] = None
             elif variable.var.dimensions == 3:
                 levels = vars_dict.get(ds_name, list())

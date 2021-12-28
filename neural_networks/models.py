@@ -99,6 +99,15 @@ class ModelDescription:
             name="Adam",
         )
         
+#         optimizer = tf.keras.optimizers.RMSprop(
+#             learning_rate=0.001,
+#             rho=0.9,
+#             momentum=0.0,
+#             epsilon=1e-07,
+#             centered=False,
+#             name="RMSprop",
+#         )
+        
         model.compile(
             # TODO? Move to configuration
             optimizer=optimizer,
