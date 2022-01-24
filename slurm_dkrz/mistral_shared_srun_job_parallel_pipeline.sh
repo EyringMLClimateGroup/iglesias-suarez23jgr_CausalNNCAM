@@ -2,12 +2,12 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=s3Dt
+#SBATCH --job-name=s3Dq
 #SBATCH --partition=shared
 #SBATCH --ntasks=30
 #SBATCH --cpus-per-task=1
-#SBATCH --output=LOG.s3Dt-out_%j
-#SBATCH --error=LOG.s3Dt-out_%j
+#SBATCH --output=LOG.s3Dq-out_%j
+#SBATCH --error=LOG.s3Dq-out_%j
 #SBATCH --mail-type=FAIL
 #SBATCH --time=7-00:00:00
 # --------------------------------
@@ -16,13 +16,14 @@
 #    $> sbatch slurm_dkrz/<script>.sh
 # --------------------------------
 
-logFile=`ls LOG.s3Dt-out_*`
+logFile=`ls LOG.s3Dq-out_*`
 
 # Variables & Levels
-variables_3D=" tphystnd "
-#variables_3D=" phq "
+#variables_3D=" tphystnd "
+variables_3D=" phq "
 #variables_3D=""
-levels=" 3.643 7.595 14.357 24.612 38.268 54.595 72.012 87.821 103.317 121.547 142.994 168.225 197.908 232.829 273.911 322.242 379.101 445.993 524.687 609.779 691.389 763.404 820.858 859.535 887.020 912.645 936.198 957.485 976.325 992.556 "
+levels=" 3.643 7.595 14.357 24.612 38.268 54.6 72.012 87.821 103.317 121.547 142.994 168.225 197.908 232.829 273.911 322.242 379.101 445.993 524.687 609.779 691.389 763.404 820.858 859.535 887.020 912.645 936.198 957.485 976.325 992.556 "
+#levels=" 54.6 "
 
 #variables_2D=" fsns flns fsnt flnt prect "
 variables_2D=""
