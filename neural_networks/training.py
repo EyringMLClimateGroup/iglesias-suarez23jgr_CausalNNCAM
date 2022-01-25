@@ -1,7 +1,7 @@
 from pathlib import Path
 
 import tensorflow as tf
-from tensorflow.keras.callbacks import LearningRateScheduler, EarlyStopping
+from tensorflow.keras.callbacks import LearningRateScheduler, EarlyStopping, ModelCheckpoint
 from .cbrain.learning_rate_schedule import LRUpdate
 from .cbrain.save_weights import save_norm
 from .data_generator import build_train_generator, build_valid_generator
@@ -56,11 +56,20 @@ def train_save_model(
         )
         
         early_stop = EarlyStopping(monitor="val_loss", patience=setup.train_patience)
+        
+        checkpoint = ModelCheckpoint(
+            str(model_description.get_path(setup.nn_output_path)),
+            save_best_only=True, 
+            monitor='val_loss', 
+            mode='min'
+        )
+        
         model_description.fit_model(
             x=train_gen,
             validation_data=valid_gen,
             epochs=setup.epochs,
-            callbacks=[lrs, tensorboard, early_stop],
+#             callbacks=[lrs, tensorboard, early_stop],
+            callbacks=[lrs, tensorboard, early_stop, checkpoint],
             verbose=setup.train_verbose,
         )
 

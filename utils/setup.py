@@ -53,8 +53,8 @@ class Setup:
         self.parents_idx_levs = [[lev, i] for i, lev in enumerate(self.levels)]  # All
 
         lim_levels = yml_cfg["lim_levels"]
-        target_levels = yml_cfg["target_levels"]
-        target_levels = _calculate_target_levels(lim_levels, target_levels)
+        self.target_levels = yml_cfg["target_levels"]
+        target_levels = _calculate_target_levels(lim_levels, self.target_levels)
         self.children_idx_levs = _calculate_children_level_indices(
             self.levels, target_levels, self.parents_idx_levs
         )
@@ -143,6 +143,7 @@ class SetupPCMCIAggregation(Setup):
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds    = yml_cfg["thresholds"]
         self.area_weighted = yml_cfg["area_weighted"]
+        self.pdf           = yml_cfg["pdf"]
 
     def _setup_plots(self, yml_cfg):
         self.plots_folder = yml_cfg["plots_folder"]

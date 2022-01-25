@@ -62,7 +62,7 @@ area_weighted : True # True; False
 # Neural Network configuration
 # ============================
 
-nn_type : "all" # "all"; SingleNN"; "CausalSingleNN"
+nn_type : "all" # "all"; "SingleNN"; "CausalSingleNN"
 
 nn_output_path : models_tb
 

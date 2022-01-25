@@ -1,10 +1,12 @@
+import os, pickle
 import numpy as np
 from pathlib import Path
 
 from . import utils
 from .plotting import plot_links, find_linked_variables, plot_links_metrics
 from .variable import Variable_Lev_Metadata
-from .constants import ANCIL_FILE
+from .constants import ANCIL_FILE, AGGREGATE_PATTERN
+from scipy      import stats
 
 from collections import defaultdict
 
@@ -93,6 +95,7 @@ def collect_results_file(key, results_file, collected_results, errors, lat_wtg):
                 )
         else:
             record_error(results_file, "is_empty", errors)
+#     collected_results[str(key)] = collected_pc_alpha
     collected_results[key] = collected_pc_alpha
     # Doesn't return, instead modifies the received `collected results` object
 
@@ -111,10 +114,10 @@ def count_total_variables(var_children, levels):
     return total
 
 
-def collect_results(setup):
+def collect_results(setup, reuse=False):
     """Collect the pcmci results defined in the setup in a file"""
     collected_results = dict()
-    errors = dict()
+    errors            = dict()
 
     total_vars = count_total_variables(setup.spcam_outputs, setup.children_idx_levs)
     total_files = total_vars * len(setup.gridpoints)
@@ -122,8 +125,11 @@ def collect_results(setup):
     step_progress = 0
     step = 5
 
+    folder = Path(setup.output_folder+'/aggregate_results')
+    Path(folder).mkdir(parents=True, exist_ok=True)
+    
     for child in setup.spcam_outputs:
-        print(f"Variable: {child.name}")
+        print(f"Variable: {child.name}")        
         if child.dimensions == 2:
             child_levels = [[setup.levels[-1], 0]]
             child_var = Variable_Lev_Metadata(child, None, None)
@@ -132,43 +138,98 @@ def collect_results(setup):
         for level in child_levels:
             if child.dimensions == 3:
                 child_var = Variable_Lev_Metadata(child, level[0], level[1])
+
+            collected_results_tmp       = dict()
+            errors_tmp                  = dict()
+            collected_results_fixed     = dict()
+            errors_fixed                = dict()
+                
             if setup.analysis == "single":
-                for i_grid, (lat, lon) in enumerate(setup.gridpoints):
-                    results_file = utils.generate_results_filename_single(
-                        child,
-                        level[1],
-                        lat,
-                        lon,
-                        setup.ind_test_name,
-                        setup.experiment,
-                        setup.output_file_pattern,
-                        setup.output_folder,
-                    )
-                    
-                    # Area-weights?
-                    if setup.area_weighted:
-                        lat_wtg = utils.get_weights(setup.region, lat, norm=True)
-                    else:
-                        lat_wtg = 1.
-                        
-                    collect_results_file(
-                        child_var, results_file, collected_results, errors, lat_wtg
-                    )
-                    
-                    file_progress += 1
-                    if file_progress == total_files or (
-                        (file_progress / total_files * 100) >= step * step_progress
-                    ):
-                        step_progress = 1 + np.floor(
-                            (file_progress / total_files * 100) / step
+                
+                filename = Path(
+                    folder,
+                    AGGREGATE_PATTERN.format(
+                    var_name=child_var,
+                    experiment=setup.experiment,
+                    ),
+                )
+                errorname = Path(
+                    folder,
+                    AGGREGATE_PATTERN.format(
+                    var_name=child_var,
+                    experiment=setup.experiment,
+                    )+"_errors",
+                )
+                                
+                if not os.path.isfile(filename) or reuse == False:
+                
+                    for i_grid, (lat, lon) in enumerate(setup.gridpoints):
+                        results_file = utils.generate_results_filename_single(
+                            child,
+                            level[1],
+                            lat,
+                            lon,
+                            setup.ind_test_name,
+                            setup.experiment,
+                            setup.output_file_pattern,
+                            setup.output_folder,
                         )
-                        print(
-                            "Progress: {:.2f}% - {} of {} files".format(
-                                file_progress / total_files * 100,
-                                file_progress,
-                                total_files,
+
+                        # Area-weights?
+                        if setup.area_weighted:
+                            lat_wtg = utils.get_weights(setup.region, lat, norm=True)
+                        else:
+                            lat_wtg = 1.
+
+                        collect_results_file(
+                            child_var, results_file, collected_results_tmp, errors, lat_wtg
+                        )
+
+                        file_progress += 1
+                        if file_progress == total_files or (
+                            (file_progress / total_files * 100) >= step * step_progress
+                        ):
+                            step_progress = 1 + np.floor(
+                                (file_progress / total_files * 100) / step
                             )
-                        )
+                            print(
+                                "Progress: {:.2f}% - {} of {} files".format(
+                                    file_progress / total_files * 100,
+                                    file_progress,
+                                    total_files,
+                                )
+                            )
+
+                    # Fix keys: from class type to str (for saving results in dicts)
+                    for iK in collected_results_tmp.keys():
+                        collected_results[str(iK)]       = collected_results_tmp[iK]
+                        collected_results_fixed[str(iK)] = collected_results_tmp[iK]
+                    for iK in errors.keys():
+                        errors[str(iK)]       = errors_tmp[iK]
+                        errors_fixed[str(iK)] = errors_tmp[iK]
+
+                    # Save to pickle object
+                    if not os.path.isfile(filename) and reuse == True:
+                        print(f'Saving {filename}...\n')
+                        collected_results_outfile = open(filename,'wb')
+                        errors_outfile            = open(errorname,'wb')
+                        pickle.dump(collected_results_fixed,collected_results_outfile)
+                        pickle.dump(errors_fixed,errors_outfile)
+                        collected_results_outfile.close()
+                        errors_outfile.close()
+
+                else:
+                    print(f'{filename} exists; loading...\n')
+                    collected_results_outfile = open(filename,'rb')
+                    errors_outfile            = open(errorname,'rb')
+                    collected_results_tmp     = pickle.load(collected_results_outfile)
+                    errors_tmp                = pickle.load(errors_outfile)
+                    collected_results_outfile.close()
+                    errors_outfile.close()
+
+                    collected_results.update(collected_results_tmp)
+                    errors.update(errors_tmp)
+                            
             elif setup.analysis == "concat":
                 results_file = utils.generate_results_filename_concat(
                     child,
@@ -180,7 +241,7 @@ def collect_results(setup):
                     setup.output_folder,
                 )
                 collect_results_file(key, results_file, collected_results, errors)
-
+    
     return collected_results, errors
 
 
@@ -238,15 +299,36 @@ def aggregate_results(collected_results, setup):
 
             parents_matrix = collected["parents"]
             parents_matrix = np.array(parents_matrix)
-            parents_percent = parents_matrix.mean(axis=0)
+            parents_percent = parents_matrix.mean(axis=0)[:-1] # All but itself [which is zero]
             for threshold in thresholds:
-                parents_filtered = parents_percent >= threshold
-                parents = [
-                    i for i in range(len(parents_filtered)) if parents_filtered[i]
-                ]
+                # Threshold based on the own output's inputs-distrubution
+                if setup.pdf:
+                    parents_percent = [[0.00001,i][i>0.00001] for i in parents_percent]
+                    parents_percent_boxcox, _ = stats.boxcox(parents_percent) # to normal distribution
+                    ks = stats.kstest(
+                        parents_percent_boxcox, 
+                        stats.norm.name, 
+                        stats.norm.fit(parents_percent_boxcox), 
+                        len(parents_percent_boxcox))[1]   # return p-value
+                    if ks > 0.05: # KS's p-val > 0.05
+                        zscores = stats.zscore(parents_percent_boxcox)
+                        n_sided = 1 # 1: one-tail; two-tail
+                        z_crit  = stats.norm.ppf(1-threshold/n_sided)
+                        parents = [i for i in range(len(parents_percent_boxcox)) if zscores[i] > -z_crit]
+                    else:
+                        import pdb
+                        print(f'{child} not normaly distributed; stop!')
+                        pdb.set_trace()
+                
+                else:
+                    parents_filtered = parents_percent >= threshold
+                    parents = [
+                        i for i in range(len(parents_filtered)) if parents_filtered[i]
+                    ]
                 dict_threshold_parents[str(threshold)] = parents
                 dict_num_parents[str(threshold)]  = len(parents)
                 dict_per_parents[str(threshold)]  = len(parents) * 100. / len(var_names_parents)
+            
             dict_pc_alpha_parents[pc_alpha] = {
                 "parents": dict_threshold_parents,
                 "num_parents": dict_num_parents,
@@ -379,10 +461,15 @@ def build_links_metrics(setup, aggregated_results):
     pc_alphas  = setup.pc_alphas
     outputs_nm = [var.name for var in setup.list_spcam if var.type == "out"]
     
-#     dict_combinations = defaultdict(dict)
+#     Model_levels = [ 
+#         3.64, 7.59, 14.36, 24.61, 38.27, 54.6, 72.01, 87.82, 103.32, 121.55, 142.99, 
+#         168.23, 197.91, 232.83, 273.91, 322.24, 379.1, 445.99, 524.69, 609.78, 
+#         691.39, 763.4, 820.86, 859.53, 887.02, 912.64, 936.2, 957.49, 976.33, 992.56
+#     ]
+#     target_levels = Model_levels if not setup.target_levels else setup.target_levels
+#     target_levels = [str(round(i,2)) for i in target_levels]
+    
     dict_combinations = {}
-#     dict_combinations = dict.fromkeys(outputs_nm, {})
-#     for iVar in dict_combinations: dict_combinations[iVar] = dict.fromkeys(pc_alphas, {})
     
     # Num. of parents (by level in 3D)
     for i_child, (child, dict_pc_alpha_parents) in enumerate(
@@ -391,8 +478,16 @@ def build_links_metrics(setup, aggregated_results):
         
         for pc_alpha, pc_alpha_results in dict_pc_alpha_parents.items():
             
-            child_main = child.var.name
-            child_lev  = str(child.level)
+            Model_levels = [
+                float(i.split('-')[-1]) \
+                for i in aggregated_results[child][pc_alpha]['var_names'] \
+                if 'tbp' in i
+            ]
+            target_levels = Model_levels if not setup.target_levels else setup.target_levels
+            target_levels = [str(i) for i in target_levels]
+            
+            child_main = child.split('-')[0]
+            child_lev = child.split('-')[-1] if child_main in ['phq', 'tphystnd'] else 'None'
             
             if child_main not in dict_combinations: dict_combinations[child_main] = {}
             if pc_alpha not in dict_combinations[child_main]: dict_combinations[child_main][pc_alpha] = {}
@@ -405,22 +500,18 @@ def build_links_metrics(setup, aggregated_results):
             nPar = [nPar       for thr, nPar in dict_num_parents.items()]
             pPar = [pPar       for thr, pPar in dict_per_parents.items()]
 
-            to_be_updated = {child_lev:{'thresholds':thrs,'num_parents':nPar,'per_parents':pPar,}}
-            dict_combinations[child_main][pc_alpha].update(to_be_updated)
-#             dict_combinations[child_main][float(pc_alpha)][child_lev] = {
-#                 'thresholds':thrs,
-#                 'num_parents':nPar,
-#                 'per_parents':pPar,
-#             } 
-    
-#     print(dict_combinations['tphystnd']['0.001']['992.56']['num_parents'])
-#     print(dict_combinations['tphystnd']['0.1']['992.56']['num_parents'])
+            if child_main in ['phq', 'tphystnd'] and child_lev not in target_levels:
+                pass
+            else:
+                to_be_updated = {child_lev:{'thresholds':thrs,'num_parents':nPar,'per_parents':pPar,}}
+                dict_combinations[child_main][pc_alpha].update(to_be_updated)
     
     for child_main in dict_combinations.keys():
         for pc_alpha in dict_combinations[child_main].keys():
             
-            if len(dict_combinations[child_main][pc_alpha]) > 1:
-            
+#             if len(dict_combinations[child_main][pc_alpha]) > 1:
+            if child_main in ['phq', 'tphystnd']:
+                
                 nLevs = len(dict_combinations[child_main][pc_alpha].keys())
                 nPar_mean = np.zeros([nLevs,len(thrs)])
                 pPar_mean = np.zeros([nLevs,len(thrs)])
@@ -432,22 +523,11 @@ def build_links_metrics(setup, aggregated_results):
                 nPar_mean, pPar_mean = np.mean(nPar_mean,axis=0), np.mean(pPar_mean,axis=0)
                 to_be_updated = {'mean':{'thresholds':thrs,'num_parents':nPar_mean,'per_parents':pPar_mean,}}
                 dict_combinations[child_main][pc_alpha].update(to_be_updated)
-#                 dict_combinations[child_main][pc_alpha]['mean'] = {
-#                     'thresholds':thrs,
-#                     'num_parents':nPar_mean,
-#                     'per_parents':pPar_mean,
-#                 }
             
             else:
                 dict_combinations[child_main][str(pc_alpha)]['mean'] = \
                 dict_combinations[child_main][str(pc_alpha)].pop('None')
-#     print()
-#     print(dict_combinations['tphystnd']['0.001']['992.56']['num_parents'])
-#     print(dict_combinations['tphystnd']['0.1']['992.56']['num_parents'])
-#     print()
-#     print(dict_combinations['tphystnd']['0.001']['mean']['num_parents'])
-#     print(dict_combinations['tphystnd']['0.1']['mean']['num_parents'])
-                
+    
     dict_combinations['mean'] = {}
     for j, iPC in enumerate(pc_alphas):
         nPar_mean = np.zeros([len(outputs_nm),len(thrs)])
@@ -458,16 +538,6 @@ def build_links_metrics(setup, aggregated_results):
         nPar_mean, pPar_mean = np.mean(nPar_mean,axis=0), np.mean(pPar_mean,axis=0)
         to_be_updated = {str(iPC):{'thresholds':thrs,'num_parents':nPar_mean,'per_parents':pPar_mean,}}
         dict_combinations['mean'].update(to_be_updated)
-#         dict_combinations['mean'][iPC] = {
-#             'thresholds':thrs,
-#             'num_parents':nPar_mean,
-#             'per_parents':pPar_mean,
-#         }
-    
-#     print()
-#     print(dict_combinations['mean']['0.001']['num_parents'])
-#     print(dict_combinations['mean']['0.1']['num_parents'])
-#     import pdb; pdb.set_trace()
     
     return dict_combinations
 

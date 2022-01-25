@@ -41,6 +41,7 @@ class SPCAM_Vars(Enum):
 #DATA_FOLDER = "/work/bd0854/b309172/data/SPCAM_recons"
 ANCIL_FILE = "./data/ancil_spcam.nc"
 FILENAME_PATTERN = "{var_name}_{level}_{experiment}.nc"
+AGGREGATE_PATTERN = "{var_name}_{experiment}"
 TAU_MIN = 1
 TAU_MAX = 1
 SIGNIFICANCE = "analytic"
