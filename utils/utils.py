@@ -122,7 +122,7 @@ def log_normalize(values):
         raise ValueError("Values for prect are zero; check data.")
 
 
-def get_normalized_data(variable, experiment, folder, idx_lats, idx_lons, level):
+def get_normalized_data(variable, shifting, experiment, folder, idx_lats, idx_lons, level):
     """
     Returns normalized data for one level
     """
@@ -142,6 +142,10 @@ def get_normalized_data(variable, experiment, folder, idx_lats, idx_lons, level)
     elif variable.dimensions == 2:
         level_data = data[:, idx_lats, idx_lons]
 
+    if shifting != 0:
+        level_data = deque(level_data)
+        level_data.rotate(shifting)
+        
     if variable == SPCAM_Vars.prect:
         print(f"Log normalization...")
         return log_normalize(level_data)
@@ -149,12 +153,12 @@ def get_normalized_data(variable, experiment, folder, idx_lats, idx_lons, level)
         return normalize(level_data)
 
 
-def load_data(var_list, experiment, folder, idx_lvls, idx_lats, idx_lons):
+def load_data(var_list, shifting, experiment, folder, idx_lvls, idx_lats, idx_lons):
     data = list()
     for var in var_list:
         for target_lvl, idx_lvl in idx_lvls:
             norm_data = get_normalized_data(
-                var, experiment, folder, idx_lats, idx_lons, idx_lvl
+                var, shifting, experiment, folder, idx_lats, idx_lons, idx_lvl
             )
             if var.dimensions == 3:
                 var_data = VarData(var, norm_data, target_lvl)

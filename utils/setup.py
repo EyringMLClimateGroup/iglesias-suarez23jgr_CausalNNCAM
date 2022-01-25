@@ -133,6 +133,7 @@ class SetupPCAnalysis(Setup):
 
         self.overwrite_pc = yml_cfg.get("overwrite_pc", False)
 
+        self.shifting = yml_cfg["shifting"]
 
 class SetupPCMCIAggregation(Setup):
     def __init__(self, argv):

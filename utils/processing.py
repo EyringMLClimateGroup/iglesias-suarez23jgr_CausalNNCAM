@@ -15,6 +15,7 @@ def proc_analysis(
     cond_ind_test,
     ind_test_name,
     pc_alphas,
+    shifting,
     levels,
     parents_idx_levs,
     children_idx_levs,
@@ -37,6 +38,7 @@ def proc_analysis(
             cond_ind_test,
             ind_test_name,
             pc_alphas,
+            shifting,
             levels,
             parents_idx_levs,
             children_idx_levs,
@@ -84,6 +86,7 @@ def single(
     cond_ind_test,
     ind_test_name,
     pc_alphas,
+    shifting,
     levels,
     parents_idx_levs,
     children_idx_levs,
@@ -144,6 +147,7 @@ def single(
                     t_before_load_parents = time.time()
                     data_parents = utils.load_data(
                         var_parents,
+                        0, # shifting always 0 (no-shifting)
                         experiment,
                         data_folder,
                         parents_idx_levs,
@@ -157,7 +161,7 @@ def single(
 
                 # Process child
                 data_child = utils.load_data(
-                    [child], experiment, data_folder, [level], idx_lat, idx_lon
+                    [child], shifting, experiment, data_folder, [level], idx_lat, idx_lon
                 )
                 data = [*data_parents, *data_child]
 
