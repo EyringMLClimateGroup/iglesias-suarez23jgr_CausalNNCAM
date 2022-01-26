@@ -15,12 +15,19 @@ class SPCAM_Vars(Enum):
     def __repr__(self):
         return f"({self._name_}, {self.dimensions}, {self.type})"
 
+    tphystndtdt = (3, "in", "Temperature tendency (t-1)")
+    phqtdt = (3, "in", "Specific humidity tendency (t-1)")
     tbp = (3, "in", "Temperature")
     qbp = (3, "in", "Specific humidity")
     vbp = (3, "in", "Meridional wind")
     rh  = (3, "in", "Relative humidity")
     bmse = (3, "in", "TODO")
 
+    fsnttdt = (2, "in", "Net solar flux at top of model (t-1)")
+    fsnstdt = (2, "in", "Net solar flux at surface (t-1)")
+    flnttdt = (2, "in", "Net longwave flux at top of model (t-1)")
+    flnstdt = (2, "in", "Net longwave flux at surface (t-1)")
+    precttdt = (2, "in", "Precipitation (t-1)")
     ps = (2, "in", "Surf. Pressure")
     solin = (2, "in", "Incoming solar radiation")
     shflx = (2, "in", "Sensible heat flux")
