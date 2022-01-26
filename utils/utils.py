@@ -6,6 +6,7 @@ from .constants import ANCIL_FILE, FILENAME_PATTERN, SPCAM_Vars # DATA_FOLDER
 from neural_networks.cbrain.cam_constants  import *
 from netCDF4    import Dataset
 import pickle
+from collections import deque
 
 
 #########################
