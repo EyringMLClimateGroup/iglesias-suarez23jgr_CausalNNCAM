@@ -182,7 +182,7 @@ def collect_results(setup, reuse=False):
                             lat_wtg = 1.
 
                         collect_results_file(
-                            child_var, results_file, collected_results_tmp, errors, lat_wtg
+                            child_var, results_file, collected_results_tmp, errors_tmp, lat_wtg
                         )
 
                         file_progress += 1
@@ -204,7 +204,7 @@ def collect_results(setup, reuse=False):
                     for iK in collected_results_tmp.keys():
                         collected_results[str(iK)]       = collected_results_tmp[iK]
                         collected_results_fixed[str(iK)] = collected_results_tmp[iK]
-                    for iK in errors.keys():
+                    for iK in errors_tmp.keys():
                         errors[str(iK)]       = errors_tmp[iK]
                         errors_fixed[str(iK)] = errors_tmp[iK]
 
