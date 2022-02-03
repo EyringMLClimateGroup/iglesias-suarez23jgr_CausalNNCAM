@@ -2,12 +2,12 @@
 # mistral cpu batch job parameters
 # --------------------------------
 #SBATCH --account=bd1179
-#SBATCH --job-name=s3Dt
+#SBATCH --job-name=s2Dt
 #SBATCH --partition=shared
-#SBATCH --ntasks=30
+#SBATCH --ntasks=35
 #SBATCH --cpus-per-task=1
-#SBATCH --output=LOG.s3Dt-out_%j
-#SBATCH --error=LOG.s3Dt-out_%j
+#SBATCH --output=LOG.s2Dt-out_%j
+#SBATCH --error=LOG.s2Dt-out_%j
 #SBATCH --mail-type=FAIL
 #SBATCH --time=7-00:00:00
 # --------------------------------
@@ -16,7 +16,7 @@
 #    $> sbatch slurm_dkrz/<script>.sh
 # --------------------------------
 
-logFile=`ls LOG.s3Dt-out_*`
+logFile=`ls LOG.s2Dt-out_*`
 
 # Variables & Levels
 variables_3D=" tphystnd "
@@ -24,10 +24,10 @@ variables_3D=" tphystnd "
 #variables_3D=" tphystnd phq "
 #variables_3D=""
 levels=" 3.64 7.59 14.36 24.61 38.27 54.6 72.01 87.82 103.32 121.55 142.99 168.23 197.91 232.83 273.91 322.24 379.1 445.99 524.69 609.78 691.39 763.4 820.86 859.53 887.02 912.64 936.2 957.49 976.33 992.56 "
-#levels=" 168.23 "
+#levels=" 691.39 "
 
-#variables_2D=" fsns flns fsnt flnt prect "
-variables_2D=""
+variables_2D=" fsns flns fsnt flnt prect "
+#variables_2D=""
 
 
 # Paths
@@ -46,7 +46,8 @@ pyScript=pipeline
 echo "---------- Starting $0 ----------"
 echo ""
 
-cfgFile_tmp=cfg_pipeline_srun_parallel.yml
+#cfgFile_tmp=cfg_pipeline_srun_parallel.yml
+cfgFile_tmp=cfg_pipeline_t-dt_srun_parallel.yml
 
 if [ ! -f ${pyScript}.py ]; then
     echo "Convert jupyter notebook into python script"
