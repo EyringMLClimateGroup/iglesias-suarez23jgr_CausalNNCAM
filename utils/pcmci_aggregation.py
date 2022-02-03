@@ -3,10 +3,11 @@ import numpy as np
 from pathlib import Path
 
 from . import utils
-from .plotting import plot_links, find_linked_variables, plot_links_metrics
+from .plotting import plot_links, find_linked_variables, plot_links_metrics, plot_matrix
 from .variable import Variable_Lev_Metadata
 from .constants import ANCIL_FILE, AGGREGATE_PATTERN
 from scipy      import stats
+from sklearn    import preprocessing
 
 from collections import defaultdict
 
@@ -125,7 +126,7 @@ def collect_results(setup, reuse=False):
     step_progress = 0
     step = 5
 
-    folder = Path(setup.output_folder+'/aggregate_results')
+    folder = Path(setup.output_folder+'/'+setup.aggregate_folder)
     Path(folder).mkdir(parents=True, exist_ok=True)
     
     for child in setup.spcam_outputs:
@@ -315,11 +316,12 @@ def aggregate_results(collected_results, setup):
                         n_sided = 1 # 1: one-tail; two-tail
                         z_crit  = stats.norm.ppf(1-threshold/n_sided)
                         parents = [i for i in range(len(parents_percent_boxcox)) if zscores[i] > -z_crit]
+                    elif 'phq-3.' in child or 'phq-7.' in child:
+                        parents = []
                     else:
                         import pdb
                         print(f'{child} not normaly distributed; stop!')
                         pdb.set_trace()
-                
                 else:
                     parents_filtered = parents_percent >= threshold
                     parents = [
@@ -657,3 +659,118 @@ def plot_causal_metrics(
     if save: save = save_dir+'/'+filenm
     
     plot_links_metrics(setup, dict_combinations, save)
+    
+    
+def get_matrix_idx(dict_vars_idx, inverted=False):
+    idx_2d = 0; idx_3d = []; levels = []; child_main = []
+    for i, key in dict_vars_idx.items():
+        child_tmp = key
+        if len(key.split('-')) == 1:
+            idx_2d += 1
+        else:
+            child_main_tmp = key.split('-')[0]
+            child_lev_tmp  = int(float(key.split('-')[-1]))
+            child_lev_tmp  = 50 * round(child_lev_tmp/50) # Round to 50hPa for ticks
+            
+            if child_main_tmp not in child_main: child_main.append(child_main_tmp)
+            levels.append(child_lev_tmp) 
+    
+    # For boxes separators
+    if inverted==True:
+        idx_vars = [i for i in range(len(levels))][::int(len(levels)/len(child_main))]
+        idx_vars = np.array(idx_vars) + idx_2d -.5
+        idx_3d = [i for i in range(len(levels))][::10]           # Get every 10 idx
+    else:
+        idx_vars = np.array([int(len(levels)/len(child_main)),int(len(levels))]) - .5
+        idx_3d = [i for i in range(len(levels))][9::10]          # Get every 10 idx
+    # x-Y ticks
+    levels = np.array(levels)[idx_3d]                         # Get such levels
+    levels = [str(i) for i in levels]                         # Get the ticks_labels
+    idx_3d = np.array(idx_3d)+[+.5,idx_2d-.5][inverted==True] # Get the idx including 2D vars
+    return child_main, idx_vars, idx_3d, levels
+
+
+def plot_matrix_results(
+    var_names_parents, 
+    aggregated_results, 
+    setup, 
+    values='percentage',
+    save=False,
+):
+    
+    pltPath = Path(setup.output_folder+'/'+setup.aggregate_folder+'/'+setup.plots_folder)
+    pltPath.mkdir(parents=True, exist_ok=True)
+
+    var_names_parents_inv = var_names_parents[::-1]
+    dict_inputs_idxs_inv  = {i:var_names_parents_inv[i] for i in range(len(var_names_parents_inv))}
+    dict_outputs_idxs = {i:key for i, key in enumerate(aggregated_results.keys())}
+    
+    in_vars, in_box_idx, in_ticks, in_ticks_labs = get_matrix_idx(dict_inputs_idxs_inv, inverted=True)
+    out_vars, out_box_idx, out_ticks, out_ticks_labs = get_matrix_idx(dict_outputs_idxs)
+
+    # Using only two thresholds if more were given (min-max) 
+    if len(setup.thresholds) > 1:
+        thresholds = [setup.thresholds[0],setup.thresholds[-1]]
+        thrs_labs  = str(setup.thresholds[0])+'-'+str(setup.thresholds[-1])
+    else:
+        thresholds = setup.thresholds
+        thrs_labs  = str(setup.thresholds[0])
+
+    for iAlpha in setup.pc_alphas:
+        iAlpha      = str(iAlpha)
+        var_to_plot = np.ma.zeros([len(dict_outputs_idxs),len(dict_inputs_idxs_inv)])
+        mask        = {}
+        mask[str(thresholds[-1])] = np.ma.zeros([len(dict_outputs_idxs),len(dict_inputs_idxs_inv)])
+        for i, output in dict_outputs_idxs.items():
+            for j, jThrs in enumerate(thresholds):
+                jThrs = str(jThrs)
+                parents_tmp = aggregated_results[output][iAlpha]['parents'][jThrs]
+                if values == 'percentage':
+                    values_tmp  = aggregated_results[output][iAlpha]['parents_percent']
+                    vmin = 0.; vmax = .9; cmap='Blues'; extend='max'; cbar_label='ratio'
+                elif values == 'val_matrix':
+                    values_tmp  = aggregated_results[output][iAlpha]['val_matrix'][:,-1][:-1,1]
+                    vmin = -.7; vmax = .7; cmap='bwr'; extend='both'; cbar_label='r'
+                if j == 0:
+                    var_to_plot[i,:] = np.ma.masked_equal(
+                        [[0.,val][i in parents_tmp] for i, val in enumerate(values_tmp)][::-1],
+                        1.
+                    )
+                if j > 0 or len(thresholds) == 1:
+                    mask[jThrs][i,:] = np.ma.masked_equal(
+                        [[0.,1.][i in parents_tmp] for i, val in enumerate(values_tmp)][::-1],
+                        1.
+                    )
+        
+        # Normalization [-1,1]
+        if values == 'val_matrix':
+            var_to_plot = preprocessing.normalize(var_to_plot)
+        
+        fig, ax = plot_matrix(
+            iAlpha,
+            var_to_plot,
+            in_vars,
+            in_box_idx,
+            in_ticks, 
+            in_ticks_labs,
+            out_vars,
+            out_box_idx,
+            out_ticks, 
+            out_ticks_labs,
+            extend,
+            cbar_label,
+            mask=mask,
+            vmin=vmin,
+            vmax=vmax,
+            cmap=cmap,
+        )
+        
+        if save:
+            fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}.png"
+            print(f"Saving figure: {fignm}")
+            fig.savefig(
+                fignm, dpi='figure', format='png', metadata=None,
+                bbox_inches=None, pad_inches=0.1,
+                facecolor='auto', edgecolor='auto',
+                backend=None,
+           )
