@@ -191,4 +191,70 @@ def plot_links_metrics(
        )
     
     plt.show()
+
     
+def plot_matrix(
+    pc_alpha,
+    matrix,
+    in_vars,
+    in_box_idx,
+    in_ticks, 
+    in_ticks_labs,
+    out_vars,
+    out_box_idx,
+    out_ticks, 
+    out_ticks_labs,
+    extend,
+    cbar_label,
+    mask=False,
+    **kwargs
+):
+    
+    vars_labs_dict = {
+        'tbp':'T (hPa)',
+        'qbp':'Q (hPa)',
+        'vbp':'V (hPa)',
+        'tphystnd':'dT/dt (hPa)',
+        'phq':'dQ/dt (hPa)',
+    }
+    
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(1, 1, figsize=(12, 5))
+    
+    # Mask?
+    if mask is not False:
+        X, Y = np.meshgrid(np.arange(0,len(matrix[0]),1), np.arange(0,len(matrix),1))
+        jThrs = list(mask.keys())[0]
+        cs = axes.contourf(
+            X,
+            Y,
+            mask[jThrs],
+            colors='none',
+            hatches='.',
+            extend='both',
+        )
+
+    I  = axes.imshow(matrix,**kwargs)
+    cbar = plt.colorbar(I, extend=extend)
+    cbar.set_label(cbar_label)
+    axes.set_xticks(in_ticks); axes.set_xticklabels(in_ticks_labs)
+    axes.set_yticks(out_ticks); axes.set_yticklabels(out_ticks_labs)
+    axes.vlines(in_box_idx, ymin=-.5, ymax=len(matrix), color='k')
+    axes.hlines(out_box_idx, xmin=-.5, xmax=len(matrix[0]), color='k')
+    
+    axes.set_xlim(xmax=len(matrix[0])-.5)
+    axes.set_ylim(ymin=len(matrix)-.5)
+    
+    trans = axes.get_xaxis_transform()
+    xy_coor = [(-15., .68),(-15., .20)]
+    for i, iVar in enumerate(out_vars):
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90)
+    axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0)
+    xy_coor = [(12., -.15),(42., -.15),(72., -.15)]
+    for i, iVar in enumerate(in_vars):
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0)
+    axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90)
+    
+    fig.suptitle(pc_alpha)
+
+    return fig, axes

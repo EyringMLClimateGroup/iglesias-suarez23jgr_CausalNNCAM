@@ -145,6 +145,7 @@ class SetupPCMCIAggregation(Setup):
         self.thresholds    = yml_cfg["thresholds"]
         self.area_weighted = yml_cfg["area_weighted"]
         self.pdf           = yml_cfg["pdf"]
+        self.aggregate_folder = yml_cfg["aggregate_folder"]
 
     def _setup_plots(self, yml_cfg):
         self.plots_folder = yml_cfg["plots_folder"]
