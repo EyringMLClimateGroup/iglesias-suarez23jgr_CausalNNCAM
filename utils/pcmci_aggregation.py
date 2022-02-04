@@ -151,6 +151,7 @@ def collect_results(setup, reuse=False):
                     folder,
                     AGGREGATE_PATTERN.format(
                     var_name=child_var,
+                    ind_test_name=setup.ind_test_name,
                     experiment=setup.experiment,
                     ),
                 )
@@ -158,6 +159,7 @@ def collect_results(setup, reuse=False):
                     folder,
                     AGGREGATE_PATTERN.format(
                     var_name=child_var,
+                    ind_test_name=setup.ind_test_name,
                     experiment=setup.experiment,
                     )+"_errors",
                 )
@@ -311,17 +313,15 @@ def aggregate_results(collected_results, setup):
                         stats.norm.name, 
                         stats.norm.fit(parents_percent_boxcox), 
                         len(parents_percent_boxcox))[1]   # return p-value
-                    if ks > 0.05: # KS's p-val > 0.05
+                    if 'phq-3.' in child or 'phq-7.' in child:
+                        parents = []
+                    else:
                         zscores = stats.zscore(parents_percent_boxcox)
                         n_sided = 1 # 1: one-tail; two-tail
                         z_crit  = stats.norm.ppf(1-threshold/n_sided)
                         parents = [i for i in range(len(parents_percent_boxcox)) if zscores[i] > -z_crit]
-                    elif 'phq-3.' in child or 'phq-7.' in child:
-                        parents = []
-                    else:
-                        import pdb
-                        print(f'{child} not normaly distributed; stop!')
-                        pdb.set_trace()
+                    if ks < 0.05: # Normal distribution, KS's p-val should be > 0.05
+                        print(f'Caution! For threshold ({threshold}): {child} not normaly distributed')
                 else:
                     parents_filtered = parents_percent >= threshold
                     parents = [
@@ -734,7 +734,7 @@ def plot_matrix_results(
                 if j == 0:
                     var_to_plot[i,:] = np.ma.masked_equal(
                         [[0.,val][i in parents_tmp] for i, val in enumerate(values_tmp)][::-1],
-                        1.
+                        0.
                     )
                 if j > 0 or len(thresholds) == 1:
                     mask[jThrs][i,:] = np.ma.masked_equal(

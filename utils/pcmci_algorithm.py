@@ -92,3 +92,72 @@ def find_links(list_var_data, list_pc_alpha, cond_ind_test, verbosity=0):
     pcmci = PCMCI(dataframe=dataframe, cond_ind_test=cond_ind_test, verbosity=verbosity)
 
     return run_pc_stable(pcmci, selected_links, list_pc_alpha)
+
+
+def run_pearsonr(
+    dataframe, 
+    cond_ind_test,
+    list_pc_alpha, 
+    TAU_MIN, 
+    TAU_MAX, 
+    parents, 
+    children
+):
+
+    parents = set(parents)
+    children = set(children)
+    pc_alpha_results = dict()
+
+    for pc_alpha in list_pc_alpha:
+        try:
+            
+            links = dict()
+            p_matrix = np.zeros([len(dataframe.values[0]),len(dataframe.values[0]),2])
+            r_matrix = np.zeros(p_matrix.shape)
+            
+            # Set the default as all combinations of the selected variables
+            for var in [*parents, *children]:
+                if var in children:
+                    # Children can be caused only by parents and by themselves
+                    links_tmp = []
+                    for parent in [*parents, *children]:
+                        
+                        r_matrix[parent,-1,-1], p_matrix[parent,-1,-1] = cond_ind_test(
+                            dataframe.values[:,parent],
+                            dataframe.values[:,var]
+                        )
+                        
+                        if p_matrix[parent,-1,-1] <= pc_alpha and parent != var:
+                            [links_tmp.append((parent, -lag)) for lag in range(TAU_MIN, TAU_MAX + 1)]
+                    links[var] = links_tmp
+                else:
+                    links[var] = []
+
+            results = {
+                "links": links,
+                "p_matrix": p_matrix,
+                "val_matrix": r_matrix,
+                "var_names": dataframe.var_names,
+            }
+    
+        except ValueError as e:
+            print(e)
+            results = {}
+        
+        pc_alpha_results[str(pc_alpha)] = results
+
+    return pc_alpha_results
+
+
+def pearsonr(list_var_data, list_pc_alpha, cond_ind_test, verbosity=0):
+
+    spcam_data, var_names, parents, children = links.prepare_tigramite_data(
+        list_var_data
+    )
+
+    # Initialize dataframe object, specify time axis and variable names
+    dataframe = pp.DataFrame(
+        spcam_data, datatime=np.arange(len(spcam_data)), var_names=var_names
+    )
+    
+    return run_pearsonr(dataframe, cond_ind_test, list_pc_alpha, TAU_MIN, TAU_MAX, parents, children)

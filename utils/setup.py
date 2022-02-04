@@ -6,6 +6,7 @@ import getopt
 import yaml
 from pathlib import Path
 from tigramite.independence_tests import ParCorr, GPDC
+from scipy.stats                  import pearsonr
 
 
 class Setup:
@@ -80,8 +81,9 @@ class SetupPCAnalysis(Setup):
     INDEPENDENCE_TESTS = {
         "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
         "gpdc": lambda: GPDC(recycle_residuals=True),
-        "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-        # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+        "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True),
+        # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False),
+        "pearsonr": lambda: pearsonr, 
     }
 
     def __init__(self, argv):
