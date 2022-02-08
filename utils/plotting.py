@@ -171,8 +171,8 @@ def plot_links_metrics(
     plt.ylabel('Num. Causal links')
     
     ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
-    ax.xaxis.set_major_locator(MultipleLocator(.05))
-    ax.xaxis.set_minor_locator(MultipleLocator(.01))
+    ax.xaxis.set_major_locator(MultipleLocator(.10))
+    ax.xaxis.set_minor_locator(MultipleLocator(.05))
 #     ax.yaxis.set_major_locator(MultipleLocator(10))
     ax.yaxis.set_minor_locator(MultipleLocator(5))
     

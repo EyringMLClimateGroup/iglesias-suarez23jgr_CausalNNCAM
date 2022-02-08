@@ -183,7 +183,7 @@ def collect_results(setup, reuse=False):
                             lat_wtg = utils.get_weights(setup.region, lat, norm=True)
                         else:
                             lat_wtg = 1.
-
+#                         print(f"Collecting: {results_file}")
                         collect_results_file(
                             child_var, results_file, collected_results_tmp, errors_tmp, lat_wtg
                         )
@@ -202,6 +202,7 @@ def collect_results(setup, reuse=False):
                                     total_files,
                                 )
                             )
+                            print(f"Collecting: {results_file}")
 
                     # Fix keys: from class type to str (for saving results in dicts)
                     for iK in collected_results_tmp.keys():
@@ -646,7 +647,8 @@ def plot_causal_metrics(
     dict_combinations = build_links_metrics(setup, aggregated_results)
     
     # Filenm format (folder and figure name)
-    save_dir = setup.plots_folder
+#     save_dir = setup.plots_folder
+    save_dir = Path(setup.output_folder+'/'+setup.aggregate_folder+'/'+setup.plots_folder)
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     variables = [var.name for var in setup.list_spcam if var.type == "out"]
     variables = '-'.join(variables)
@@ -654,9 +656,10 @@ def plot_causal_metrics(
     pcs       = '-'.join(pc_alphas)
     lats = [str(iL) for iL in setup.region[0]];  lats = '-'.join(lats)
     lons = [str(iL) for iL in setup.region[-1]]; lons = '-'.join(lons)
-    wgt_format = ['.png','_latwts.png'][setup.area_weighted]
-    filenm = variables+'_a-'+pcs+'_lats-'+lats+'_lons'+lons+wgt_format
-    if save: save = save_dir+'/'+filenm
+#     wgt_format = ['.png','_latwts.png'][setup.area_weighted]
+    wgt_format = ['.pdf','_latwts.pdf'][setup.area_weighted]
+    filenm = 'causal-links_metrics'+'_'+variables+'_a-'+pcs+'_'+wgt_format
+    if save: save = str(save_dir)+'/'+filenm
     
     plot_links_metrics(setup, dict_combinations, save)
     
