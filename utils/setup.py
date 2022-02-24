@@ -164,13 +164,15 @@ class SetupNeuralNetworks(Setup):
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds = yml_cfg["thresholds"]
         self.area_weighted = yml_cfg["area_weighted"]
+        self.pdf           = yml_cfg["pdf"]
+        self.aggregate_folder = yml_cfg["aggregate_folder"]
 
     def _setup_neural_networks(self, yml_cfg):
         self.nn_type = yml_cfg["nn_type"]
         self.do_single_nn = self.do_causal_single_nn = False
         if self.nn_type == "SingleNN":
             self.do_single_nn = True
-        elif self.nn_type == "CausalSingleNN":
+        elif self.nn_type == "CausalSingleNN" or self.nn_type == "CorrSingleNN":
             self.do_causal_single_nn = True
         elif self.nn_type == "all":
             self.do_single_nn = self.do_causal_single_nn = True

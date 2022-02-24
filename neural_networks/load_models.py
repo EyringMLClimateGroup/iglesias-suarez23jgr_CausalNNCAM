@@ -7,7 +7,7 @@ import                              collections
 def get_path(setup, model_type, *, pc_alpha=None, threshold=None):
     """ Generate a path based on this model metadata """
     path = Path(setup.nn_output_path, model_type)
-    if model_type == "CausalSingleNN":
+    if model_type == "CausalSingleNN" or model_type == "CorrSingleNN":
         if setup.area_weighted:
             cfg_str = "a{pc_alpha}-t{threshold}-latwts/" 
         else: 
@@ -86,15 +86,16 @@ def load_models(setup):
             )
     if setup.do_causal_single_nn:
         for pc_alpha in setup.pc_alphas:
-            models['CausalSingleNN'][pc_alpha] = {}
+            nn_type = 'CausalSingleNN' if setup.ind_test_name == 'parcorr' else 'CorrSingleNN'
+            models[nn_type][pc_alpha] = {}
             for threshold in setup.thresholds:
-                models['CausalSingleNN'][pc_alpha][threshold] = {}
+                models[nn_type][pc_alpha][threshold] = {}
                 for output in output_list:
                     output = Variable_Lev_Metadata.parse_var_name(output)
-                    models['CausalSingleNN'][pc_alpha][threshold][output] = get_model(
+                    models[nn_type][pc_alpha][threshold][output] = get_model(
                         setup, 
                         output, 
-                        'CausalSingleNN',
+                        nn_type,
                         pc_alpha=pc_alpha, 
                         threshold=threshold
                     )

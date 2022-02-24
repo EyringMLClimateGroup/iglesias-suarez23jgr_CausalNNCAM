@@ -178,13 +178,14 @@ def plot_links_metrics(
     
 #     plt.legend(loc=0)
     plt.legend(ncol=3,bbox_to_anchor=(1.05, -.2))
+#     plt.legend(ncol=2,fontsize='medium')
     
     if save:
         sPath = save.split('/')[0]
         sName = save.split('/')[-1]
         Path(sPath).mkdir(parents=True, exist_ok=True)
         fig.savefig(
-            save, dpi='figure', format=None, metadata=None,
+            save, dpi=1000, format=None, metadata=None,
             bbox_inches=None, pad_inches=0.1,
             facecolor='auto', edgecolor='auto',
             backend=None, **kwargs
