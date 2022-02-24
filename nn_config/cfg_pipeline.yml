@@ -40,9 +40,10 @@ lim_levels     : False
 target_levels  : False # [887.02] # False
 # Rasp. GB: "./SPCAM_Rasp_causal_links_1yr"; "SPCAM_Rasp_concat_causal_links_1yr"
 #       TB: "./SPCAM_Rasp_causal_links_3mth"; "./SPCAM_Rasp_causal_links_3mth_v2";
+#           "./SPCAM_Rasp_causal_links_3mth_pearsonr_v2"
 #           "./SPCAM_Rasp_Aqua_0K_t-dt_causal_links_shifting"
 # ClInv. TB: "./SPCAM_ClInv_causal_links_3mth"
-output_folder  : "./SPCAM_Rasp_causal_links_3mth_v2"
+output_folder  : "./SPCAM_Rasp_causal_links_3mth_pearsonr_v2"
 plots_folder   : "./plots"
 verbosity      : 1
 output_file_pattern :
