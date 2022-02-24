@@ -4,7 +4,7 @@ import numpy as np
 from pathlib import Path
 import utils.utils as utils
 from utils.constants import ANCIL_FILE        # DATA_FOLDER, EXPERIMENT
-from utils.pcmci_algorithm import find_links
+from utils.pcmci_algorithm import find_links, pearsonr
 
 
 def proc_analysis(
@@ -171,7 +171,13 @@ def single(
                     f"Finding links for {child.name} at level {level[-1]+1}"
                 )
                 t_before_find_links = time.time()
-                results = find_links(data, pc_alphas, cond_ind_test, verbosity)
+                if ind_test_name == 'parcorr':
+                    results = find_links(data, pc_alphas, cond_ind_test, verbosity)
+                elif ind_test_name == 'pearsonr':
+                    results = pearsonr(data, pc_alphas, cond_ind_test, verbosity)
+                else:
+                    print(f"Invalid independence_test: {setup.independence_test}; stop!")
+                    sys.exit()
                 time_links = datetime.timedelta(
                     seconds=time.time() - t_before_find_links
                 )

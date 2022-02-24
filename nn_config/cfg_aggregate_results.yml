@@ -30,7 +30,6 @@ analysis       : 'single' # 'single': gridpoints individually;
 # Tom (ClInv): ['rh','bmse','ps','solin','shflx','lhf_nsdelq']
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','fsns','flns','fsnt','flnt','prect']
-spcam_children : ['tphystnd']
 independence_test : "parcorr"
 pc_alphas      : [0.01,0.05] # [0.001,0.01,0.1]
 region         : [ [-90,90] , [0.,359.] ] # [ [-90,90] , [0.,359.] ]
@@ -55,14 +54,15 @@ data_folder: "/work/bd1179/b309172/data/SPCAM_tb_recons"
 #        Rasp+t-dt: 2022_01_10_TRAIN_For_Nando_t-dt
 #       ClInv:      2021_09_03_TRAIN_For_Nando_ClInv
 experiment:  "2021_09_02_TRAIN_For_Nando"
+shifting: 1 # 0 (no shifting); 1 (output t-1)
 
 
 # Aggregated analysis
 # ===================
 thresholds :    [.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95] # [.2,.15] # [.15, .2, .25]
 area_weighted : True # True; False
-pdf : False # True; False
-aggregate_folder   : "./aggregate_thrs"
+pdf : True # True; False
+aggregate_folder   : "./aggregate_pdf"
 plot_file_pattern : 
   single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"

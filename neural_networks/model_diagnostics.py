@@ -194,6 +194,7 @@ class ModelDiagnostics():
                     hor_psqmean   = pred_sqmean[:,ilon]
                     hor_pmean     = pred_mean[:,ilon]
                     hor_mse       = mse[:,ilon]
+                    hor_rmse      = np.sqrt(mse[:,ilon])
             elif ilon == 'mean':
                 truth[iLev,:] = np.mean(t, axis=1)
                 pred[iLev,:]  = np.mean(p, axis=1)
@@ -246,8 +247,8 @@ class ModelDiagnostics():
             vmin, vmax = kwargs['vmin'], kwargs['vmax']
             kwargs.pop('vmin', None); kwargs.pop('vmax', None)
         else:
-            vmin = np.min([np.min(p),np.min(t)])
-            vmax = np.max([np.max(p),np.max(t)])
+            vmin = np.min([np.min(pred),np.min(t)])
+            vmax = np.max([np.max(pred),np.max(t)])
             if varname in ['tphystnd','phq']:
                 vlim = np.max([np.abs(vmin),np.abs(vmax)])/2.
                 vmin = -vlim; vmax = vlim
@@ -261,7 +262,7 @@ class ModelDiagnostics():
             cmap = cThemes[varname]
         cmap_diff = 'coolwarm'
         
-        vars_to_plot = [np.array([p, t]),np.array([p, t, p-t])][diff is True]
+        vars_to_plot = [np.array([pred, t]),np.array([pred, t, pred-t])][diff is True]
         labs_to_plot = [['Prediction', 'SPCAM', 'Prediction - SPCAM'],
                         ['Prediction', 'SPCAM']][diff is False]
         if stats is not False:

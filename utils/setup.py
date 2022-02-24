@@ -6,6 +6,7 @@ import getopt
 import yaml
 from pathlib import Path
 from tigramite.independence_tests import ParCorr, GPDC
+from scipy.stats                  import pearsonr
 
 
 class Setup:
@@ -80,8 +81,9 @@ class SetupPCAnalysis(Setup):
     INDEPENDENCE_TESTS = {
         "parcorr": lambda: ParCorr(significance=SIGNIFICANCE),
         "gpdc": lambda: GPDC(recycle_residuals=True),
-        "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True)
-        # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False)
+        "gpdc_torch": lambda: _build_GPDCtorch(recycle_residuals=True),
+        # "gpdc_torch" : lambda: _build_GPDCtorch(recycle_residuals=False),
+        "pearsonr": lambda: pearsonr, 
     }
 
     def __init__(self, argv):
@@ -162,13 +164,15 @@ class SetupNeuralNetworks(Setup):
     def _setup_results_aggregation(self, yml_cfg):
         self.thresholds = yml_cfg["thresholds"]
         self.area_weighted = yml_cfg["area_weighted"]
+        self.pdf           = yml_cfg["pdf"]
+        self.aggregate_folder = yml_cfg["aggregate_folder"]
 
     def _setup_neural_networks(self, yml_cfg):
         self.nn_type = yml_cfg["nn_type"]
         self.do_single_nn = self.do_causal_single_nn = False
         if self.nn_type == "SingleNN":
             self.do_single_nn = True
-        elif self.nn_type == "CausalSingleNN":
+        elif self.nn_type == "CausalSingleNN" or self.nn_type == "CorrSingleNN":
             self.do_causal_single_nn = True
         elif self.nn_type == "all":
             self.do_single_nn = self.do_causal_single_nn = True

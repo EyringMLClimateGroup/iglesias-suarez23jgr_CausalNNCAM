@@ -151,6 +151,7 @@ def collect_results(setup, reuse=False):
                     folder,
                     AGGREGATE_PATTERN.format(
                     var_name=child_var,
+                    ind_test_name=setup.ind_test_name,
                     experiment=setup.experiment,
                     ),
                 )
@@ -158,6 +159,7 @@ def collect_results(setup, reuse=False):
                     folder,
                     AGGREGATE_PATTERN.format(
                     var_name=child_var,
+                    ind_test_name=setup.ind_test_name,
                     experiment=setup.experiment,
                     )+"_errors",
                 )
@@ -181,7 +183,7 @@ def collect_results(setup, reuse=False):
                             lat_wtg = utils.get_weights(setup.region, lat, norm=True)
                         else:
                             lat_wtg = 1.
-
+#                         print(f"Collecting: {results_file}")
                         collect_results_file(
                             child_var, results_file, collected_results_tmp, errors_tmp, lat_wtg
                         )
@@ -200,6 +202,7 @@ def collect_results(setup, reuse=False):
                                     total_files,
                                 )
                             )
+                            print(f"Collecting: {results_file}")
 
                     # Fix keys: from class type to str (for saving results in dicts)
                     for iK in collected_results_tmp.keys():
@@ -311,17 +314,15 @@ def aggregate_results(collected_results, setup):
                         stats.norm.name, 
                         stats.norm.fit(parents_percent_boxcox), 
                         len(parents_percent_boxcox))[1]   # return p-value
-                    if ks > 0.05: # KS's p-val > 0.05
+                    if 'phq-3.' in child or 'phq-7.' in child:
+                        parents = []
+                    else:
                         zscores = stats.zscore(parents_percent_boxcox)
                         n_sided = 1 # 1: one-tail; two-tail
                         z_crit  = stats.norm.ppf(1-threshold/n_sided)
                         parents = [i for i in range(len(parents_percent_boxcox)) if zscores[i] > -z_crit]
-                    elif 'phq-3.' in child or 'phq-7.' in child:
-                        parents = []
-                    else:
-                        import pdb
-                        print(f'{child} not normaly distributed; stop!')
-                        pdb.set_trace()
+                    if ks < 0.05: # Normal distribution, KS's p-val should be > 0.05
+                        print(f'Caution! For threshold ({threshold}): {child} not normaly distributed')
                 else:
                     parents_filtered = parents_percent >= threshold
                     parents = [
@@ -646,7 +647,8 @@ def plot_causal_metrics(
     dict_combinations = build_links_metrics(setup, aggregated_results)
     
     # Filenm format (folder and figure name)
-    save_dir = setup.plots_folder
+#     save_dir = setup.plots_folder
+    save_dir = Path(setup.output_folder+'/'+setup.aggregate_folder+'/'+setup.plots_folder)
     Path(save_dir).mkdir(parents=True, exist_ok=True)
     variables = [var.name for var in setup.list_spcam if var.type == "out"]
     variables = '-'.join(variables)
@@ -654,9 +656,10 @@ def plot_causal_metrics(
     pcs       = '-'.join(pc_alphas)
     lats = [str(iL) for iL in setup.region[0]];  lats = '-'.join(lats)
     lons = [str(iL) for iL in setup.region[-1]]; lons = '-'.join(lons)
-    wgt_format = ['.png','_latwts.png'][setup.area_weighted]
-    filenm = variables+'_a-'+pcs+'_lats-'+lats+'_lons'+lons+wgt_format
-    if save: save = save_dir+'/'+filenm
+#     wgt_format = ['.png','_latwts.png'][setup.area_weighted]
+    wgt_format = ['.pdf','_latwts.pdf'][setup.area_weighted]
+    filenm = 'causal-links_metrics'+'_'+variables+'_a-'+pcs+'_'+wgt_format
+    if save: save = str(save_dir)+'/'+filenm
     
     plot_links_metrics(setup, dict_combinations, save)
     
@@ -734,7 +737,7 @@ def plot_matrix_results(
                 if j == 0:
                     var_to_plot[i,:] = np.ma.masked_equal(
                         [[0.,val][i in parents_tmp] for i, val in enumerate(values_tmp)][::-1],
-                        1.
+                        0.
                     )
                 if j > 0 or len(thresholds) == 1:
                     mask[jThrs][i,:] = np.ma.masked_equal(

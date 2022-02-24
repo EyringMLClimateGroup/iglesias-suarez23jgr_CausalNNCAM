@@ -163,7 +163,7 @@ class ModelDescription:
     def get_path(self, base_path):
         """ Generate a path based on this model metadata """
         path = Path(base_path, self.model_type)
-        if self.model_type == "CausalSingleNN":
+        if self.model_type == "CausalSingleNN" or self.model_type == "CorrSingleNN":
             if self.setup.area_weighted:
                 cfg_str = "a{pc_alpha}-t{threshold}-latwts/" 
             else: 
@@ -299,7 +299,7 @@ def generate_all_causal_single_nn(setup, aggregated_results):
             for threshold, parent_idxs in pc_alpha_results["parents"].items():
                 parents = var_names[parent_idxs]
                 model_description = ModelDescription(
-                    output, parents, "CausalSingleNN", pc_alpha, threshold, setup=setup,
+                    output, parents, setup.nn_type, pc_alpha, threshold, setup=setup,
                 )
                 model_descriptions.append(model_description)
     return model_descriptions
@@ -313,7 +313,7 @@ def generate_models(setup):
         model_descriptions.extend(generate_all_single_nn(setup))
 
     if setup.do_causal_single_nn:
-        collected_results, errors = aggregation.collect_results(setup)
+        collected_results, errors = aggregation.collect_results(setup, reuse=True)
         aggregation.print_errors(errors)
         aggregated_results, var_names_parents = aggregation.aggregate_results(
             collected_results, setup
