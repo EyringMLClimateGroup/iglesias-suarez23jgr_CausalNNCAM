@@ -93,7 +93,8 @@ class ModelDiagnostics():
                 
             elif itime == 'mean' or itime == 'range':
                 if not nTime:
-                    nTime = len(self.valid_gen)
+                    nTime = len(self.valid_gen)    
+                print(f"Time samples: {nTime}")
                 truth = np.zeros([nTime,self.ngeo,1])
                 pred  = np.zeros([nTime,self.ngeo,1])
                 for iTime in range(nTime):
@@ -573,6 +574,7 @@ class ModelDiagnostics():
         """Compute statistics in for [lat, lon, var, lev]"""
         
         t, p = self.get_truth_pred(itime, var, nTime=nTime)
+        nTime = len(t) if nTime is False else nTime # Time steps
         
         psum, tsum, psqsum, tsqsum, sse = self.calc_sums(p,t,nTime)
             
