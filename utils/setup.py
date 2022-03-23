@@ -234,8 +234,14 @@ class SetupSherpa(SetupNeuralNetworks):
         self._setup_sherpa(self.yml_cfg)
     
     def _setup_sherpa(self, yml_cfg):
-        self.sherpa_hyper   = yml_cfg["sherpa_hyper"]
-        self.nn_type        = yml_cfg["sherpa_nn_type"]
+        self.sherpa_hyper      = yml_cfg["sherpa_hyper"]
+        self.nn_type           = yml_cfg["sherpa_nn_type"]
+        self.nn_sherpa_path    = yml_cfg["nn_sherpa_path"]
+        self.sherpa_pc_alphas  = yml_cfg["sherpa_pc_alphas"]
+        self.sherpa_thresholds = yml_cfg["sherpa_thresholds"]
+        self.sherpa_num_layers = yml_cfg["sherpa_num_layers"]
+        self.sherpa_num_nodes  = yml_cfg["sherpa_num_nodes"]
+        self.sherpa_num_trials = yml_cfg["sherpa_num_trials"]
 
 
 def _calculate_gridpoints(region):

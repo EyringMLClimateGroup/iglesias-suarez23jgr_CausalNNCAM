@@ -699,6 +699,7 @@ def plot_matrix_results(
     setup, 
     values='percentage',
     save=False,
+    masking=False,
 ):
     
     pltPath = Path(setup.output_folder+'/'+setup.aggregate_folder+'/'+setup.plots_folder)
@@ -762,17 +763,20 @@ def plot_matrix_results(
             out_ticks_labs,
             extend,
             cbar_label,
-            mask=mask,
+            mask=[False,mask][masking!=False],
             vmin=vmin,
             vmax=vmax,
             cmap=cmap,
         )
         
         if save:
-            fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}.png"
+            if masking != False:
+                fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}.png"
+            else:
+                fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}_no-mask.png"
             print(f"Saving figure: {fignm}")
             fig.savefig(
-                fignm, dpi='figure', format='png', metadata=None,
+                fignm, dpi=1000., format='png', metadata=None,
                 bbox_inches=None, pad_inches=0.1,
                 facecolor='auto', edgecolor='auto',
                 backend=None,

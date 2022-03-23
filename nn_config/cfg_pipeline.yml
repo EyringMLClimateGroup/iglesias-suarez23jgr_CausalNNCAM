@@ -32,7 +32,7 @@ spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','fsns','flns','fsnt','flnt','prect']
 # PCMCI. independence_test : "parcorr"
 # Correlation. independence_test : "pearsonr"
-independence_test : "pearsonr"
+independence_test : "parcorr"
 pc_alphas      : [0.01,0.05] # [0.001,0.01,0.05,0.1]
 region         : [ [-90,90] , [0.,359.] ] # [ [-90,90] , [0.,359.] ]
 lim_levels     : False
@@ -42,30 +42,33 @@ target_levels  : False # [887.02] # False
 #       TB: "./SPCAM_Rasp_causal_links_3mth"; "./SPCAM_Rasp_causal_links_3mth_v2";
 #           "./SPCAM_Rasp_causal_links_3mth_pearsonr_v2"
 #           "./SPCAM_Rasp_Aqua_0K_t-dt_causal_links_shifting"
+#           +/-4K: "./Aqua_Generalization_Training_Sets_causal_links_[m,p]4K";
 # ClInv. TB: "./SPCAM_ClInv_causal_links_3mth"
-output_folder  : "./SPCAM_Rasp_causal_links_3mth_pearsonr_v2"
+output_folder  : "./Aqua_Generalization_Training_Sets_causal_links_p4K"
 plots_folder   : "./plots"
 verbosity      : 1
 output_file_pattern :
   single: "{var_name}_{level}_lat-{lat}_lon-{lon}_{ind_test}_{experiment}.obj"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_{ind_test}_{experiment}.obj"
 ## DATASETS. 
-# Gunnar's: SPCAM_gb_recons; Tom's: SPCAM_tb_recons; Aqua_0K_t-dt_recons
-data_folder: "/work/bd1179/b309172/data/SPCAM_tb_recons"
+# Gunnar's: SPCAM_gb_recons;
+# Tom's: SPCAM_tb_recons; Aqua_Generalization_Training_Sets_recons; Aqua_0K_t-dt_recons
+data_folder: "./Aqua_Generalization_Training_Sets_recons"
 # Gunnar's: 002_train_1_year
-# Tom's. Rasp:      2021_09_02_TRAIN_For_Nando; 
-#        Rasp+t-dt: 2022_01_10_TRAIN_For_Nando_t-dt
-#       ClInv:      2021_09_03_TRAIN_For_Nando_ClInv
-experiment:  "2021_09_02_TRAIN_For_Nando"
+# Tom's. Rasp:       2021_09_02_TRAIN_For_Nando; 
+#        Rasp+t-dt:  2022_01_10_TRAIN_For_Nando_t-dt
+#        Rasp (4Ks): 2022_02_16_TRAIN_For_Nando_[m,p]4K
+#        ClInv:      2021_09_03_TRAIN_For_Nando_ClInv
+experiment:  "2022_02_16_TRAIN_For_Nando_p4K"
 shifting: 0 # 0 (no shifting); 1 (output t-1)
 
 
 # Aggregated analysis
 # ===================
-thresholds :    [.05,.1,.2,.3,.4,.5,.6,.7,.8,.9,.95] # [.2,.15] # [.15, .2, .25]
+thresholds :    [.59] # [.2,.15] # [.15, .2, .25]
 area_weighted : True # True; False
-pdf : False # True; False
-aggregate_folder   : "./aggregate_thrs"
+pdf : True # True; False
+aggregate_folder   : "./aggregate_pdf"
 plot_file_pattern : 
   single: "{var_name}_{level}_lat{lat}_lon{lon}_a{pc_alpha}_{ind_test}_{experiment}.png"
   concat: "{var_name}_{level}_{lat1}-{lat2}_{lon1}-{lon2}_a{pc_alpha}_{ind_test}_{experiment}.png"
