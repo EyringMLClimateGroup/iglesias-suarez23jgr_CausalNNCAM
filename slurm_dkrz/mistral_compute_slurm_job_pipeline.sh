@@ -1,14 +1,15 @@
 #!/bin/bash
 # mistral cpu batch job parameters
 # --------------------------------
-#SBATCH --account=bd1179
-#SBATCH --job-name=Rasp
-#SBATCH --partition=compute
+######SBATCH --account=bd1179
+#SBATCH --account=bd1083
+#SBATCH --job-name=pc1-90s
+#SBATCH --partition=compute,compute2,prepost
 #SBATCH --nodes=1
 #SBATCH --mem=0
 #SBATCH --exclusive
-#SBATCH --output=LOG.Rasp_tb_pipeline_%j.o
-#SBATCH --error=LOG.Rasp_tb_pipeline_%j.o
+#SBATCH --output=LOG.pc1-m4k-90s_%j.o
+#SBATCH --error=LOG.pc1-m4k-90s_%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=08:00:00
 # --------------------------------
@@ -17,21 +18,25 @@
 #    $> sbatch slurm_dkrz/<script>.sh
 # --------------------------------
 
+logFile=`ls LOG.pc1-m4k-90s_*`
+
+# Scripts
+pyScript=pipeline
+#cfgFile=cfg_${pyScript}.yml
+cfgFile=220304_pipeline_4Ks/cfg_${pyScript}_90s.yml
+#cfgFile=220304_pipeline_4Ks/cfg_${pyScript}.yml
+
 # Paths
 scriptPath=`pwd`
 logPath=logs
 
 
-# Scripts
-pyScript=pipeline
-cfgFile=cfg_${pyScript}.yml
 
 ## PROCESSING
 #
 echo "---------- Starting $0 ----------"
 echo ""
 
-logFile=`ls LOG.Rasp_tb_pipeline_*`
 cat ./nn_config/$cfgFile > $logFile
 
 if [ ! -f ${pyScript}.py ]; then
