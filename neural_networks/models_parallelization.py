@@ -4,6 +4,7 @@ from pathlib import Path
 
 from tensorflow.keras        import Sequential, Input
 from tensorflow.keras.layers import Dense, Activation
+import horovod.tensorflow.keras as hvd
 
 from utils.constants import SPCAM_Vars
 from utils.variable import Variable_Lev_Metadata
@@ -108,6 +109,9 @@ class ModelDescription:
 #             name="RMSprop",
 #         )
         
+        # Decorate the optimizer with Horovod's distributed optimizer
+        optimizer = hvd.DistributedOptimizer(optimizer)
+    
         model.compile(
             # TODO? Move to configuration
             optimizer=optimizer,
@@ -367,7 +371,7 @@ def generate_output_list(setup):
 
 def get_parents_sherpa(setup):
     
-    collected_results, errors = aggregation.collect_results(setup, reuse=True)
+    collected_results, errors = aggregation.collect_results(setup)
     aggregation.print_errors(errors)
     aggregated_results, var_names_parents = aggregation.aggregate_results(
         collected_results, setup

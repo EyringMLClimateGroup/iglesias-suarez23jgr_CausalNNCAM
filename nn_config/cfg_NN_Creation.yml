@@ -29,7 +29,6 @@ analysis       : 'single' # 'single': gridpoints individually;
 # Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 spcam_children : ['tphystnd','phq','fsns','flns','fsnt','flnt','prect']
-spcam_children : ['phq']
 # PCMCI. independence_test : "parcorr"
 # Correlation. independence_test : "pearsonr"
 independence_test : "parcorr"
@@ -74,7 +73,7 @@ plot_file_pattern :
 # Neural Network configuration
 # ============================
 
-nn_type : "SingleNN" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
+nn_type : "all" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
 
 nn_output_path : models_causal_links-tb_train-tb
 

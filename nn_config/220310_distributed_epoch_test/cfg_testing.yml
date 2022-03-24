@@ -76,12 +76,7 @@ plot_file_pattern :
 
 nn_type : "SingleNN" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
 
-nn_output_path : test-models_causal_links-tb_train-tb
-
-# Rasp et at.: [qbp, tbp, vbp, ps, solin, shflx, lhflx] 
-# Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
-input_order  : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
-output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
+nn_output_path : single-test-models_causal_links-tb_train-tb
 
 # Rasp et at.: [qbp, tbp, vbp, ps, solin, shflx, lhflx] 
 # Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
@@ -106,7 +101,7 @@ train_data_folder : "./SPCAM_tb_preproc"
 #                                 2021_09_03_VALID_For_Nando_ClInv.nc
 train_data_fn : 2021_09_02_TRAIN_For_Nando_shuffle.nc
 valid_data_fn : 2021_09_02_VALID_For_Nando.nc
-epochs        : 8
+epochs        : 12
 train_verbose : 1 # 0:Silent; 1:Continuous update; 2:Summary on epochs
 tensorboard_folder : tensorboard
 
