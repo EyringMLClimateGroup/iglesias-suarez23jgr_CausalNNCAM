@@ -76,7 +76,12 @@ plot_file_pattern :
 
 nn_type : "SingleNN" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
 
-nn_output_path : models_causal_links-tb_train-tb
+nn_output_path : test-models_causal_links-tb_train-tb
+
+# Rasp et at.: [qbp, tbp, vbp, ps, solin, shflx, lhflx] 
+# Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
+input_order  : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
+output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
 # Rasp et at.: [qbp, tbp, vbp, ps, solin, shflx, lhflx] 
 # Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]

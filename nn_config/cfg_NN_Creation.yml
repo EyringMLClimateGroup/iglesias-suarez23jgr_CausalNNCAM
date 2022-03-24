@@ -61,7 +61,7 @@ shifting: 0 # 0 (no shifting); 1 (output t-1)
 
 # Aggregated analysis
 # ===================
-thresholds : [.58]
+thresholds : [.59]
 area_weighted: True # True; False
 pdf : True # True; False
 aggregate_folder   : "./aggregate_pdf"
