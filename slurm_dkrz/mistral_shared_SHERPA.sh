@@ -1,14 +1,14 @@
 #!/bin/bash
 # mistral cpu batch job parameters
 # --------------------------------
-#####SBATCH --account=bd1179
-#SBATCH --account=bd1083
-#SBATCH --job-name=SHE-RS
+#SBATCH --account=bd1179
+#####SBATCH --account=bd1083
+#SBATCH --job-name=SHE-GS
 #SBATCH --partition=shared
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=24
-#SBATCH --output=LOG.SHE-RS_%j.o
-#SBATCH --error=LOG.SHE-RS_%j.o
+#SBATCH --output=LOG.SHE-GS_%j.o
+#SBATCH --error=LOG.SHE-GS_%j.o
 #SBATCH --mail-type=FAIL
 #SBATCH --time=7-00:00:00
 # -------------------------------
@@ -17,14 +17,16 @@
 #    $> sbatch slurm_dkrz/<script>.sh
 # --------------------------------
 
-logFile=`ls LOG.SHE-RS_*`
+logFile=`ls LOG.SHE-GS_*`
 
 # Scripts
-pyScript=SHERPA_RandomSearch
+#pyScript=SHERPA_RandomSearch
+pyScript=SHERPA_GridSearch
 #pyScript=SHERPA_ASHA
 
 # Config file
-cfgFile=220322_SHERPA_RandomSearch/cfg_SHERPA_RandomSearch.yml
+#cfgFile=220322_SHERPA_RandomSearch/cfg_SHERPA_RandomSearch.yml
+cfgFile=220324_SHERPA_GridSearch/cfg_SHERPA_GridSearch.yml
 #cfgFile=220322_SHERPA_ASHA/cfg_SHERPA_ASHA.yml
 
 
@@ -48,7 +50,7 @@ if [ ! -f ${scriptPath}/${pyScript}.py ]; then
     echo ""
 fi
 
-echo "SHERPA (RandomSearch) Hyperparameter Tuning"
+echo "SHERPA Hyperparameter Tuning"
 source /pf/b/b309172/.bashrc
 conda activate causalnncam
 python ${pyScript}.py -c ./nn_config/$cfgFile
