@@ -371,7 +371,7 @@ def generate_output_list(setup):
 
 def get_parents_sherpa(setup):
     
-    collected_results, errors = aggregation.collect_results(setup)
+    collected_results, errors = aggregation.collect_results(setup, reuse=True)
     aggregation.print_errors(errors)
     aggregated_results, var_names_parents = aggregation.aggregate_results(
         collected_results, setup
