@@ -130,7 +130,7 @@ train_patience : 5 # TODO: This number was chosen arbitrarily
 # ============================
 sherpa_hyper      : True # False; True
 sherpa_nn_type    : "CausalSingleNN" # "CausalSingleNN"; or "SingleNN"
-nn_sherpa_path    : "hyperparameter_tuning_GridSearch_SHERPA"
+nn_sherpa_path    : "hyperparameter_tuning_GridSearch_threshold_SHERPA"
 sherpa_pc_alphas  : 0.01
 sherpa_thresholds : .59
 sherpa_num_layers : [9]
