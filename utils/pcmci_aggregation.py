@@ -271,9 +271,12 @@ def print_errors(errors):
             print(file)
 
 
-def aggregate_results(collected_results, setup):
+def aggregate_results(collected_results, setup, threshold_dict=False):
     # Configuration
-    thresholds = setup.thresholds
+    if threshold_dict:
+        thresholds = utils.get_thresholds_dict(setup.thrs_argv) # dict
+    else:
+        thresholds = setup.thresholds # list
     pc_alphas_filter = [str(a) for a in setup.pc_alphas]
 
     # Combine results
@@ -304,7 +307,8 @@ def aggregate_results(collected_results, setup):
             parents_matrix = collected["parents"]
             parents_matrix = np.array(parents_matrix)
             parents_percent = parents_matrix.mean(axis=0)[:-1] # All but itself [which is zero]
-            for threshold in thresholds:
+            thresholds_list = [thresholds[child]] if threshold_dict else thresholds
+            for threshold in thresholds_list:
                 # Threshold based on the own output's inputs-distrubution
                 if setup.pdf:
                     parents_percent = [[0.00001,i][i>0.00001] for i in parents_percent]
@@ -328,9 +332,10 @@ def aggregate_results(collected_results, setup):
                     parents = [
                         i for i in range(len(parents_filtered)) if parents_filtered[i]
                     ]
-                dict_threshold_parents[str(threshold)] = parents
-                dict_num_parents[str(threshold)]  = len(parents)
-                dict_per_parents[str(threshold)]  = len(parents) * 100. / len(var_names_parents)
+                threshold_nm = 'optimized' if threshold_dict else str(threshold)
+                dict_threshold_parents[threshold_nm] = parents
+                dict_num_parents[threshold_nm]  = len(parents)
+                dict_per_parents[threshold_nm]  = len(parents) * 100. / len(var_names_parents)
             
             dict_pc_alpha_parents[pc_alpha] = {
                 "parents": dict_threshold_parents,
@@ -698,6 +703,7 @@ def plot_matrix_results(
     aggregated_results, 
     setup, 
     values='percentage',
+    threshold_dict=False,
     num_parents=False,
     save=False,
     masking=False,
@@ -713,8 +719,11 @@ def plot_matrix_results(
     in_vars, in_box_idx, in_ticks, in_ticks_labs = get_matrix_idx(dict_inputs_idxs_inv, inverted=True)
     out_vars, out_box_idx, out_ticks, out_ticks_labs = get_matrix_idx(dict_outputs_idxs)
 
-    # Using only two thresholds if more were given (min-max) 
-    if len(setup.thresholds) > 1:
+    # Using only two thresholds if more were given (min-max)
+    if threshold_dict:
+        thrs_labs  = 'optimized'
+        thresholds = [thrs_labs]
+    elif len(setup.thresholds) > 1:
         thresholds = [setup.thresholds[0],setup.thresholds[-1]]
         thrs_labs  = str(setup.thresholds[0])+'-'+str(setup.thresholds[-1])
     else:

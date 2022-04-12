@@ -274,7 +274,7 @@ def plot_matrix(
         axy.spines['top'].set_visible(False)
         axy.spines['right'].set_visible(False)
         axy.spines['bottom'].set_visible(True)
-        axy.spines['left'].set_visible(False)
+#         axy.spines['left'].set_visible(False)
         axy.set_xlim(-1.,100.)
     
     

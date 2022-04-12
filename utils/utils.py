@@ -7,6 +7,7 @@ from neural_networks.cbrain.cam_constants  import *
 from netCDF4    import Dataset
 import pickle
 from collections import deque
+import getopt, yaml
 
 
 #########################
@@ -72,6 +73,19 @@ def read_ancilaries(path):
         latitudes = nc_ancil.variables["lat"][:]
         longitudes = nc_ancil.variables["lon"][:]
     return levels, latitudes, longitudes
+
+
+def get_thresholds_dict(thrs_argv):
+    opts, args = getopt.getopt(thrs_argv, "hc:a", ["cfg_file=", "add="])
+    for opt, arg in opts:
+        if opt in ("-c", "--cfg_file"):
+            yml_cfgFilenm = arg
+        elif opt in ("-a", "--add"):
+            pass
+    # YAML config file
+    yml_filename = yml_cfgFilenm
+    yml_cfgFile = open(yml_filename)
+    return yaml.load(yml_cfgFile, Loader=yaml.FullLoader)['thresholds_dict']
 
 
 #########################
