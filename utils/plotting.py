@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FormatStrFormatter, MultipleLocator
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from tigramite import plotting as tp
 import numpy as np
 from pathlib import Path
@@ -208,9 +209,10 @@ def plot_matrix(
     extend,
     cbar_label,
     mask=False,
+    num_parents=False,
     **kwargs
 ):
-    
+
     vars_labs_dict = {
         'tbp':'T (hPa)',
         'qbp':'Q (hPa)',
@@ -236,7 +238,7 @@ def plot_matrix(
         )
 
     I  = axes.imshow(matrix,**kwargs)
-    cbar = plt.colorbar(I, extend=extend)
+    cbar = plt.colorbar(I, ax=axes, extend=extend)
     cbar.set_label(cbar_label)
     axes.set_xticks(in_ticks); axes.set_xticklabels(in_ticks_labs)
     axes.set_yticks(out_ticks); axes.set_yticklabels(out_ticks_labs)
@@ -256,6 +258,26 @@ def plot_matrix(
         axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0)
     axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90)
     
+    if isinstance(num_parents, np.ndarray):
+        divider = make_axes_locatable(axes)
+        axy = divider.append_axes("right", size="20%", pad=.5, sharey=axes)
+        axy.plot(
+            num_parents,
+            np.arange(0.,len(num_parents),1),
+            
+            linewidth=3.,
+        )
+        axy.xaxis.set_tick_params(labelright=False)
+        axy.yaxis.set_tick_params(labelleft=False)
+        axy.set_xlabel('Num. Parents')
+        axy.get_yaxis().set_visible(False)
+        axy.spines['top'].set_visible(False)
+        axy.spines['right'].set_visible(False)
+        axy.spines['bottom'].set_visible(True)
+        axy.spines['left'].set_visible(False)
+        axy.set_xlim(-1.,100.)
+    
+    
     fig.suptitle(pc_alpha)
-
+    
     return fig, axes

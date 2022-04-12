@@ -698,6 +698,7 @@ def plot_matrix_results(
     aggregated_results, 
     setup, 
     values='percentage',
+    num_parents=False,
     save=False,
     masking=False,
 ):
@@ -723,11 +724,13 @@ def plot_matrix_results(
     for iAlpha in setup.pc_alphas:
         iAlpha      = str(iAlpha)
         var_to_plot = np.ma.zeros([len(dict_outputs_idxs),len(dict_inputs_idxs_inv)])
+        nparents    = np.ma.zeros([len(dict_outputs_idxs)])
         mask        = {}
         mask[str(thresholds[-1])] = np.ma.zeros([len(dict_outputs_idxs),len(dict_inputs_idxs_inv)])
         for i, output in dict_outputs_idxs.items():
             for j, jThrs in enumerate(thresholds):
                 jThrs = str(jThrs)
+                nparents[i] = aggregated_results[output][iAlpha]['num_parents'][jThrs]
                 parents_tmp = aggregated_results[output][iAlpha]['parents'][jThrs]
                 if values == 'percentage':
                     values_tmp  = aggregated_results[output][iAlpha]['parents_percent']
@@ -764,16 +767,20 @@ def plot_matrix_results(
             extend,
             cbar_label,
             mask=[False,mask][masking!=False],
+            num_parents=[False,nparents][num_parents!=False],
             vmin=vmin,
             vmax=vmax,
             cmap=cmap,
         )
         
         if save:
-            if masking != False:
-                fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}.png"
+            fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}"
+            if num_parents:
+                fignm = fignm+'_parnm'
+            if masking:
+                fignm = fignm+'.png'
             else:
-                fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}_no-mask.png"
+                fignm = fignm+'_no-mask.png'
             print(f"Saving figure: {fignm}")
             fig.savefig(
                 fignm, dpi=1000., format='png', metadata=None,
