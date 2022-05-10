@@ -269,7 +269,7 @@ def plot_matrix(
         )
         axy.xaxis.set_tick_params(labelright=False)
         axy.yaxis.set_tick_params(labelleft=False)
-        axy.set_xlabel('Num. Parents')
+        axy.set_xlabel('Num. Inputs')
         axy.get_yaxis().set_visible(False)
         axy.spines['top'].set_visible(False)
         axy.spines['right'].set_visible(False)
