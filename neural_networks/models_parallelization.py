@@ -309,7 +309,7 @@ def generate_all_causal_single_nn(setup, aggregated_results):
     return model_descriptions
 
 
-def generate_models(setup):
+def generate_models(setup, threshold_dict=False):
     """ Generate all NN models specified in setup """
     model_descriptions = list()
 
@@ -320,8 +320,7 @@ def generate_models(setup):
         collected_results, errors = aggregation.collect_results(setup, reuse=True)
         aggregation.print_errors(errors)
         aggregated_results, var_names_parents = aggregation.aggregate_results(
-            collected_results, setup
-        )
+            collected_results, setup, threshold_dict=threshold_dict)
         model_descriptions.extend(
             generate_all_causal_single_nn(setup, aggregated_results)
         )
