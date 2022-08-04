@@ -62,7 +62,7 @@ shifting: 0 # 0 (no shifting); 1 (output t-1)
 
 # Aggregated analysis
 # ===================
-thresholds : [.58]
+thresholds : [.59]
 area_weighted: True # True; False
 pdf : True # True; False
 aggregate_folder   : "./aggregate_pdf"
@@ -74,7 +74,7 @@ plot_file_pattern :
 # Neural Network configuration
 # ============================
 
-nn_type : "SingleNN" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
+nn_type : "CausalSingleNN" # "all"; SingleNN"; "CausalSingleNN"; "CorrSingleNN"
 
 nn_output_path : test-models_causal_links-tb_train-tb
 
@@ -89,32 +89,32 @@ input_order  : [qbp, tbp, vbp, ps, solin, shflx, lhflx]
 output_order : [phq, tphystnd, fsnt, fsns, flnt, flns, prect]
 
 # Hidden layers: [32, 32, 32]; [256,256,256,256,256,256,256,256,256]
-hidden_layers : [256,256,256,256,256,256,256,256,256]
-activation : LeakyReLU # LeakyReLU
+hidden_layers : [32, 32]
+activation : linear # LeakyReLU
 
 
 # Training configuration
 # ----------------------
 ## DATASETS.
 # Gunnar's: SPCAM_gb_prepoc; Tom's: SPCAM_tb_prepoc
-train_data_folder : "./SPCAM_tb_preproc"
+train_data_folder : "./SPCAM_gb_preproc"
 # Gunnar's. Train (year/month): 002_train_1_<year/month>.nc 002_train_1_<year/month>_shuffle.nc
 #           Valid (year/month): 000_valid_1_<year/month>.nc
 # Tom's. Case: TRAIN/VALID. Rasp: 2021_09_02_TRAIN_For_Nando_shuffle.nc
 #                                 2021_09_02_VALID_For_Nando.nc
 #                          ClInv: 2021_09_03_TRAIN_For_Nando_ClInv_shuffle.nc
 #                                 2021_09_03_VALID_For_Nando_ClInv.nc
-train_data_fn : 2021_09_02_TRAIN_For_Nando_shuffle.nc
-valid_data_fn : 2021_09_02_VALID_For_Nando.nc
-epochs        : 8
+train_data_fn : 002_train_1_month_shuffle.nc # 2021_09_02_TRAIN_For_Nando_shuffle.nc
+valid_data_fn : 000_valid_1_month.nc # 2021_09_02_VALID_For_Nando.nc
+epochs        : 1
 train_verbose : 1 # 0:Silent; 1:Continuous update; 2:Summary on epochs
 tensorboard_folder : tensorboard
 
 # From Tom https://github.com/tbeucler/CBRAIN-CAM/tree/master/notebooks/tbeucler_devlog/UW_DATA
 # gb: Gunnar Behrens;     001_norm.nc
 # tb: Tom Beucler (ClInv) 2021_09_02_NORM_For_Nando.nc
-normalization_folder : "./SPCAM_tb_preproc"
-normalization_fn     : 001_norm_for_tb_dataset.nc
+normalization_folder : "./SPCAM_gb_preproc"
+normalization_fn     : 001_norm.nc # 001_norm_for_tb_dataset.nc
 
 input_sub : mean # From 006_8col_pnas_exact.yml
 input_div : maxrs # From 006_8col_pnas_exact.yml
@@ -128,4 +128,4 @@ step_lr   : 3 # From 006_8col_pnas_exact.yml
 divide_lr : 5 # From train.py (default)
 
 # Early Stopping
-train_patience : 5 # TODO: This number was chosen arbitrarily
+train_patience : 3 # TODO: This number was chosen arbitrarily

@@ -1,0 +1,34 @@
+tphystnd-3.64: 0.1
+tphystnd-7.59: 0.15
+tphystnd-14.36: 0.0
+tphystnd-24.61: 0.05
+tphystnd-38.27: 0.05
+tphystnd-54.6: 0.0
+tphystnd-72.01: 0.2
+tphystnd-87.82: 0.5
+tphystnd-103.32: 0.7
+
+tphystnd-121.55: 0.8
+tphystnd-142.99: 0.6
+tphystnd-168.23: 0.7
+tphystnd-197.91: 0.5
+
+tphystnd-232.83: 0.55
+tphystnd-273.91: 0.45
+
+tphystnd-322.24: 0.15
+tphystnd-379.1: 0.1
+tphystnd-445.99: 0.15
+tphystnd-524.69: 0.3
+tphystnd-609.78: 0.4
+tphystnd-691.39: 0.25
+
+tphystnd-763.4: 0.45
+tphystnd-820.86: 0.6
+tphystnd-859.53: 0.5
+tphystnd-887.02: 0.55
+tphystnd-912.64: 0.4
+tphystnd-936.2: 0.55
+tphystnd-957.49: 0.65
+tphystnd-976.33: 0.35
+tphystnd-992.56: 0.4

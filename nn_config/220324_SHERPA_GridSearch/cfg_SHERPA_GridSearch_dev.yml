@@ -29,7 +29,7 @@ analysis       : 'single' # 'single': gridpoints individually;
 # Tom (ClInv): [rh,bmse,ps,solin,shflx,lhf_nsdelq]
 spcam_parents  : ['tbp','qbp','vbp','ps','solin','shflx','lhflx']
 # spcam_children : ['tphystnd','phq','fsns','flns','fsnt','flnt','prect']
-spcam_children : ['tphystnd']
+spcam_children : ['fsns']
 independence_test : "parcorr"
 pc_alphas      : &pc_alphas
   [0.01] # [0.001,0.01,0.1]; [0.01,0.05]
@@ -130,9 +130,9 @@ train_patience : 5 # TODO: This number was chosen arbitrarily
 # ============================
 sherpa_hyper      : True # False; True
 sherpa_nn_type    : "CausalSingleNN" # "CausalSingleNN"; or "SingleNN"
-nn_sherpa_path    : "hyperparameter_tuning_GridSearch_SHERPA"
+nn_sherpa_path    : "dev_hyperparameter_tuning_GridSearch_SHERPA" # "hyperparameter_tuning_GridSearch_SHERPA"
 sherpa_pc_alphas  : 0.01
-sherpa_thresholds : 0.59
-sherpa_num_layers : [1, 2]
-sherpa_num_nodes  : [64]
+sherpa_thresholds : .59
+sherpa_num_layers : [1]
+sherpa_num_nodes  : [32,64]
 sherpa_num_trials : 0 # This is not taken into account

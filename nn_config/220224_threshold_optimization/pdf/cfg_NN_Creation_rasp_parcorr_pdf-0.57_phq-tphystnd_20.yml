@@ -131,7 +131,7 @@ train_patience : 5 # TODO: This number was chosen arbitrarily
 ## DATASETS.
 # Gunnar's: SPCAM_gb_prepoc; Tom's: SPCAM_tb_preproc
 # Tom's: SPCAM_tb_preproc; Aqua_Generalization_Test_Sets
-test_data_folder : "./SPCAM_tb_preproc"
+test_data_folder : "./Aqua_Generalization_Test_Sets"
 # Gunnar's. Train (year/month): 002_train_1_<year/month>.nc 002_train_1_<year/month>_shuffle.nc
 #           Valid (year/month): 000_valid_1_<year/month>.nc
 # Tom's. Case: TRAIN/VALID. Rasp: 2021_09_02_TEST_For_Nando_shuffle.nc
@@ -139,7 +139,7 @@ test_data_folder : "./SPCAM_tb_preproc"
 #                          Gener: 2022_02_07_TEST_For_Nando_m4K.nc; 2022_02_07_TEST_For_Nando_p4K.nc
 #                          ClInv: 2021_09_03_TEST_For_Nando_ClInv_shuffle.nc
 #                                 2021_09_03_TEST_For_Nando_ClInv.nc
-test_data_fn : 2021_09_02_TEST_For_Nando.nc
+test_data_fn : 2022_02_07_TEST_For_Nando_p4K.nc
 # Diagnostics
 diagnostics      : ['map']  # 'map'
 diagnostics_time : ['mean'] # snapshot: int; time-mean: 'mean'
