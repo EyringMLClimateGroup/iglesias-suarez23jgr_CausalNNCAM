@@ -3,7 +3,7 @@ from utils.variable                        import Variable_Lev_Metadata
 from utils.utils import read_ancilaries, find_closest_value, find_closest_longitude, get_weights #, get_pressure
 from pathlib                               import Path
 from neural_networks.load_models           import get_var_list
-from neural_networks.data_generator        import build_valid_generator
+from neural_networks.data_generator        import build_train_generator, build_valid_generator
 from neural_networks.cbrain.utils          import load_pickle
 from neural_networks.cbrain.cam_constants  import *
 import numpy                               as     np
@@ -18,7 +18,8 @@ if in_notebook():
     from tqdm.notebook import tqdm
 else:
     from tqdm import tqdm
-
+import shap
+    
     
 cThemes = {'tphystnd':'coolwarm',
            'phq':'RdBu',
@@ -60,8 +61,8 @@ class ModelDiagnostics():
         var_idxs = self.valid_gen.norm_ds.var_names[self.valid_gen.output_idxs]
         var_idxs = np.where(var_idxs == var)[0]
         return var_idxs
+        
     
-
     def get_truth_pred(self, itime, var, nTime=False):
         
         input_list  = get_var_list(self.setup, self.setup.spcam_inputs)
@@ -118,6 +119,89 @@ class ModelDiagnostics():
 
         return truth, pred
 
+    
+    def get_shapley_values(
+        self,
+        itime,
+        var,
+        nTime=False,
+        nSamples=False,
+        metric=False
+    ):
+        
+        input_list  = get_var_list(self.setup, self.setup.spcam_inputs)
+        self.inputs = sorted(
+            [Variable_Lev_Metadata.parse_var_name(p) for p in input_list],
+            key=lambda x: self.setup.input_order_list.index(x),
+        )
+        self.input_vars_dict  = ModelDiagnostics._build_vars_dict(self.inputs)
+        
+        self.output = Variable_Lev_Metadata.parse_var_name(var)
+        self.output_vars_dict = ModelDiagnostics._build_vars_dict([self.output])
+        
+        # Train data as background
+        model, inputs = self.models[var]
+        self.train_gen       = build_train_generator(
+            self.input_vars_dict, 
+            self.output_vars_dict, 
+            self.setup,
+        )
+        with self.train_gen as train_gen:
+            if itime == 'range':
+                if not nTime: nTime = len(train_gen)
+                # X_train, _ = train_gen[0] #TODO: Change this to retrieve all the data
+                n_batches  = int( (self.ngeo / self.setup.batch_size) * nTime )
+                # print(f"n_batches: {n_batches}")
+                X_train = np.zeros([self.ngeo*nTime,len(self.inputs)])
+                # print(f"concatenated.shape: {concatenated.shape}")
+                sIdx = 0; eIdx = self.setup.batch_size
+                for i in range(n_batches):
+                    X_train[sIdx:eIdx,:] = train_gen[i][0]
+                    sIdx += self.setup.batch_size; eIdx += self.setup.batch_size
+        
+        self.valid_gen       = build_valid_generator(
+            self.input_vars_dict, 
+            self.output_vars_dict, 
+            self.setup,
+            test=True
+        )
+        with self.valid_gen as valid_gen:
+            if itime == 'range':
+                # X_test, _ = valid_gen[0] #TODO: Change this to retrieve all the data
+                if not nTime: nTime = len(valid_gen)
+                n_batches = nTime
+                X_test = np.zeros([self.ngeo*nTime,len(self.inputs)])
+                sIdx = 0; eIdx = self.ngeo
+                for i in range(n_batches):
+                    X_test[sIdx:eIdx,:] = valid_gen[i][0]
+                    sIdx += self.ngeo; eIdx += self.ngeo
+        
+        if not nSamples: nSamples = len(X_train)
+        
+        # explain predictions of the model
+        background = X_train[np.random.choice(X_train.shape[0], nSamples, replace=False)]
+        test       = X_test[np.random.choice(X_test.shape[0], nSamples, replace=False)]
+        e = shap.DeepExplainer(model, background[:, inputs])        
+        shap_values      = e.shap_values(test[:, inputs],check_additivity=False)
+        shap_values_sign = np.mean(shap_values[0],axis=0)
+        shap_values_sign[shap_values_sign < 0] = -1.; shap_values_sign[shap_values_sign > 0] = 1.
+        shap_values_mean          = np.mean(shap_values[0],axis=0)
+        shap_values_abs_mean      = np.mean(np.absolute(shap_values[0]),axis=0)
+        shap_values_abs_mean_sign = shap_values_abs_mean * shap_values_sign
+        # shap_values_mean = valid_gen.output_transform.inverse_transform(np.mean(shap_values[0],axis=0))
+        # print(f'transformed shap_values_mean: {valid_gen.output_transform.inverse_transform(shap_values_mean)}')
+        
+        # return model, X_train, X_test, self.input_vars_dict
+        if not metric or metric == 'mean':
+            return shap_values_mean, inputs, self.input_vars_dict
+        elif metric == 'abs_mean':
+            return shap_values_abs_mean, inputs, self.input_vars_dict
+        elif metric == 'abs_mean_sign':
+            return shap_values_abs_mean_sign, inputs, self.input_vars_dict
+        else:
+            print(f"metric not available, only: mean, abs_mean and abs_mean_sign; stop")
+            exit()
+    
     
     # Plotting functions
     def plot_double_xy(

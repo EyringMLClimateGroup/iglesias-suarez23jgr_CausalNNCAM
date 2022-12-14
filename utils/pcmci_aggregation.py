@@ -673,11 +673,11 @@ def get_matrix_idx(dict_vars_idx, inverted=False):
     idx_2d = 0; idx_3d = []; levels = []; child_main = []
     for i, key in dict_vars_idx.items():
         child_tmp = key
-        if len(key.split('-')) == 1:
+        if len(str(key).split('-')) == 1:
             idx_2d += 1
         else:
-            child_main_tmp = key.split('-')[0]
-            child_lev_tmp  = int(float(key.split('-')[-1]))
+            child_main_tmp = str(key).split('-')[0]
+            child_lev_tmp  = int(float(str(key).split('-')[-1]))
             child_lev_tmp  = 50 * round(child_lev_tmp/50) # Round to 50hPa for ticks
             
             if child_main_tmp not in child_main: child_main.append(child_main_tmp)
@@ -707,6 +707,7 @@ def plot_matrix_results(
     num_parents=False,
     save=False,
     masking=False,
+    cmap=False,
 ):
     
     pltPath = Path(setup.output_folder+'/'+setup.aggregate_folder+'/'+setup.plots_folder)
@@ -743,10 +744,10 @@ def plot_matrix_results(
                 parents_tmp = aggregated_results[output][iAlpha]['parents'][jThrs]
                 if values == 'percentage':
                     values_tmp  = aggregated_results[output][iAlpha]['parents_percent']
-                    vmin = 0.; vmax = .9; cmap='Blues'; extend='max'; cbar_label='ratio'
+                    vmin = 0.; vmax = .9; cmap=[cmap,'Reds'][cmap is False]; extend='max'; cbar_label='ratio'
                 elif values == 'val_matrix':
                     values_tmp  = aggregated_results[output][iAlpha]['val_matrix'][:,-1][:-1,1]
-                    vmin = -.7; vmax = .7; cmap='bwr'; extend='both'; cbar_label='r'
+                    vmin = -.7; vmax = .7; cmap=[cmap,'bwr'][cmap is False]; extend='both'; cbar_label='r'
                 if j == 0:
                     var_to_plot[i,:] = np.ma.masked_equal(
                         [[0.,val][i in parents_tmp] for i, val in enumerate(values_tmp)][::-1],
@@ -792,8 +793,8 @@ def plot_matrix_results(
                 fignm = fignm+'_no-mask.png'
             print(f"Saving figure: {fignm}")
             fig.savefig(
-                fignm, dpi=1000., format='png', metadata=None,
-                bbox_inches=None, pad_inches=0.1,
+                fignm, dpi=3000., format='png', metadata=None,
+                bbox_inches='tight', pad_inches=0.1,
                 facecolor='auto', edgecolor='auto',
                 backend=None,
            )

@@ -215,13 +215,21 @@ def plot_matrix(
 
     vars_labs_dict = {
         'tbp':'T (hPa)',
-        'qbp':'Q (hPa)',
+        'qbp':'q (hPa)',
         'vbp':'V (hPa)',
-        'tphystnd':'dT/dt (hPa)',
-        'phq':'dQ/dt (hPa)',
+        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$',
+        'phq':'$\Delta$q$\mathregular{_{phy}}$',
+        # 'tphystnd':'dT/dt (hPa)',
+        # 'phq':'dq/dt (hPa)',
     }
     
     import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import matplotlib as mpl
+    
+    # mpl.rcParams['font.size']      = 12
+    mpl.rcParams['axes.labelsize'] = 'large'
+    
     fig, axes = plt.subplots(1, 1, figsize=(12, 5))
     
     # Mask?
@@ -234,7 +242,7 @@ def plot_matrix(
             mask[jThrs],
             colors='none',
             hatches='.',
-            extend='both',
+            # extend=extend,
         )
 
     I  = axes.imshow(matrix,**kwargs)
@@ -251,12 +259,12 @@ def plot_matrix(
     trans = axes.get_xaxis_transform()
     xy_coor = [(-15., .68),(-15., .20)]
     for i, iVar in enumerate(out_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90)
-    axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0)
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large')
+    axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0,fontsize='large')
     xy_coor = [(12., -.15),(42., -.15),(72., -.15)]
     for i, iVar in enumerate(in_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0)
-    axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90)
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large')
+    axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90,fontsize='large')
     
     if isinstance(num_parents, np.ndarray):
         divider = make_axes_locatable(axes)
@@ -264,9 +272,11 @@ def plot_matrix(
         axy.plot(
             num_parents,
             np.arange(0.,len(num_parents),1),
-            
+            color='darkred',
+            alpha=.8,
             linewidth=3.,
         )
+        axy.set_xticks([0,50,100])
         axy.xaxis.set_tick_params(labelright=False)
         axy.yaxis.set_tick_params(labelleft=False)
         axy.set_xlabel('Num. Inputs')
@@ -278,6 +288,6 @@ def plot_matrix(
         axy.set_xlim(-1.,100.)
     
     
-    fig.suptitle(pc_alpha)
+    # fig.suptitle(pc_alpha)
     
     return fig, axes
