@@ -1,0 +1,31 @@
+name: causalnncam
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+# Tigramite
+  - python=3
+  - numpy>=1.14.0
+  - scipy>=1.3.0
+  - scikit-learn>=0.21.2
+  - matplotlib>=3.1.1
+  - networkx>=2.4
+  - cython>=0.26
+# Tigramite - GPDC
+  - dcor
+# Tigramite - GPDC Torch
+#  - torch>=1.7
+  - pytorch>=1.7
+  - gpytorch>=1.4
+# Jupyter
+  - ipykernel
+# FortranKerasBridge
+  - h5py
+# CausalNNCAM
+  - netcdf4
+  - pyyaml
+  - tensorflow
+# Cbrain
+  - xarray
+

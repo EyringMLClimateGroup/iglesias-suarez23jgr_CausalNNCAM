@@ -1,0 +1,89 @@
+# Made up dictionary for testing purposes.
+# quantile_thresholds.yml
+---
+documentation:
+  description: Specific quantile_thresholds for each output.
+
+  authors:
+    - solino-fernandez_breixo
+    - iglesias-suarez_fernando
+
+  maintainer:
+    - solino-fernandez_breixo
+    - iglesias-suarez_fernando
+
+  references:
+    - acknow_project
+
+  projects:
+    - usmile
+
+
+# Quantile thresholds
+# ======
+thresholds_dict :
+  tphystnd-3.64 : .90
+  tphystnd-7.59 : .89
+  tphystnd-14.36 : .88
+  tphystnd-24.61 : .87
+  tphystnd-38.27 : .86
+  tphystnd-54.6 : .85
+  tphystnd-72.01 : .85
+  tphystnd-87.82 : .84
+  tphystnd-103.32 : .83
+  tphystnd-121.55 : .82
+  tphystnd-142.99 : .81
+  tphystnd-168.23 : .80
+  tphystnd-197.91 : .70
+  tphystnd-232.83 : .68
+  tphystnd-273.91 : .66
+  tphystnd-322.24 : .64
+  tphystnd-379.1 : .62
+  tphystnd-445.99 : .60
+  tphystnd-524.69 : .58
+  tphystnd-609.78 : .20
+  tphystnd-691.39 : .20
+  tphystnd-763.4 : .30
+  tphystnd-820.86 : .40
+  tphystnd-859.53 : .45
+  tphystnd-887.02 : .50
+  tphystnd-912.64 : .55
+  tphystnd-936.2 : .56
+  tphystnd-957.49 : .58
+  tphystnd-976.33 : .58
+  tphystnd-992.56 : .59
+  phq-3.64 : .1
+  phq-7.59 : .1
+  phq-14.36 : .95
+  phq-24.61 : .95
+  phq-38.27 : .95
+  phq-54.6 : .95
+  phq-72.01 : .90
+  phq-87.82 : .85
+  phq-103.32 : .80
+  phq-121.55 : .75
+  phq-142.99 : .70
+  phq-168.23 : .68
+  phq-197.91 : .66
+  phq-232.83 : .64
+  phq-273.91 : .62
+  phq-322.24 : .60
+  phq-379.1 : .58
+  phq-445.99 : .56
+  phq-524.69 : .50
+  phq-609.78 : .20
+  phq-691.39 : .25
+  phq-763.4 : .40
+  phq-820.86 : .45
+  phq-859.53 : .50
+  phq-887.02 : .52
+  phq-912.64 : .54
+  phq-936.2 : .56
+  phq-957.49 : .58
+  phq-976.33 : .58
+  phq-992.56 : .58
+  fsnt : .80
+  fsns : .80
+  flnt : .80
+  flns : .80
+  prect : .80
