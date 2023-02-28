@@ -7,6 +7,8 @@ Authors:
 
 This repository provides the source code used on the paper [Causally-informed deep learning to improve climate models and projections](https://meetingorganizer.copernicus.org/EGU23/EGU23-6450.html), by Iglesias-Suarez et al.
 
+Corresponding DOI: [![DOI](https://zenodo.org/badge/607760765.svg)](https://zenodo.org/badge/latestdoi/607760765)
+
 ## Installation
 
 To install the dependencies, it is recomended to use Anaconda or Mamba. An environment file is provided in `dependencies.yml`.
