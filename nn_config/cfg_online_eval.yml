@@ -1,0 +1,27 @@
+# pipeline
+# cfg_online_eval.yml
+---
+documentation:
+  description: Options (specifications) for evaluating prognostic simulations.
+
+  authors:
+    - solino-fernandez_breixo
+    - iglesias-suarez_fernando
+
+  maintainer:
+    - solino-fernandez_breixo
+    - iglesias-suarez_fernando
+
+  references:
+    - acknow_project
+
+  projects:
+    - usmile
+
+
+# Common
+# ======
+# Specifications
+simulations: ['SPCAM','Non-causalNNCAM','Causally-informedNNCAM','Causally-informed0.59NNCAM']
+data_folder: "./experiments/{simulation}"
+file_pattern: "{simulation}_zonalmean_dailymean_concatenated_0000-01-01-0000-12-31.nc"
