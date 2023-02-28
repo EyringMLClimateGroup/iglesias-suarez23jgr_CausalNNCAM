@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 
 from . import utils
-from .plotting import plot_links, find_linked_variables, plot_links_metrics, plot_matrix
+from .plotting import plot_links, find_linked_variables, plot_links_metrics, plot_matrix, plot_matrix_insets
 from .variable import Variable_Lev_Metadata
 from .constants import ANCIL_FILE, AGGREGATE_PATTERN
 from scipy      import stats
@@ -336,6 +336,75 @@ def aggregate_results(collected_results, setup, threshold_dict=False):
                 dict_threshold_parents[threshold_nm] = parents
                 dict_num_parents[threshold_nm]  = len(parents)
                 dict_per_parents[threshold_nm]  = len(parents) * 100. / len(var_names_parents)
+            
+            dict_pc_alpha_parents[pc_alpha] = {
+                "parents": dict_threshold_parents,
+                "num_parents": dict_num_parents,
+                "per_parents": dict_per_parents,
+                "val_matrix": val_matrix_mean,
+                "parents_percent": parents_percent,
+                "var_names": var_names,
+            }
+
+        aggregated_results[child] = dict_pc_alpha_parents
+    return aggregated_results, var_names_parents
+
+
+def aggregate_results_for_numparents(collected_results, setup, thresholds_dict=False, random=False):
+    # Configuration
+    if thresholds_dict: thresholds_dict = utils.get_thresholds_dict(setup.thrs_argv)
+    
+    pc_alphas_filter = [str(a) for a in setup.pc_alphas]
+
+    # Combine results
+    aggregated_results = dict()
+    var_names_parents = None
+    for child, collected_pc_alpha in collected_results.items():
+        dict_pc_alpha_parents = dict()
+        for pc_alpha, collected in collected_pc_alpha.items():
+            dict_threshold_parents = dict()
+            dict_num_parents = dict()
+            dict_per_parents = dict()
+            if pc_alpha not in pc_alphas_filter:
+                continue  # Skip this pc alpha
+            val_matrix_list = np.array(collected["val_matrix"])
+            val_matrix_mean = val_matrix_list.mean(axis=0)
+
+            var_names = collected["var_names"]
+            if var_names_parents is None:
+                # NOTE: This assumes that the list has only one child, and
+                # that the child is last
+                var_names_parents = var_names[:-1]
+            else:
+                assert var_names_parents == var_names[:-1], (
+                    "Found different variable names. "
+                    f"Expected {var_names_parents}\nFound {var_names[:-1]}"
+                )
+
+            parents_matrix = collected["parents"]
+            parents_matrix = np.array(parents_matrix)
+            parents_percent = parents_matrix.mean(axis=0)[:-1] # All but itself [which is zero]
+            
+            if isinstance(parents_percent,np.ndarray):
+                if random:
+                    proba_0 = float(thresholds_dict[child]) if thresholds_dict else float(setup.thresholds[0])
+                    parents_percent = np.random.choice([0, 1], size=len(parents_percent), p=[proba_0, 1-proba_0])
+                    parents = [i for i in range(len(parents_percent)) if parents_percent[i] > 0]
+                else:
+                    numparents = utils.get_thresholds_dict(setup.numparents_argv, key_dic='numparents_dict') # dict
+                    if int(numparents[child]) > 0:
+                        parents_percent_ordered = np.sort(parents_percent)[::-1]
+                        parents_threshold = parents_percent_ordered[:int(numparents[child])][-1]
+                        parents = [i for i in range(len(parents_percent)) if parents_percent[i] >= parents_threshold]
+                    else:
+                        parents = []
+            else:
+                parents = []
+            
+            threshold_nm = 'optimized' if thresholds_dict else setup.thresholds[0]
+            dict_threshold_parents[threshold_nm] = parents
+            dict_num_parents[threshold_nm]  = len(parents)
+            dict_per_parents[threshold_nm]  = len(parents) * 100. / len(var_names_parents)
             
             dict_pc_alpha_parents[pc_alpha] = {
                 "parents": dict_threshold_parents,
@@ -698,13 +767,63 @@ def get_matrix_idx(dict_vars_idx, inverted=False):
     return child_main, idx_vars, idx_3d, levels
 
 
+def get_matrix_insets_idx(dict_vars_idx, inverted=False, insets=False):
+    idx_2d = 0; idx_3d = []; levels = []; child_main = []
+    for i, key in dict_vars_idx.items():
+        child_tmp = key
+        if len(str(key).split('-')) == 1:
+            idx_2d += 1
+        else:
+            child_main_tmp = str(key).split('-')[0]
+            child_lev_tmp  = int(float(str(key).split('-')[-1]))
+            child_lev_tmp  = 50 * round(child_lev_tmp/50) # Round to 50hPa for ticks
+
+            if child_main_tmp not in child_main: child_main.append(child_main_tmp)
+            levels.append(child_lev_tmp) 
+
+    # For boxes separators
+    if inverted==True or insets==True:
+        idx_vars = [i for i in range(len(levels))][::int(len(levels)/len(child_main))]
+        idx_vars = np.array(idx_vars) + idx_2d
+    else:
+        idx_vars = np.array([int(len(levels)/len(child_main)),int(len(levels))]) -[.5,0.][insets is True]
+        
+    # 3D ticks
+    if inverted:
+        idx_3d = [i for i in range(len(levels))][::10]           # Get every 10 idx
+    else:
+        idx_3d = [i for i in range(len(levels))][9::10]          # Get every 10 idx
+        
+    # x-Y ticks
+    levels = np.array(levels)[idx_3d]                         # Get such levels
+    levels = [str(i) for i in levels]                         # Get the ticks_labels
+    
+    if insets:
+        idx_3d = np.array(idx_3d)-idx_2d+1. # Get the idx including 2D vars
+    else:
+        idx_3d = np.array(idx_3d)+[+.5,idx_2d][inverted==True] # Get the idx including 2D vars
+    
+    return child_main, idx_vars, idx_3d, levels
+
+
+def get_matrix_2d_idx(dict_vars_idx):
+    idx_2d = []; child_main = []
+    for i, key in dict_vars_idx.items():
+        if len(str(key).split('-')) == 1:
+            child_main.append(str(key))
+            idx_2d.append(i)
+    return child_main, idx_2d
+
+
 def plot_matrix_results(
     var_names_parents, 
     aggregated_results, 
     setup, 
     values='percentage',
+    insets=False,
     threshold_dict=False,
     num_parents=False,
+    random=False,
     save=False,
     masking=False,
     cmap=False,
@@ -717,8 +836,8 @@ def plot_matrix_results(
     dict_inputs_idxs_inv  = {i:var_names_parents_inv[i] for i in range(len(var_names_parents_inv))}
     dict_outputs_idxs = {i:key for i, key in enumerate(aggregated_results.keys())}
     
-    in_vars, in_box_idx, in_ticks, in_ticks_labs = get_matrix_idx(dict_inputs_idxs_inv, inverted=True)
-    out_vars, out_box_idx, out_ticks, out_ticks_labs = get_matrix_idx(dict_outputs_idxs)
+    in_vars, in_box_idx, in_ticks, in_ticks_labs = get_matrix_insets_idx(dict_inputs_idxs_inv, inverted=True)
+    out_vars, out_box_idx, out_ticks, out_ticks_labs = get_matrix_insets_idx(dict_outputs_idxs,insets=insets)
 
     # Using only two thresholds if more were given (min-max)
     if threshold_dict:
@@ -763,30 +882,59 @@ def plot_matrix_results(
         if values == 'val_matrix':
             var_to_plot = preprocessing.normalize(var_to_plot)
         
-        fig, ax = plot_matrix(
-            iAlpha,
-            var_to_plot,
-            in_vars,
-            in_box_idx,
-            in_ticks, 
-            in_ticks_labs,
-            out_vars,
-            out_box_idx,
-            out_ticks, 
-            out_ticks_labs,
-            extend,
-            cbar_label,
-            mask=[False,mask][masking!=False],
-            num_parents=[False,nparents][num_parents!=False],
-            vmin=vmin,
-            vmax=vmax,
-            cmap=cmap,
-        )
+        if insets:
+            out_vars_2d, out_vars_2d_ticks = get_matrix_2d_idx(dict_outputs_idxs)
+            fig, ax = plot_matrix_insets(
+                iAlpha,
+                var_to_plot,
+                in_vars,
+                in_box_idx,
+                in_ticks, 
+                in_ticks_labs,
+                out_vars,
+                out_box_idx,
+                out_ticks, 
+                out_ticks_labs,
+                out_vars_2d, 
+                out_vars_2d_ticks,
+                extend,
+                cbar_label,
+                dict_outputs_idxs=dict_outputs_idxs,
+                mask=[False,mask][masking!=False],
+                num_parents=[False,nparents][num_parents!=False],
+                vmin=vmin,
+                vmax=vmax,
+                cmap=cmap,
+            )
+        else:
+            fig, ax = plot_matrix(
+                iAlpha,
+                var_to_plot,
+                in_vars,
+                in_box_idx,
+                in_ticks, 
+                in_ticks_labs,
+                out_vars,
+                out_box_idx,
+                out_ticks, 
+                out_ticks_labs,
+                extend,
+                cbar_label,
+                mask=[False,mask][masking!=False],
+                num_parents=[False,nparents][num_parents!=False],
+                vmin=vmin,
+                vmax=vmax,
+                cmap=cmap,
+            )
         
         if save:
             fignm = str(pltPath)+'/'+f"matrix_pcalpha-{iAlpha}_{values}_thrs-{thrs_labs}"
             if num_parents:
                 fignm = fignm+'_parnm'
+            if random:
+                fignm = fignm+'_random-links'
+            if insets:
+                fignm = fignm+'_insets'
             if masking:
                 fignm = fignm+'.png'
             else:

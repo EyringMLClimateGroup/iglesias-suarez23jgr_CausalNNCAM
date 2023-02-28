@@ -1,8 +1,11 @@
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from tigramite import plotting as tp
 import numpy as np
+import numpy.ma as ma
 from pathlib import Path
 
 
@@ -217,8 +220,8 @@ def plot_matrix(
         'tbp':'T (hPa)',
         'qbp':'q (hPa)',
         'vbp':'V (hPa)',
-        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$',
-        'phq':'$\Delta$q$\mathregular{_{phy}}$',
+        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$ (hPa)',
+        'phq':'$\Delta$q$\mathregular{_{phy}}$ (hPa)',
         # 'tphystnd':'dT/dt (hPa)',
         # 'phq':'dq/dt (hPa)',
     }
@@ -287,6 +290,152 @@ def plot_matrix(
 #         axy.spines['left'].set_visible(False)
         axy.set_xlim(-1.,100.)
     
+    
+    # fig.suptitle(pc_alpha)
+    
+    return fig, axes
+
+
+def plot_matrix_insets(
+    pc_alpha,
+    raw_matrix,
+    in_vars,
+    in_box_idx,
+    in_ticks, 
+    in_ticks_labs,
+    out_vars,
+    out_box_idx,
+    out_ticks, 
+    out_ticks_labs,
+    out_vars_2d, 
+    out_vars_2d_ticks,
+    extend,
+    cbar_label,
+    dict_outputs_idxs=False,
+    mask=False,
+    num_parents=False,
+    inset_var='phq',
+    **kwargs
+):
+
+    vars_labs_dict = {
+        'tbp':'T (hPa)',
+        'qbp':'q (hPa)',
+        'vbp':'V (hPa)',
+        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$ (hPa)',
+        'phq':'$\Delta$q$\mathregular{_{phy}}$ (hPa)',
+        'fsns':'$Q\mathregular{_{sw}^{srf}}$',
+        'flns':'$Q\mathregular{_{lw}^{srf}}$',
+        'fsnt':'$Q\mathregular{_{sw}^{top}}$',
+        'flnt':'$Q\mathregular{_{lw}^{top}}$',
+        'prect':'$P$',
+    }
+    
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import matplotlib as mpl
+    
+    # mpl.rcParams['font.size']      = 12
+    mpl.rcParams['axes.labelsize'] = 'large'
+    
+    fig, axes = plt.subplots(1, 1, figsize=(12, 5))
+    
+    # Mask?
+    if mask is not False:
+        X, Y = np.meshgrid(np.arange(0,len(matrix[0]),1), np.arange(0,len(matrix),1))
+        jThrs = list(mask.keys())[0]
+        cs = axes.contourf(
+            X,
+            Y,
+            mask[jThrs],
+            colors='none',
+            hatches='.',
+            # extend=extend,
+        )
+
+    matrix    = ma.zeros([raw_matrix.shape[0], raw_matrix.shape[-1]], dtype="d")
+    matrix[:] = raw_matrix
+    
+    extent = (0, matrix.shape[-1], 0, matrix.shape[0])
+        
+    I  = axes.imshow(matrix,extent=extent,origin="upper",**kwargs)
+    cbar = plt.colorbar(I, ax=axes, extend=extend)
+    cbar.set_label(cbar_label)
+    axes.set_xticks(in_ticks); axes.set_xticklabels(in_ticks_labs)
+    axes.set_yticks(out_ticks[::-1]); axes.set_yticklabels(out_ticks_labs)
+    axes.vlines(in_box_idx, ymin=-.5, ymax=len(matrix), color='k')
+    axes.hlines(out_box_idx, xmin=-.5, xmax=len(matrix[0]), color='k')
+    
+    axes.set_xlim(xmin=0,xmax=len(matrix[0])-.5)
+    axes.set_ylim(ymin=0)
+    
+    trans = axes.get_xaxis_transform()
+    xy_coor = [(-15., .68),(-15., .20)]
+    for i, iVar in enumerate(out_vars):
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large')
+    axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0,fontsize='large')
+    xy_coor = [(12., -.15),(42., -.15),(72., -.15)]
+    for i, iVar in enumerate(in_vars):
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large')
+    axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90,fontsize='large')
+    
+    if isinstance(num_parents, np.ndarray):
+        divider = make_axes_locatable(axes)
+        axy = divider.append_axes("right", size="20%", pad=.5, sharey=axes)
+        axy.plot(
+            num_parents,
+            np.arange(0.,len(num_parents),1),
+            color='darkred',
+            alpha=.8,
+            linewidth=3.,
+        )
+        axy.set_xticks([0,50,100])
+        axy.xaxis.set_tick_params(labelright=False)
+        axy.yaxis.set_tick_params(labelleft=False)
+        axy.set_xlabel('Num. Inputs')
+        axy.get_yaxis().set_visible(False)
+        axy.spines['top'].set_visible(False)
+        axy.spines['right'].set_visible(False)
+        axy.spines['bottom'].set_visible(True)
+#         axy.spines['left'].set_visible(False)
+        axy.set_xlim(-1.,100.)
+    
+    ## 3D inset
+    ax3ins = zoomed_inset_axes(axes, 2.,
+                              bbox_to_anchor=(1.015, 1.87),
+                              bbox_transform=axes.transAxes)
+    ax3ins.imshow(matrix,extent=extent,origin="upper",**kwargs)
+    ax3ins.set_xticks(in_ticks); ax3ins.set_xticklabels(in_ticks_labs)
+    ax3ins.set_yticks(out_ticks[::-1]); ax3ins.set_yticklabels(out_ticks_labs)
+    if inset_var == 'phq':
+        # sub region of the original image
+        x1, x2, y1, y2 = 34, 55., 5., 26.
+        ax3ins.set_xlim(x1, x2)
+        ax3ins.set_ylim(y1, y2)
+        trans = ax3ins.get_xaxis_transform()
+        ax3ins.annotate(vars_labs_dict['phq'], xy=(28.,.4), xycoords=trans, rotation=90,fontsize='large')
+        ax3ins.annotate(vars_labs_dict['qbp'], xy=(42.,-.18), xycoords=trans, rotation=0,fontsize='large')
+    ax3ins.set_aspect(1.)
+    mark_inset(axes, ax3ins, loc1=3, loc2=4, linewidth=3, ec='k', fc='none',linestyle='--',alpha=.7)
+    # mark_inset(axes, ax3ins, loc1=4, loc2=1, fc="none", ec="white",linewidth=2.)
+
+    ## 2D inset
+    ax2ins = zoomed_inset_axes(axes, 4.5,
+                              bbox_to_anchor=(2.774, -.25),
+                              bbox_transform=axes.transAxes)
+    ax2ins.imshow(matrix,extent=extent,origin="upper",**kwargs)
+    out_vars_2d_ticks = [i+.5 for i in range(len(out_ticks))]
+    ax2ins.set_yticks(out_vars_2d_ticks[::-1])#; ax2ins.set_yticklabels(out_vars_2d)
+    trans = ax2ins.get_xaxis_transform()
+    xy_coor = [(-8., .87),(-8., .66),(-8., .45),(-8., .24),(-7., .04)]
+    for i, iVar in enumerate(out_vars_2d):
+        ax2ins.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large')
+    ax2ins.tick_params(bottom=False,labelbottom=False,labelleft=False)
+    ax2ins.vlines(in_box_idx, ymin=-.5, ymax=len(matrix), color='k')
+    y1, y2 = 0., 5.
+    ax2ins.set_ylim(y1, y2)
+    ax2ins.set_aspect(4.52)
+    mark_inset(axes, ax2ins, loc1=2, loc2=1, linewidth=3, ec='k', fc='none',linestyle='--',alpha=.7)
     
     # fig.suptitle(pc_alpha)
     

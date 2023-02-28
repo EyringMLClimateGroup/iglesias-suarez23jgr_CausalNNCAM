@@ -74,13 +74,14 @@ def load_models(setup):
     models = collections.defaultdict(dict)
     
     output_list = get_var_list(setup, setup.spcam_outputs)
-    if setup.do_single_nn:
+    if setup.do_single_nn or setup.do_random_single_nn:
+        nn_type = setup.nn_type if setup.do_random_single_nn else 'SingleNN'
         for output in output_list:
             output = Variable_Lev_Metadata.parse_var_name(output)
-            models['SingleNN'][output] = get_model(
+            models[nn_type][output] = get_model(
                 setup, 
                 output, 
-                'SingleNN',
+                nn_type,
                 pc_alpha=None,
                 threshold=None
             )

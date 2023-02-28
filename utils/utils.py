@@ -75,7 +75,8 @@ def read_ancilaries(path):
     return levels, latitudes, longitudes
 
 
-def get_thresholds_dict(thrs_argv):
+def get_thresholds_dict(thrs_argv, key_dic=False):
+    key_dic = 'thresholds_dict' if not key_dic else key_dic
     opts, args = getopt.getopt(thrs_argv, "hc:a", ["cfg_file=", "add="])
     for opt, arg in opts:
         if opt in ("-c", "--cfg_file"):
@@ -85,7 +86,7 @@ def get_thresholds_dict(thrs_argv):
     # YAML config file
     yml_filename = yml_cfgFilenm
     yml_cfgFile = open(yml_filename)
-    return yaml.load(yml_cfgFile, Loader=yaml.FullLoader)['thresholds_dict']
+    return yaml.load(yml_cfgFile, Loader=yaml.FullLoader)[key_dic]
 
 
 #########################

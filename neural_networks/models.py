@@ -312,6 +312,20 @@ def generate_models(setup, threshold_dict=False):
     if setup.do_single_nn:
         model_descriptions.extend(generate_all_single_nn(setup))
 
+    if setup.do_random_single_nn:
+        collected_results, errors = aggregation.collect_results(setup, reuse=True)
+        aggregation.print_errors(errors)
+        
+        aggregated_results, var_names_parents = aggregation.aggregate_results_for_numparents(
+            collected_results, setup, thresholds_dict=setup.thrs_argv, random=setup.random
+        )
+        # aggregated_results, var_names_parents = aggregation.aggregate_results_for_numparents(
+        #     collected_results, setup.numparents_argv, setup, random=setup.random
+        # )
+        model_descriptions.extend(
+            generate_all_causal_single_nn(setup, aggregated_results)
+        )
+    
     if setup.do_causal_single_nn:
         collected_results, errors = aggregation.collect_results(setup, reuse=True)
         aggregation.print_errors(errors)
