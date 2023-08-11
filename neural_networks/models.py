@@ -273,7 +273,7 @@ def generate_all_single_nn(setup):
                 output_list.append(var_name)
         elif spcam_var.dimensions == 2:
             var_name = spcam_var.name
-        output_list.append(var_name)
+            output_list.append(var_name)
 
     for output in output_list:
         model_description = ModelDescription(

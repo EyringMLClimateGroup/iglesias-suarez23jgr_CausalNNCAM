@@ -217,13 +217,11 @@ def plot_matrix(
 ):
 
     vars_labs_dict = {
-        'tbp':'T (hPa)',
-        'qbp':'q (hPa)',
-        'vbp':'V (hPa)',
-        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$ (hPa)',
-        'phq':'$\Delta$q$\mathregular{_{phy}}$ (hPa)',
-        # 'tphystnd':'dT/dt (hPa)',
-        # 'phq':'dq/dt (hPa)',
+        'tbp':'Pressure (hPa) \n T',
+        'qbp':'Pressure (hPa) \n q',
+        'vbp':'Pressure (hPa) \n V',
+        'tphystnd':'$\Delta$T$\mathregular{_{phy}}$ \n Pressure (hPa)',
+        'phq':'$\Delta$q$\mathregular{_{phy}}$ \n Pressure (hPa)',
     }
     
     import matplotlib.pyplot as plt
@@ -260,13 +258,13 @@ def plot_matrix(
     axes.set_ylim(ymin=len(matrix)-.5)
     
     trans = axes.get_xaxis_transform()
-    xy_coor = [(-15., .68),(-15., .20)]
+    xy_coor = [(-15., .62),(-15., .16)]
     for i, iVar in enumerate(out_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large')
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large',ha='center')
     axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0,fontsize='large')
-    xy_coor = [(12., -.15),(42., -.15),(72., -.15)]
+    xy_coor = [(18., -.20),(48., -.20),(78., -.20)]
     for i, iVar in enumerate(in_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large')
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large',ha='center')
     axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90,fontsize='large')
     
     if isinstance(num_parents, np.ndarray):
@@ -319,11 +317,11 @@ def plot_matrix_insets(
 ):
 
     vars_labs_dict = {
-        'tbp':'T (hPa)',
-        'qbp':'q (hPa)',
-        'vbp':'V (hPa)',
-        'tphystnd':r'$\Delta$T$\mathregular{_{phy}}$ (hPa)',
-        'phq':'$\Delta$q$\mathregular{_{phy}}$ (hPa)',
+        'tbp':'Pressure (hPa) \n T',
+        'qbp':'Pressure (hPa) \n q',
+        'vbp':'Pressure (hPa) \n V',
+        'tphystnd':'$\Delta$T$\mathregular{_{phy}}$ \n Pressure (hPa)',
+        'phq':'$\Delta$q$\mathregular{_{phy}}$ \n Pressure (hPa)',
         'fsns':'$Q\mathregular{_{sw}^{srf}}$',
         'flns':'$Q\mathregular{_{lw}^{srf}}$',
         'fsnt':'$Q\mathregular{_{sw}^{top}}$',
@@ -370,13 +368,13 @@ def plot_matrix_insets(
     axes.set_ylim(ymin=0)
     
     trans = axes.get_xaxis_transform()
-    xy_coor = [(-15., .68),(-15., .20)]
+    xy_coor = [(-15., .62),(-15., .16)]
     for i, iVar in enumerate(out_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large')
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=90,fontsize='large',ha='center')
     axes.annotate('out-2Ds', xy=(-20., .02), xycoords=trans, rotation=0,fontsize='large')
-    xy_coor = [(12., -.15),(42., -.15),(72., -.15)]
+    xy_coor = [(18., -.20),(48., -.20),(78., -.20)]
     for i, iVar in enumerate(in_vars):
-        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large')
+        axes.annotate(vars_labs_dict[iVar], xy=xy_coor[i], xycoords=trans, rotation=0,fontsize='large',ha='center')
     axes.annotate('in-2Ds', xy=(.6, -.2), xycoords=trans, rotation=90,fontsize='large')
     
     if isinstance(num_parents, np.ndarray):
@@ -413,8 +411,8 @@ def plot_matrix_insets(
         ax3ins.set_xlim(x1, x2)
         ax3ins.set_ylim(y1, y2)
         trans = ax3ins.get_xaxis_transform()
-        ax3ins.annotate(vars_labs_dict['phq'], xy=(28.,.4), xycoords=trans, rotation=90,fontsize='large')
-        ax3ins.annotate(vars_labs_dict['qbp'], xy=(42.,-.18), xycoords=trans, rotation=0,fontsize='large')
+        ax3ins.annotate(vars_labs_dict['phq'], xy=(28.,.30), xycoords=trans, rotation=90,fontsize='large',ha='center')
+        ax3ins.annotate(vars_labs_dict['qbp'], xy=(44.,-.24), xycoords=trans, rotation=0,fontsize='large',ha='center')
     ax3ins.set_aspect(1.)
     mark_inset(axes, ax3ins, loc1=3, loc2=4, linewidth=3, ec='k', fc='none',linestyle='--',alpha=.7)
     # mark_inset(axes, ax3ins, loc1=4, loc2=1, fc="none", ec="white",linewidth=2.)

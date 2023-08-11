@@ -907,6 +907,7 @@ def plot_matrix_results(
                 cmap=cmap,
             )
         else:
+            # return var_to_plot
             fig, ax = plot_matrix(
                 iAlpha,
                 var_to_plot,
@@ -941,7 +942,7 @@ def plot_matrix_results(
                 fignm = fignm+'_no-mask.png'
             print(f"Saving figure: {fignm}")
             fig.savefig(
-                fignm, dpi=3000., format='png', metadata=None,
+                fignm, dpi=1000., format='png', metadata=None,
                 bbox_inches='tight', pad_inches=0.1,
                 facecolor='auto', edgecolor='auto',
                 backend=None,

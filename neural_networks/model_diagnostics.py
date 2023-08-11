@@ -11,6 +11,7 @@ from math                                  import pi
 import numpy.ma                            as     ma
 import pandas                              as     pd
 import matplotlib.pyplot                   as     plt
+import matplotlib                          as mpl
 from ipykernel.kernelapp                   import IPKernelApp
 def in_notebook():
     return IPKernelApp.initialized()
@@ -95,7 +96,7 @@ class ModelDiagnostics():
             elif itime == 'mean' or itime == 'range':
                 if not nTime:
                     nTime = len(self.valid_gen)    
-                print(f"Time samples: {nTime}")
+                # print(f"Time samples: {nTime}")
                 truth = np.zeros([nTime,self.ngeo,1])
                 pred  = np.zeros([nTime,self.ngeo,1])
                 for iTime in range(nTime):
@@ -250,6 +251,7 @@ class ModelDiagnostics():
         save=False, 
         diff=False,
         stats=False,
+        values=False,
         **kwargs
     ):  
         varname = var.var.value  
@@ -295,18 +297,21 @@ class ModelDiagnostics():
                 hor_pvar = hor_psqmean - hor_pmean ** 2
                 hor_r2   = 1 - (hor_mse / hor_tvar)
                 mean_stats[iLev,:] = locals()['hor_'+stats]
-                
-        return self.plot_slices(
-            truth, 
-            pred, 
-            itime, 
-            varname=varname, 
-            stype='yz',
-            save=save, 
-            diff=diff,
-            stats=[False,(stats,mean_stats)][stats is not False],
-            **kwargs
-        )
+        
+        if values:
+            return truth, pred, [False,(stats,mean_stats)][stats is not False]
+        else:
+            return self.plot_slices(
+                truth, 
+                pred, 
+                itime, 
+                varname=varname, 
+                stype='yz',
+                save=save, 
+                diff=diff,
+                stats=[False,(stats,mean_stats)][stats is not False],
+                **kwargs
+            )
     
     
     def plot_slices(
@@ -326,7 +331,11 @@ class ModelDiagnostics():
         n_slices  = [3,2][diff is False]
         n_slices  = [n_slices+1,n_slices][stats is False]
         fig, axes = plt.subplots(1, n_slices, figsize=(12, 5))
-
+        # fig, axes = plt.subplots(1, n_slices, figsize=(10, 8))
+        
+        label_size                 = 18 #'xx-large'
+        mpl.rcParams['font.size']  = 14
+        
         extend='both'
         if 'vmin' in kwargs.keys() and 'vmax' in kwargs.keys():
             vmin, vmax = kwargs['vmin'], kwargs['vmax']
@@ -387,26 +396,35 @@ class ModelDiagnostics():
                 lat_labels = [str(int(l)) for i, l in enumerate(self.latitudes) if i %9 == 0]
                 axes[iSlice].set_yticks(lat_ticks)
                 axes[iSlice].set_yticklabels(lat_labels)
-                axes[iSlice].set_ylabel('Latitude')
+                axes[iSlice].set_ylabel('Latitude', fontsize=label_size)
                 lon_ticks  = [int(l) for l in range(len(self.longitudes)) if l %9 ==0]
                 lon_labels = [str(int(l)) for i, l in enumerate(self.longitudes) if i %9 == 0]
                 axes[iSlice].set_xticks(lon_ticks)
                 axes[iSlice].set_xticklabels(lon_labels)
-                axes[iSlice].set_xlabel('Longitude')
+                axes[iSlice].set_xlabel('Longitude', fontsize=label_size)
             elif stype == 'yz':
                 P_ticks = [int(press) for press in range(len(P)) if press %5 ==0]
                 P_label = [str(int(press)) for i, press in enumerate(P) if i %5 == 0]
                 axes[iSlice].set_yticks(P_ticks)
                 axes[iSlice].set_yticklabels(P_label)
-                axes[iSlice].set_ylabel('hPa')
-                lat_ticks  = [int(l) for l in range(len(self.latitudes)) if l %9 ==0]
-                lat_labels = [str(int(l)) for i, l in enumerate(self.latitudes) if i %9 == 0]
+                axes[iSlice].set_ylabel('Pressure (hPa)', fontsize=label_size)
+                
+                degree1 = u'\xb0'
+                # lat_ticks  = [int(l) for l in range(len(self.latitudes)) if l %9 ==0]
+                # # lat_labels = [str(int(l)) for i, l in enumerate(self.latitudes) if i %9 == 0]
+                # lat_labels = [str(abs(int(l)))+degree1+['S','N'][l>0] \
+                #               for i, l in enumerate(self.latitudes) if i %9 == 0]
+                
+                lat_ticks  = [0, 21, 31.5, 42, 63]
+                lat_labels = ['90'+degree1+'S','30'+degree1+'S','EQ.',
+                              '30'+degree1+'N','90'+degree1+'N']
+                
                 axes[iSlice].set_xticks(lat_ticks)
                 axes[iSlice].set_xticklabels(lat_labels)
-                axes[iSlice].set_xlabel('Latitude')
+                axes[iSlice].set_xlabel('Latitudes', fontsize=label_size)
         
         fig.suptitle(title)
-        plt.tight_layout()
+        fig.tight_layout()
         if save:
             Path(save).mkdir(parents=True, exist_ok=True)
             fig.savefig(f"{save}/{varname}_map_time-{itime}.png")
@@ -654,7 +672,7 @@ class ModelDiagnostics():
     
     
     # Statistics computation
-    def compute_stats(self, itime, var, nTime=False):
+    def compute_stats(self, itime, var, nTime=False, zm=False):
         """Compute statistics in for [lat, lon, var, lev]"""
         
         t, p = self.get_truth_pred(itime, var, nTime=nTime)
@@ -669,11 +687,18 @@ class ModelDiagnostics():
         
         # Compute horizontal stats: single value per var
         self.stats                = {}
-        self.stats['hor_tsqmean'] = np.average(np.mean(true_sqmean,axis=1),weights=self.lat_weights)
-        self.stats['hor_tmean']   = np.average(np.mean(true_mean,axis=1),weights=self.lat_weights)
-        self.stats['hor_mse']     = np.average(np.mean(mse,axis=1),weights=self.lat_weights)
-        self.stats['hor_tvar']    = self.stats['hor_tsqmean'] - self.stats['hor_tmean'] ** 2
-        self.stats['hor_r2']      = 1 - (self.stats['hor_mse'] / self.stats['hor_tvar'])
+        if not zm:
+            self.stats['hor_tsqmean'] = np.average(np.mean(true_sqmean,axis=1),weights=self.lat_weights)
+            self.stats['hor_tmean']   = np.average(np.mean(true_mean,axis=1),weights=self.lat_weights)
+            self.stats['hor_mse']     = np.average(np.mean(mse,axis=1),weights=self.lat_weights)
+            self.stats['hor_tvar']    = self.stats['hor_tsqmean'] - self.stats['hor_tmean'] ** 2
+            self.stats['hor_r2']      = 1 - (self.stats['hor_mse'] / self.stats['hor_tvar'])
+        else:
+            self.stats['hor_tsqmean'] = np.mean(true_sqmean,axis=1)
+            self.stats['hor_tmean']   = np.mean(true_mean,axis=1)
+            self.stats['hor_mse']     = np.mean(mse,axis=1)
+            self.stats['hor_tvar']    = self.stats['hor_tsqmean'] - self.stats['hor_tmean'] ** 2
+            self.stats['hor_r2']      = 1 - (self.stats['hor_mse'] / self.stats['hor_tvar'])
     
     
     def mean_stats(self):
